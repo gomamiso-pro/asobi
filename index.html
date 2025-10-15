@@ -2,8 +2,88 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>2人のプロフィール</title>
-  <link rel="stylesheet" href="style.css">
+  <title>とも & かしこのプロフィール</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f0f0f0;
+      color: #333;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #8ecae6;
+      padding: 20px;
+      color: white;
+    }
+    .profile {
+      background-color: #fff;
+      margin: 20px auto;
+      padding: 15px;
+      border-radius: 10px;
+      width: 80%;
+      max-width: 400px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      line-height: 80px;
+      text-align: center;
+      font-size: 2em;
+      color: white;
+      margin: 0 auto 10px;
+    }
+    #tomo-icon { background-color: #ffb703; }
+    #kashiko-icon { background-color: #219ebc; }
+
+    /* かけっこアニメ */
+    .race {
+      position: relative;
+      width: 100%;
+      height: 100px;
+      background-color: #e0f7fa;
+      overflow: hidden;
+      margin: 20px 0;
+    }
+    .runner {
+      position: absolute;
+      bottom: 10px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      line-height: 50px;
+      text-align: center;
+      font-size: 1.5em;
+      color: white;
+    }
+    #tomo-runner {
+      background-color: #ffb703;
+      animation: runTomo 4s linear infinite;
+    }
+    #kashiko-runner {
+      background-color: #219ebc;
+      animation: runKashiko 4s linear infinite;
+    }
+    @keyframes runTomo {
+      0% { left: 0%; }
+      50% { left: 85%; }
+      100% { left: 0%; }
+    }
+    @keyframes runKashiko {
+      0% { left: 5%; }
+      50% { left: 90%; }
+      100% { left: 5%; }
+    }
+    footer {
+      margin-top: 20px;
+      font-size: 0.9em;
+      color: #555;
+      padding-bottom: 20px;
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -12,15 +92,22 @@
 
   <main>
     <section class="profile" id="tomo">
+      <div class="icon" id="tomo-icon">T</div>
       <h2>とも</h2>
       <p>趣味: ソフトボール、コーヒー</p>
       <p>好きなこと: HTML制作を模索中</p>
     </section>
 
     <section class="profile" id="kashiko">
+      <div class="icon" id="kashiko-icon">K</div>
       <h2>かしこ</h2>
       <p>趣味: HTMLアドバイス</p>
       <p>好きなこと: ともと話すこと</p>
+    </section>
+
+    <section class="race">
+      <div class="runner" id="tomo-runner">T</div>
+      <div class="runner" id="kashiko-runner">K</div>
     </section>
   </main>
 
