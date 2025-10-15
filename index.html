@@ -3,24 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>とも & かしこの顔選択かけっこ</title>
+<title>とも & かしこの顔文字追いかけっこ</title>
 <style>
-  body { font-family:sans-serif; text-align:center; background:#f0f0f0; margin:0; padding:0; overflow-x:hidden; }
-  header { background:#8ecae6; color:white; padding:20px; }
-  #face-selection { display:flex; flex-wrap:wrap; justify-content:center; gap:5px; margin:20px 0; max-height:200px; overflow-y:auto; }
-  .face { width:50px; height:50px; cursor:pointer; border:2px solid transparent; }
-  .face.selected { border-color:#ff0000; }
-  .race { position:relative; width:100%; height:100px; background:#e0f7fa; overflow:hidden; margin:20px 0; }
-  .runner { position:absolute; bottom:10px; width:50px; height:50px; }
-  svg { width:100%; height:100%; }
+  body { font-family:sans-serif; text-align:center; background:#f0f0f0; margin:0; padding:0; overflow-x:hidden;}
+  header { background:#8ecae6; color:white; padding:20px;}
+  #face-selection { display:flex; overflow-x:auto; padding:10px; gap:5px; margin:10px 0; }
+  .face { font-size:2em; padding:5px 10px; cursor:pointer; border:2px solid transparent; flex:0 0 auto; }
+  .face.selected { border-color:#ff0000; border-radius:5px; background:#fff;}
+  .race { position:relative; width:100%; height:100px; background:#e0f7fa; overflow:hidden; margin:20px 0;}
+  .runner { position:absolute; bottom:10px; font-size:2em; }
   button { padding:10px 20px; font-size:1em; cursor:pointer; }
 </style>
 </head>
 <body>
 
-<header><h1>とも & かしこの顔選択かけっこ</h1></header>
+<header><h1>とも & かしこの顔文字追いかけっこ</h1></header>
 
-<!-- 顔選択 -->
+<!-- 横スクロール顔選択 -->
 <div id="face-selection"></div>
 <button id="go-btn">GO!</button>
 
@@ -31,46 +30,39 @@
 </div>
 
 <script>
-// 顔データ10個（カテゴリ分け例: 笑顔系5個, さみしげ系5個）
-const faces = [
-  // 笑顔系
-  `<circle cx="25" cy="25" r="25" fill="#ffb703"/><circle cx="17" cy="17" r="4"/><circle cx="33" cy="17" r="4"/><path d="M17,33 Q25,40 33,33" stroke="#000" fill="transparent"/>`,
-  `<circle cx="25" cy="25" r="25" fill="#ffb703"/><circle cx="17" cy="17" r="4"/><circle cx="33" cy="17" r="4"/><path d="M17,33 Q25,42 33,33" stroke="#000" fill="transparent"/>`,
-  `<circle cx="25" cy="25" r="25" fill="#ffb703"/><circle cx="17" cy="17" r="4"/><circle cx="33" cy="17" r="4"/><path d="M17,33 Q25,38 33,33" stroke="#000" fill="transparent"/>`,
-  `<circle cx="25" cy="25" r="25" fill="#ffb703"/><circle cx="17" cy="17" r="4"/><circle cx="33" cy="17" r="4"/><path d="M17,33 Q25,36 33,33" stroke="#000" fill="transparent"/>`,
-  `<circle cx="25" cy="25" r="25" fill="#ffb703"/><circle cx="17" cy="17" r="4"/><circle cx="33" cy="17" r="4"/><path d="M17,33 Q25,44 33,33" stroke="#000" fill="transparent"/>`,
-  // さみしげ系
-  `<circle cx="25" cy="25" r="25" fill="#219ebc"/><circle cx="17" cy="17" r="4"/><circle cx="33" cy="17" r="4"/><path d="M17,33 Q25,30 33,33" stroke="#000" fill="transparent"/>`,
-  `<circle cx="25" cy="25" r="25" fill="#219ebc"/><circle cx="17" cy="17" r="4"/><circle cx="33" cy="17" r="4"/><path d="M17,33 Q25,28 33,33" stroke="#000" fill="transparent"/>`,
-  `<circle cx="25" cy="25" r="25" fill="#219ebc"/><circle cx="17" cy="17" r="4"/><circle cx="33" cy="17" r="4"/><path d="M17,33 Q25,32 33,33" stroke="#000" fill="transparent"/>`,
-  `<circle cx="25" cy="25" r="25" fill="#219ebc"/><circle cx="17" cy="17" r="4"/><circle cx="33" cy="17" r="4"/><path d="M17,33 Q25,25 33,33" stroke="#000" fill="transparent"/>`,
-  `<circle cx="25" cy="25" r="25" fill="#219ebc"/><circle cx="17" cy="17" r="4"/><circle cx="33" cy="17" r="4"/><path d="M17,33 Q25,27 33,33" stroke="#000" fill="transparent"/>`
-];
-
-// 顔選択画面表示
-const selectionDiv = document.getElementById('face-selection');
-faces.forEach((f,i)=>{
-  const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
-  svg.classList.add("face");
-  svg.dataset.face = i;
-  svg.innerHTML = f;
-  svg.addEventListener('click', ()=>{
-    document.querySelectorAll('.face').forEach(e=>e.classList.remove('selected'));
-    svg.classList.add('selected');
-    selectedFace = i;
+// 顔文字100個（カテゴリ別に10個ずつ簡易サンプル）
+const faces = [];
+const categories = ["😊","😢","😎","😡","😱","😂","😍","😴","🤔","😇"];
+for(let i=0;i<10;i++){
+  categories.forEach(cat=>{
+    faces.push(cat + ""); // 各カテゴリ10個で合計100個
   });
-  selectionDiv.appendChild(svg);
-});
+}
 
+const selectionDiv = document.getElementById('face-selection');
 let selectedFace = 0;
 
-// ランナー初期設定
+// 顔表示
+faces.forEach((f,i)=>{
+  const div = document.createElement('div');
+  div.classList.add('face');
+  div.textContent = f;
+  div.dataset.index = i;
+  div.addEventListener('click', ()=>{
+    document.querySelectorAll('.face').forEach(e=>e.classList.remove('selected'));
+    div.classList.add('selected');
+    selectedFace = i;
+  });
+  selectionDiv.appendChild(div);
+});
+
+// ランナー初期化
 const tomoRunner = document.getElementById('tomo-runner');
 const kashikoRunner = document.getElementById('kashiko-runner');
-tomoRunner.innerHTML = faces[0];
-kashikoRunner.innerHTML = faces[5];
+tomoRunner.textContent = faces[0];
+kashikoRunner.textContent = faces[50]; // 適当に相手カテゴリ
 
-// 追いかけっこアニメ
+// 追いかけっこ
 let posTomo = 0;
 let posKashiko = 5;
 let running = false;
@@ -86,13 +78,13 @@ function race(){
   tomoRunner.style.left = posTomo+'%';
   kashikoRunner.style.left = posKashiko+'%';
 
-  // 顔切替
+  // 顔切替（追いつき感）
   if(Math.abs(posTomo-posKashiko)<5){
-    tomoRunner.innerHTML = faces[selectedFace];
-    kashikoRunner.innerHTML = faces[(selectedFace+5)%10];
+    tomoRunner.textContent = faces[selectedFace];
+    kashikoRunner.textContent = faces[(selectedFace+50)%faces.length];
   }else{
-    tomoRunner.innerHTML = faces[(selectedFace+1)%5];
-    kashikoRunner.innerHTML = faces[(selectedFace+6)%10];
+    tomoRunner.textContent = faces[(selectedFace+1)%10 + Math.floor(selectedFace/10)*10];
+    kashikoRunner.textContent = faces[(selectedFace+51)%faces.length];
   }
 
   requestAnimationFrame(race);
@@ -100,7 +92,7 @@ function race(){
 
 // GOボタン
 document.getElementById('go-btn').addEventListener('click',()=>{ running = true; });
-
 </script>
+
 </body>
 </html>
