@@ -2,97 +2,71 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>とも & かしこの顔文字追いかけっこ</title>
+<title>ヒアリングシート プロトタイプ</title>
 <style>
-  body { font-family:sans-serif; text-align:center; background:#f0f0f0; margin:0; padding:0; overflow-x:hidden;}
-  header { background:#8ecae6; color:white; padding:20px;}
-  #face-selection { display:flex; overflow-x:auto; padding:10px; gap:5px; margin:10px 0; }
-  .face { font-size:2em; padding:5px 10px; cursor:pointer; border:2px solid transparent; flex:0 0 auto; }
-  .face.selected { border-color:#ff0000; border-radius:5px; background:#fff;}
-  .race { position:relative; width:100%; height:100px; background:#e0f7fa; overflow:hidden; margin:20px 0;}
-  .runner { position:absolute; bottom:10px; font-size:2em; }
-  button { padding:10px 20px; font-size:1em; cursor:pointer; }
+  body { font-family: sans-serif; margin: 20px; }
+  label { display: block; margin: 10px 0 5px; }
+  select, input[type="text"] { width: 300px; padding: 5px; }
+  .component { margin-bottom: 15px; }
+  pre { background: #f0f0f0; padding: 10px; }
 </style>
 </head>
 <body>
+<h1>システム設計ヒアリングシート</h1>
 
-<header><h1>とも & かしこの顔文字追いかけっこ</h1></header>
-
-<!-- 横スクロール顔選択 -->
-<div id="face-selection"></div>
-<button id="go-btn">GO!</button>
-
-<!-- レース -->
-<div class="race">
-  <div class="runner" id="tomo-runner"></div>
-  <div class="runner" id="kashiko-runner"></div>
+<div class="component">
+  <label>ページ名:</label>
+  <input type="text" id="pageName" placeholder="例: トップページ">
 </div>
 
+<div class="component">
+  <label>コンポーネント:</label>
+  <select id="componentSelect" multiple>
+    <option value="button">ボタン</option>
+    <option value="form">フォーム</option>
+    <option value="table">表</option>
+    <option value="list">リスト</option>
+  </select>
+</div>
+
+<div class="component">
+  <label>ボタン動作:</label>
+  <select id="buttonAction">
+    <option value="submitForm">フォーム送信</option>
+    <option value="goPage">ページ移動</option>
+    <option value="none">なし</option>
+  </select>
+</div>
+
+<button id="generate">設計書を生成</button>
+
+<h2>JSON形式設計書</h2>
+<pre id="jsonOutput">{}</pre>
+
+<h2>簡易設計書表示</h2>
+<pre id="designDoc">ここに設計書を表示</pre>
+
 <script>
-// 顔文字100個（カテゴリ別に10個ずつ簡易サンプル）
-const faces = [];
-const categories = ["😊","😢","😎","😡","😱","😂","😍","😴","🤔","😇"];
-for(let i=0;i<10;i++){
-  categories.forEach(cat=>{
-    faces.push(cat + ""); // 各カテゴリ10個で合計100個
-  });
-}
+document.getElementById('generate').addEventListener('click', () => {
+  const pageName = document.getElementById('pageName').value;
+  const components = Array.from(document.getElementById('componentSelect').selectedOptions).map(o => o.value);
+  const buttonAction = document.getElementById('buttonAction').value;
 
-const selectionDiv = document.getElementById('face-selection');
-let selectedFace = 0;
+  const designData = {
+    pageName,
+    components,
+    buttonAction
+  };
 
-// 顔表示
-faces.forEach((f,i)=>{
-  const div = document.createElement('div');
-  div.classList.add('face');
-  div.textContent = f;
-  div.dataset.index = i;
-  div.addEventListener('click', ()=>{
-    document.querySelectorAll('.face').forEach(e=>e.classList.remove('selected'));
-    div.classList.add('selected');
-    selectedFace = i;
-  });
-  selectionDiv.appendChild(div);
+  // JSON出力
+  document.getElementById('jsonOutput').textContent = JSON.stringify(designData, null, 2);
+
+  // 簡易設計書表示
+  let doc = `ページ名: ${pageName}\nコンポーネント:\n`;
+  components.forEach(c => { doc += ` - ${c}\n`; });
+  doc += `ボタン動作: ${buttonAction}`;
+  document.getElementById('designDoc').textContent = doc;
 });
-
-// ランナー初期化
-const tomoRunner = document.getElementById('tomo-runner');
-const kashikoRunner = document.getElementById('kashiko-runner');
-tomoRunner.textContent = faces[0];
-kashikoRunner.textContent = faces[50]; // 適当に相手カテゴリ
-
-// 追いかけっこ
-let posTomo = 0;
-let posKashiko = 5;
-let running = false;
-
-function race(){
-  if(!running) return;
-  posTomo += 0.7 + Math.random()*0.5;
-  posKashiko += 0.65 + Math.random()*0.6;
-
-  if(posTomo>100) posTomo=0;
-  if(posKashiko>100) posKashiko=5;
-
-  tomoRunner.style.left = posTomo+'%';
-  kashikoRunner.style.left = posKashiko+'%';
-
-  // 顔切替（追いつき感）
-  if(Math.abs(posTomo-posKashiko)<5){
-    tomoRunner.textContent = faces[selectedFace];
-    kashikoRunner.textContent = faces[(selectedFace+50)%faces.length];
-  }else{
-    tomoRunner.textContent = faces[(selectedFace+1)%10 + Math.floor(selectedFace/10)*10];
-    kashikoRunner.textContent = faces[(selectedFace+51)%faces.length];
-  }
-
-  requestAnimationFrame(race);
-}
-
-// GOボタン
-document.getElementById('go-btn').addEventListener('click',()=>{ running = true; });
 </script>
-
 </body>
 </html>
