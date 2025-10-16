@@ -3,85 +3,44 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Web設計ヒアリングシート</title>
+<title>Web設計ヒアリングシート（ページ追加版）</title>
 <style>
-  body { font-family:'Noto Sans JP', sans-serif; background:#fafafa; margin:0; padding:10px; color:#222; }
-  h1 { text-align:center; margin-bottom:20px; }
-  section { background:#fff; padding:15px; border-radius:10px; margin-top:10px; box-shadow:0 2px 6px rgba(0,0,0,0.05); }
-  h2 { margin-top:20px; color:#1a73e8; font-size:1.2rem; padding:8px; background:#e8f0fe; border-radius:6px; }
-  label { display:block; margin-top:10px; font-weight:700; }
-  select, textarea { width:100%; padding:8px; margin-top:5px; border-radius:6px; border:1px solid #ccc; font-size:0.9rem; }
-  button { margin-top:15px; width:100%; padding:12px; border:none; border-radius:8px; background:#333; color:white; font-size:1rem; cursor:pointer; }
-  button:hover { background:#555; }
-  pre { background:#f0f0f0; padding:10px; border-radius:6px; margin-top:10px; white-space:pre-wrap; word-break:break-word; }
-  @media screen and (max-width:600px){
-    body { padding:5px; }
-    h1 { font-size:1.4rem; }
-    h2 { font-size:1rem; }
-    select, textarea { font-size:0.85rem; }
-    button { font-size:0.9rem; padding:10px; }
-  }
+body { font-family:'Noto Sans JP', sans-serif; background:#fafafa; margin:0; padding:10px; color:#222; }
+h1 { text-align:center; margin-bottom:20px; }
+section { background:#fff; padding:15px; border-radius:10px; margin-top:10px; box-shadow:0 2px 6px rgba(0,0,0,0.05); }
+h2 { margin-top:20px; color:#1a73e8; font-size:1.2rem; padding:8px; background:#e8f0fe; border-radius:6px; }
+label { display:block; margin-top:10px; font-weight:700; }
+select, textarea { width:100%; padding:8px; margin-top:5px; border-radius:6px; border:1px solid #ccc; font-size:0.9rem; }
+button { margin-top:15px; padding:10px 12px; border:none; border-radius:8px; background:#333; color:white; font-size:1rem; cursor:pointer; }
+button:hover { background:#555; }
+pre { background:#f0f0f0; padding:10px; border-radius:6px; margin-top:10px; white-space:pre-wrap; word-break:break-word; }
+.page-container { display:flex; overflow-x:auto; gap:10px; padding:10px 0; }
+.page-card { min-width:250px; background:#fdfdfd; border:1px solid #ddd; border-radius:8px; padding:10px; flex-shrink:0; }
+.page-card h3 { font-size:1rem; color:#333; margin-bottom:8px; }
+@media screen and (max-width:600px){
+  body { padding:5px; }
+  h1 { font-size:1.4rem; }
+  h2 { font-size:1rem; }
+  select, textarea { font-size:0.85rem; }
+  button { font-size:0.9rem; padding:8px; }
+  .page-card { min-width:200px; }
+}
 </style>
 </head>
 <body>
 
-<h1>Web設計ヒアリングシート</h1>
+<h1>Web設計ヒアリングシート（ページ追加版）</h1>
 
 <section>
-  <h2>1. プロジェクト概要</h2>
-  <label>概要（任意）</label>
+  <h2>基本設定</h2>
+  <label>プロジェクト概要（任意）</label>
   <textarea id="projectOverviewInput" placeholder="未入力の場合はおまかせ"></textarea>
+</section>
 
-  <h2>2. ページ分類</h2>
-  <label>ページ分類</label>
-  <select id="pageTypeSelect">
-    <option value="コーポレート／ブランド">コーポレート／ブランド</option>
-    <option value="EC・販売サイト">EC・販売サイト</option>
-    <option value="メディア・ブログ">メディア・ブログ</option>
-    <option value="業務システム">業務システム</option>
-    <option value="LP・キャンペーン">LP・キャンペーン</option>
-    <option value="ポータル・コミュニティ">ポータル・コミュニティ</option>
-    <option value="おまかせ">おまかせ</option>
-  </select>
-
-  <h2>3. 各ページの目的と機能</h2>
-  <label>内容</label>
-  <textarea id="pagePurposeInput" placeholder="未入力の場合はおまかせ"></textarea>
-
-  <h2>4. ユーザー層・想定デバイス</h2>
-  <label>ユーザー層</label>
-  <select id="userTargetSelect">
-    <option value="一般ユーザー（20〜40代）">一般ユーザー（20〜40代）</option>
-    <option value="BtoB企業">BtoB企業</option>
-    <option value="管理者／社内利用">管理者／社内利用</option>
-    <option value="学生／若年層">学生／若年層</option>
-    <option value="高齢層中心">高齢層中心</option>
-    <option value="おまかせ">おまかせ</option>
-  </select>
-
-  <h2>5. デザイン方針</h2>
-  <label>デザイン</label>
-  <select id="designSelect">
-    <option value="シンプル＆ミニマル">シンプル＆ミニマル</option>
-    <option value="ビジネス＆信頼重視">ビジネス＆信頼重視</option>
-    <option value="ポップ＆カジュアル">ポップ＆カジュアル</option>
-    <option value="高級・スタイリッシュ">高級・スタイリッシュ</option>
-    <option value="自然・ナチュラル">自然・ナチュラル</option>
-    <option value="おまかせ">おまかせ</option>
-  </select>
-
-  <h2>6. データ・連携・管理要件</h2>
-  <label>内容</label>
-  <textarea id="dataRequirementInput" placeholder="未入力の場合はおまかせ"></textarea>
-
-  <h2>7. 運用・更新方法</h2>
-  <label>内容</label>
-  <textarea id="operationInput" placeholder="未入力の場合はおまかせ"></textarea>
-
-  <h2>8. 公開・セキュリティ・拡張性</h2>
-  <label>内容</label>
-  <textarea id="securityInput" placeholder="未入力の場合はおまかせ"></textarea>
-
+<section>
+  <h2>ページ設定</h2>
+  <button onclick="addPage()">＋ ページ追加</button>
+  <div class="page-container" id="pageContainer"></div>
 </section>
 
 <button onclick="generateJSON()">設計書生成</button>
@@ -90,20 +49,63 @@
 <pre id="jsonOutput">{}</pre>
 
 <script>
+let pageCount = 0;
+
+function addPage() {
+  pageCount++;
+  const container = document.getElementById('pageContainer');
+  
+  const card = document.createElement('div');
+  card.className = 'page-card';
+  card.id = `pageCard${pageCount}`;
+  
+  card.innerHTML = `
+    <h3>ページ${pageCount}</h3>
+    <label>ページ名</label>
+    <input type="text" id="pageName${pageCount}" placeholder="例: トップページ">
+    
+    <label>ページ分類</label>
+    <select id="pageType${pageCount}">
+      <option value="コーポレート／ブランド">コーポレート／ブランド</option>
+      <option value="EC・販売サイト">EC・販売サイト</option>
+      <option value="メディア・ブログ">メディア・ブログ</option>
+      <option value="業務システム">業務システム</option>
+      <option value="LP・キャンペーン">LP・キャンペーン</option>
+      <option value="ポータル・コミュニティ">ポータル・コミュニティ</option>
+      <option value="おまかせ">おまかせ</option>
+    </select>
+    
+    <label>目的</label>
+    <textarea id="pagePurpose${pageCount}" placeholder="未入力の場合はおまかせ"></textarea>
+    
+    <label>詳細</label>
+    <textarea id="pageDetail${pageCount}" placeholder="未入力の場合はおまかせ"></textarea>
+  `;
+  
+  container.appendChild(card);
+}
+
 function generateJSON() {
   const result = {
     projectOverview: document.getElementById('projectOverviewInput').value || "おまかせ",
-    pageType: document.getElementById('pageTypeSelect').value,
-    pagePurpose: document.getElementById('pagePurposeInput').value || "おまかせ",
-    userTarget: document.getElementById('userTargetSelect').value,
-    design: document.getElementById('designSelect').value,
-    dataRequirement: document.getElementById('dataRequirementInput').value || "おまかせ",
-    operation: document.getElementById('operationInput').value || "おまかせ",
-    security: document.getElementById('securityInput').value || "おまかせ"
+    pages: []
   };
+  
+  for(let i=1; i<=pageCount; i++){
+    const pageCard = document.getElementById(`pageCard${i}`);
+    if(pageCard){
+      result.pages.push({
+        pageName: document.getElementById(`pageName${i}`).value || `ページ${i}`,
+        pageType: document.getElementById(`pageType${i}`).value,
+        pagePurpose: document.getElementById(`pagePurpose${i}`).value || "おまかせ",
+        pageDetail: document.getElementById(`pageDetail${i}`).value || "おまかせ"
+      });
+    }
+  }
+  
   document.getElementById('jsonOutput').textContent = JSON.stringify(result, null, 2);
 }
 </script>
 
 </body>
-</html></html>
+</html>
