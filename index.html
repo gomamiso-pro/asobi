@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Web設計ヒアリングシート</title>
+<title>Web設計ヒアリングシート（完全版）</title>
 <link rel="stylesheet" href="style.css">
 <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
@@ -26,9 +26,6 @@
     <option value="ポータル・コミュニティ">ポータル・コミュニティ</option>
     <option value="おまかせ">おまかせ</option>
   </select>
-
-  <label>各ページの目的</label>
-  <textarea id="pagePurposeInput" placeholder="未入力の場合はおまかせ"></textarea>
 
   <label>ユーザー層・想定デバイス</label>
   <select id="userTargetSelect">
@@ -111,7 +108,7 @@
 
 <section>
   <h2>プレビュー</h2>
-  <button onclick="showPreview()">プレビュー表示</button>
+  <button onclick="showPreview()">プレビュー表示（簡易＋設計書生成）</button>
   <iframe id="iframePreview"></iframe>
 </section>
 
@@ -133,6 +130,7 @@
   <h2>生成結果（JSON形式）</h2>
   <pre id="jsonOutput">{}</pre>
 </section>
+
 <script src="script.js"></script>
 </body>
 </html>
