@@ -5,15 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Web設計ヒアリングシート</title>
 <style>
-  body { font-family: 'Noto Sans JP', sans-serif; background: #fafafa; margin:0; padding:10px; color:#222; }
+  body { font-family:'Noto Sans JP', sans-serif; background:#fafafa; margin:0; padding:10px; color:#222; }
   h1 { text-align:center; margin-bottom:20px; }
   section { background:#fff; padding:15px; border-radius:10px; margin-top:10px; box-shadow:0 2px 6px rgba(0,0,0,0.05); }
+  h2 { margin-top:20px; color:#1a73e8; font-size:1.2rem; padding:8px; background:#e8f0fe; border-radius:6px; }
   label { display:block; margin-top:10px; font-weight:700; }
   select, textarea { width:100%; padding:8px; margin-top:5px; border-radius:6px; border:1px solid #ccc; font-size:0.9rem; }
-  input[type=checkbox] { margin-right:6px; }
   button { margin-top:15px; width:100%; padding:12px; border:none; border-radius:8px; background:#333; color:white; font-size:1rem; cursor:pointer; }
   button:hover { background:#555; }
   pre { background:#f0f0f0; padding:10px; border-radius:6px; margin-top:10px; white-space:pre-wrap; word-break:break-word; }
+  @media screen and (max-width:600px){
+    body { padding:5px; }
+    h1 { font-size:1.4rem; }
+    h2 { font-size:1rem; }
+    select, textarea { font-size:0.85rem; }
+    button { font-size:0.9rem; padding:10px; }
+  }
 </style>
 </head>
 <body>
@@ -21,18 +28,61 @@
 <h1>Web設計ヒアリングシート</h1>
 
 <section>
-  <label>ヒアリング項目を選択してください</label>
-  <label><input type="checkbox" class="mainItem" value="projectOverview"> プロジェクト概要</label>
-  <label><input type="checkbox" class="mainItem" value="pageType"> ページ分類</label>
-  <label><input type="checkbox" class="mainItem" value="pagePurpose"> 各ページの目的と機能</label>
-  <label><input type="checkbox" class="mainItem" value="userTarget"> ユーザー層・想定デバイス</label>
-  <label><input type="checkbox" class="mainItem" value="design"> デザイン方針</label>
-  <label><input type="checkbox" class="mainItem" value="dataRequirement"> データ・連携・管理要件</label>
-  <label><input type="checkbox" class="mainItem" value="operation"> 運用・更新方法</label>
-  <label><input type="checkbox" class="mainItem" value="security"> 公開・セキュリティ・拡張性</label>
-</section>
+  <h2>1. プロジェクト概要</h2>
+  <label>概要（任意）</label>
+  <textarea id="projectOverviewInput" placeholder="未入力の場合はおまかせ"></textarea>
 
-<section id="detailsSection"></section>
+  <h2>2. ページ分類</h2>
+  <label>ページ分類</label>
+  <select id="pageTypeSelect">
+    <option value="コーポレート／ブランド">コーポレート／ブランド</option>
+    <option value="EC・販売サイト">EC・販売サイト</option>
+    <option value="メディア・ブログ">メディア・ブログ</option>
+    <option value="業務システム">業務システム</option>
+    <option value="LP・キャンペーン">LP・キャンペーン</option>
+    <option value="ポータル・コミュニティ">ポータル・コミュニティ</option>
+    <option value="おまかせ">おまかせ</option>
+  </select>
+
+  <h2>3. 各ページの目的と機能</h2>
+  <label>内容</label>
+  <textarea id="pagePurposeInput" placeholder="未入力の場合はおまかせ"></textarea>
+
+  <h2>4. ユーザー層・想定デバイス</h2>
+  <label>ユーザー層</label>
+  <select id="userTargetSelect">
+    <option value="一般ユーザー（20〜40代）">一般ユーザー（20〜40代）</option>
+    <option value="BtoB企業">BtoB企業</option>
+    <option value="管理者／社内利用">管理者／社内利用</option>
+    <option value="学生／若年層">学生／若年層</option>
+    <option value="高齢層中心">高齢層中心</option>
+    <option value="おまかせ">おまかせ</option>
+  </select>
+
+  <h2>5. デザイン方針</h2>
+  <label>デザイン</label>
+  <select id="designSelect">
+    <option value="シンプル＆ミニマル">シンプル＆ミニマル</option>
+    <option value="ビジネス＆信頼重視">ビジネス＆信頼重視</option>
+    <option value="ポップ＆カジュアル">ポップ＆カジュアル</option>
+    <option value="高級・スタイリッシュ">高級・スタイリッシュ</option>
+    <option value="自然・ナチュラル">自然・ナチュラル</option>
+    <option value="おまかせ">おまかせ</option>
+  </select>
+
+  <h2>6. データ・連携・管理要件</h2>
+  <label>内容</label>
+  <textarea id="dataRequirementInput" placeholder="未入力の場合はおまかせ"></textarea>
+
+  <h2>7. 運用・更新方法</h2>
+  <label>内容</label>
+  <textarea id="operationInput" placeholder="未入力の場合はおまかせ"></textarea>
+
+  <h2>8. 公開・セキュリティ・拡張性</h2>
+  <label>内容</label>
+  <textarea id="securityInput" placeholder="未入力の場合はおまかせ"></textarea>
+
+</section>
 
 <button onclick="generateJSON()">設計書生成</button>
 
@@ -40,116 +90,20 @@
 <pre id="jsonOutput">{}</pre>
 
 <script>
-const detailsSection = document.getElementById('detailsSection');
-
-const detailOptions = {
-  pageType: ["コーポレート／ブランド","EC・販売サイト","メディア・ブログ","業務システム","LP・キャンペーン","ポータル・コミュニティ","おまかせ"],
-  design: ["シンプル＆ミニマル","ビジネス＆信頼重視","ポップ＆カジュアル","高級・スタイリッシュ","自然・ナチュラル","おまかせ"],
-  userTarget: ["一般ユーザー（20〜40代）","BtoB企業","管理者／社内利用","学生／若年層","高齢層中心","おまかせ"]
-};
-
-function createDetailSelect(id, label, options) {
-  const wrapper = document.createElement('div');
-  const lbl = document.createElement('label');
-  lbl.textContent = label;
-  const sel = document.createElement('select');
-  sel.id = id;
-  options.forEach(opt => {
-    const o = document.createElement('option');
-    o.value = opt;
-    o.textContent = opt;
-    sel.appendChild(o);
-  });
-  wrapper.appendChild(lbl);
-  wrapper.appendChild(sel);
-  detailsSection.appendChild(wrapper);
-}
-
-function createDetailTextarea(id, label) {
-  const wrapper = document.createElement('div');
-  const lbl = document.createElement('label');
-  lbl.textContent = label;
-  const ta = document.createElement('textarea');
-  ta.id = id;
-  ta.placeholder = "任意で入力してください。未入力の場合はおまかせ";
-  wrapper.appendChild(lbl);
-  wrapper.appendChild(ta);
-  detailsSection.appendChild(wrapper);
-}
-
-function updateDetails() {
-  detailsSection.innerHTML = '';
-  document.querySelectorAll('.mainItem').forEach(cb => {
-    if(cb.checked) {
-      switch(cb.value){
-        case 'projectOverview':
-          createDetailTextarea('projectOverviewInput', 'プロジェクト概要（任意）');
-          break;
-        case 'pageType':
-          createDetailSelect('pageTypeSelect', 'ページ分類', detailOptions.pageType);
-          break;
-        case 'pagePurpose':
-          createDetailTextarea('pagePurposeInput', '各ページの目的と機能');
-          break;
-        case 'userTarget':
-          createDetailSelect('userTargetSelect', 'ユーザー層・想定デバイス', detailOptions.userTarget);
-          break;
-        case 'design':
-          createDetailSelect('designSelect', 'デザイン方針', detailOptions.design);
-          break;
-        case 'dataRequirement':
-          createDetailTextarea('dataRequirementInput', 'データ・連携・管理要件');
-          break;
-        case 'operation':
-          createDetailTextarea('operationInput', '運用・更新方法');
-          break;
-        case 'security':
-          createDetailTextarea('securityInput', '公開・セキュリティ・拡張性');
-          break;
-      }
-    }
-  });
-}
-
-document.querySelectorAll('.mainItem').forEach(cb=>{
-  cb.addEventListener('change', updateDetails);
-});
-
 function generateJSON() {
-  const result = {};
-  document.querySelectorAll('.mainItem').forEach(cb=>{
-    if(cb.checked){
-      switch(cb.value){
-        case 'projectOverview':
-          result.projectOverview = document.getElementById('projectOverviewInput').value || "おまかせ";
-          break;
-        case 'pageType':
-          result.pageType = document.getElementById('pageTypeSelect').value;
-          break;
-        case 'pagePurpose':
-          result.pagePurpose = document.getElementById('pagePurposeInput').value || "おまかせ";
-          break;
-        case 'userTarget':
-          result.userTarget = document.getElementById('userTargetSelect').value;
-          break;
-        case 'design':
-          result.design = document.getElementById('designSelect').value;
-          break;
-        case 'dataRequirement':
-          result.dataRequirement = document.getElementById('dataRequirementInput').value || "おまかせ";
-          break;
-        case 'operation':
-          result.operation = document.getElementById('operationInput').value || "おまかせ";
-          break;
-        case 'security':
-          result.security = document.getElementById('securityInput').value || "おまかせ";
-          break;
-      }
-    }
-  });
+  const result = {
+    projectOverview: document.getElementById('projectOverviewInput').value || "おまかせ",
+    pageType: document.getElementById('pageTypeSelect').value,
+    pagePurpose: document.getElementById('pagePurposeInput').value || "おまかせ",
+    userTarget: document.getElementById('userTargetSelect').value,
+    design: document.getElementById('designSelect').value,
+    dataRequirement: document.getElementById('dataRequirementInput').value || "おまかせ",
+    operation: document.getElementById('operationInput').value || "おまかせ",
+    security: document.getElementById('securityInput').value || "おまかせ"
+  };
   document.getElementById('jsonOutput').textContent = JSON.stringify(result, null, 2);
 }
 </script>
 
 </body>
-</html>
+</html></html>
