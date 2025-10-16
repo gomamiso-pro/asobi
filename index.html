@@ -3,46 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Web設計ヒアリングシート（プレビュー＆見積版）</title>
-<style>
-body { font-family:'Noto Sans JP', sans-serif; background:#fafafa; margin:0; padding:10px; color:#222; }
-h1 { text-align:center; margin-bottom:20px; }
-section { background:#fff; padding:15px; border-radius:10px; margin-top:10px; box-shadow:0 2px 6px rgba(0,0,0,0.05); }
-h2 { margin-top:20px; color:#1a73e8; font-size:1.2rem; padding:8px; background:#e8f0fe; border-radius:6px; }
-h3 { font-size:1rem; color:#333; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; }
-label { display:block; margin-top:5px; font-weight:700; }
-select, textarea, input[type=text] { width:100%; padding:8px; margin-top:5px; border-radius:6px; border:1px solid #ccc; font-size:0.9rem; }
-input[type=checkbox] { margin-right:5px; }
-button { margin-top:10px; padding:10px 12px; border:none; border-radius:8px; background:#333; color:white; font-size:1rem; cursor:pointer; }
-button:hover { background:#555; }
-.delete-btn { background:#e53935; margin:0; padding:3px 6px; font-size:0.8rem; border-radius:4px; }
-.delete-btn:hover { background:#b71c1c; }
-pre { background:#f0f0f0; padding:10px; border-radius:6px; margin-top:10px; white-space:pre-wrap; word-break:break-word; }
-.page-container { display:flex; overflow-x:auto; gap:10px; padding:10px 0; }
-.page-card { min-width:280px; background:#fdfdfd; border:1px solid #ddd; border-radius:8px; padding:10px; flex-shrink:0; position:relative; }
-.section-title { font-weight:700; margin-top:8px; }
-table { width:100%; border-collapse:collapse; margin-top:10px; min-width:600px; }
-th, td { border:1px solid #ddd; padding:8px; text-align:left; }
-th { background:#f5f5f5; font-weight:700; }
-iframe { width:100%; height:300px; border:1px solid #ccc; border-radius:8px; margin-top:10px; }
-@media screen and (max-width:600px){
-  body { padding:5px; }
-  h1 { font-size:1.4rem; }
-  h2 { font-size:1rem; }
-  select, textarea, input[type=text] { font-size:0.85rem; }
-  button { font-size:0.9rem; padding:8px; }
-  .page-card { min-width:220px; }
-  table { font-size:0.85rem; }
-}
-</style>
+<title>Web設計ヒアリングシート</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h1>Web設計ヒアリングシート（プレビュー＆見積版）</h1>
+<h1>Web設計ヒアリングシート（完全版）</h1>
 
 <section>
   <h2>基本設定</h2>
-  <!-- 既存8項目と運用統合項目 -->
   <label>プロジェクト概要（任意）</label>
   <textarea id="projectOverviewInput" placeholder="未入力の場合はおまかせ"></textarea>
 
@@ -164,95 +133,9 @@ iframe { width:100%; height:300px; border:1px solid #ccc; border-radius:8px; mar
   <pre id="jsonOutput">{}</pre>
 </section>
 
-<script>
-let pageCount = 0;
-const sectionOptions = {
-  header: ["ロゴ", "検索ボックス", "通知アイコン", "言語切替", "ログインボタン"],
-  menu: ["カテゴリメニュー", "ドロップダウン", "パンくずリスト", "サイドメニュー"],
-  body: ["カルーセル", "新着商品一覧", "特集バナー", "記事リスト", "フォーム"],
-  footer: ["会社情報", "SNSリンク", "コピーライト", "フッターメニュー"]
-};
-
-function createSectionCheckboxes(sectionName, idPrefix, options){
-  let html = `<div class="section-title">${sectionName}</div>`;
-  options.forEach((opt,i)=>{
-    html += `<label><input type="checkbox" id="${idPrefix}_${i}" value="${opt}">${opt}</label>`;
-  });
-  return html;
-}
-
-function addPage() {
-  pageCount++;
-  const container = document.getElementById('pageContainer');
-  const card = document.createElement('div');
-  card.className = 'page-card';
-  card.id = `pageCard${pageCount}`;
-  card.innerHTML = `
-    <h3>ページ${pageCount} <button class="delete-btn" onclick="deletePage(${pageCount})">削除</button></h3>
-    <label>ページ名</label>
-    <input type="text" id="pageName${pageCount}" placeholder="例: トップページ">
-    ${createSectionCheckboxes("ヘッダー", `header${pageCount}`, sectionOptions.header)}
-    ${createSectionCheckboxes("メニュー", `menu${pageCount}`, sectionOptions.menu)}
-    ${createSectionCheckboxes("ボディ", `body${pageCount}`, sectionOptions.body)}
-    ${createSectionCheckboxes("フッター", `footer${pageCount}`, sectionOptions.footer)}
-  `;
-  container.appendChild(card);
-  updateEstimate();
-}
-
-function deletePage(id){
-  const card = document.getElementById(`pageCard${id}`);
-  if(card) card.remove();
-  updateEstimate();
-}
-
-function showPreview(){
-  const pages = [];
-  for(let i=1;i<=pageCount;i++){
-    const card = document.getElementById(`pageCard${i}`);
-    if(!card) continue;
-    const pageName = document.getElementById(`pageName${i}`).value || `ページ${i}`;
-    const header = Array.from(card.querySelectorAll(`[id^=header${i}_]:checked`)).map(e=>e.value);
-    const menu = Array.from(card.querySelectorAll(`[id^=menu${i}_]:checked`)).map(e=>e.value);
-    const body = Array.from(card.querySelectorAll(`[id^=body${i}_]:checked`)).map(e=>e.value);
-    const footer = Array.from(card.querySelectorAll(`[id^=footer${i}_]:checked`)).map(e=>e.value);
-    pages.push({pageName, header, menu, body, footer});
-  }
-
-  let html = '';
-  pages.forEach(p=>{
-    html += `<h2>${p.pageName}</h2>`;
-    html += `<div><strong>ヘッダー:</strong> ${p.header.join(", ") || "なし"}</div>`;
-    html += `<div><strong>メニュー:</strong> ${p.menu.join(", ") || "なし"}</div>`;
-    html += `<div><strong>ボディ:</strong> ${p.body.join(", ") || "なし"}</div>`;
-    html += `<div><strong>フッター:</strong> ${p.footer.join(", ") || "なし"}</div>`;
-    html += `<hr>`;
-  });
-
-  document.getElementById('iframePreview').srcdoc = html;
-
-  // JSON出力
-  const output = {
-    projectOverview: document.getElementById('projectOverviewInput').value || "おまかせ",
-    pageType: document.getElementById('pageTypeSelect').value,
-    pagePurpose: document.getElementById('pagePurposeInput').value || "おまかせ",
-    userTarget: document.getElementById('userTargetSelect').value,
-    design: document.getElementById('designSelect').value,
-    dataRequirement: document.getElementById('dataRequirementInput').value || "おまかせ",
-    operation: document.getElementById('operationInput').value || "おまかせ",
-    languages: Array.from(document.querySelectorAll('[id^=lang_]:checked')).map(e=>e.value),
-    server: document.getElementById('serverSelect').value,
-    database: document.getElementById('databaseSelect').value,
-    designFramework: document.getElementById('designFrameworkSelect').value,
-    auth: document.getElementById('authSelect').value,
-    security: document.getElementById('securityInput').value || "おまかせ",
-    pages: pages
-  };
-  document.getElementById('jsonOutput').textContent = JSON.stringify(output, null, 2);
-  updateEstimate();
-}
-
-function updateEstimate(){
+<script src="script.js"></script>
+</body>
+</html>pdateEstimate(){
   const tbody = document.querySelector('#estimateTable tbody');
   tbody.innerHTML = '';
   let subtotal = 0;
