@@ -1,10 +1,19 @@
-/* 全体設定 */
+/* Google Fontsの丸文字を使用する場合：
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;900&display=swap" rel="stylesheet">
+*/
+
+/* ===== 全体設定 ===== */
 body {
   font-family: 'M PLUS Rounded 1c', 'Noto Sans JP', sans-serif;
   background: linear-gradient(135deg, #fff9f9, #f9faff);
   margin: 0;
-  padding: 10px;
+  padding: 20px;
   color: #333;
+  box-sizing: border-box;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 h1 {
@@ -19,18 +28,19 @@ h1 {
   text-shadow: 1px 2px 2px rgba(0, 0, 0, 0.25);
 }
 
-/* セクション */
+/* ===== セクション ===== */
 section {
   background: #fff;
-  padding: 15px;
+  padding: 20px;
   border-radius: 15px;
-  margin-top: 12px;
+  margin: 20px auto;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  max-width: 800px;
 }
 
-/* 各見出し（立体＆柔らか） */
+/* ===== 見出し（立体） ===== */
 h2 {
-  margin-top: 20px;
+  margin-top: 10px;
   color: #fff;
   font-size: 1.2rem;
   padding: 10px 12px;
@@ -50,10 +60,10 @@ h3 {
   align-items: center;
 }
 
-/* ラベル・入力 */
+/* ===== ラベル・入力 ===== */
 label {
   display: block;
-  margin-top: 5px;
+  margin-top: 10px;
   font-weight: 700;
 }
 
@@ -61,13 +71,14 @@ select,
 textarea,
 input[type=text] {
   width: 100%;
-  padding: 8px;
-  margin-top: 5px;
+  padding: 10px 12px;
+  margin-top: 6px;
   border-radius: 8px;
   border: 1px solid #ccc;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   box-shadow: inset 1px 1px 3px rgba(0,0,0,0.05);
   transition: all 0.2s ease;
+  background: #fff;
 }
 
 select:focus,
@@ -75,17 +86,17 @@ textarea:focus,
 input[type=text]:focus {
   outline: none;
   border-color: #64b5f6;
-  box-shadow: 0 0 4px #90caf9;
+  box-shadow: 0 0 6px #90caf9;
 }
 
 input[type=checkbox] {
   margin-right: 5px;
 }
 
-/* ボタン */
+/* ===== ボタン ===== */
 button {
-  margin-top: 10px;
-  padding: 10px 12px;
+  margin-top: 12px;
+  padding: 10px 14px;
   border: none;
   border-radius: 8px;
   background: linear-gradient(145deg, #64b5f6, #2196f3);
@@ -104,7 +115,7 @@ button:hover {
 .delete-btn {
   background: linear-gradient(145deg, #f44336, #d32f2f);
   margin: 0;
-  padding: 3px 6px;
+  padding: 4px 8px;
   font-size: 0.8rem;
   border-radius: 6px;
   box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
@@ -114,7 +125,7 @@ button:hover {
   background: linear-gradient(145deg, #d32f2f, #b71c1c);
 }
 
-/* ページカード */
+/* ===== ページカード ===== */
 .page-container {
   display: flex;
   overflow-x: auto;
@@ -140,11 +151,12 @@ button:hover {
   color: #2196f3;
 }
 
-/* 見積テーブル */
+/* ===== 見積テーブル ===== */
 #estimateTable {
   display: block;
   width: 100%;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 #estimateTable table {
@@ -165,7 +177,7 @@ button:hover {
   font-weight: 700;
 }
 
-/* プレビューJSON */
+/* ===== プレビューJSON ===== */
 pre {
   background: #f8f8f8;
   padding: 10px;
@@ -176,7 +188,7 @@ pre {
   box-shadow: inset 1px 1px 3px rgba(0,0,0,0.05);
 }
 
-/* iframeプレビュー */
+/* ===== iframeプレビュー ===== */
 iframe {
   width: 100%;
   height: 300px;
@@ -186,12 +198,36 @@ iframe {
   box-shadow: 1px 2px 6px rgba(0,0,0,0.1);
 }
 
-/* スマホ対応 */
+/* ===== スマホ対応 ===== */
 @media screen and (max-width: 600px) {
-  body { padding: 5px; }
-  h1 { font-size: 1.4rem; }
-  h2 { font-size: 1rem; }
-  select, textarea, input[type=text] { font-size: 0.85rem; }
-  button { font-size: 0.9rem; padding: 8px; }
-  table { font-size: 0.85rem; }
+  body {
+    padding: 15px;
+  }
+
+  section {
+    padding: 18px;
+    margin: 15px auto;
+  }
+
+  h1 {
+    font-size: 1.4rem;
+    padding: 12px;
+  }
+
+  h2 {
+    font-size: 1rem;
+  }
+
+  select, textarea, input[type=text] {
+    font-size: 0.9rem;
+  }
+
+  button {
+    font-size: 0.9rem;
+    padding: 9px 12px;
+  }
+
+  table {
+    font-size: 0.85rem;
+  }
 }
