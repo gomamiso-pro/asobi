@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Web設計ヒアリングシート（詳細＋削除対応版）</title>
+<title>Web設計ヒアリングシート（運用統合版）</title>
 <style>
 body { font-family:'Noto Sans JP', sans-serif; background:#fafafa; margin:0; padding:10px; color:#222; }
 h1 { text-align:center; margin-bottom:20px; }
@@ -33,7 +33,7 @@ pre { background:#f0f0f0; padding:10px; border-radius:6px; margin-top:10px; whit
 </head>
 <body>
 
-<h1>Web設計ヒアリングシート（詳細＋削除対応版）</h1>
+<h1>Web設計ヒアリングシート（運用統合版）</h1>
 
 <section>
   <h2>基本設定</h2>
@@ -41,6 +41,47 @@ pre { background:#f0f0f0; padding:10px; border-radius:6px; margin-top:10px; whit
   <label>プロジェクト概要（任意）</label>
   <textarea id="projectOverviewInput" placeholder="未入力の場合はおまかせ"></textarea>
 
+  <label>ページ分類</label>
+  <select id="pageTypeSelect">
+    <option value="コーポレート／ブランド">コーポレート／ブランド</option>
+    <option value="EC・販売サイト">EC・販売サイト</option>
+    <option value="メディア・ブログ">メディア・ブログ</option>
+    <option value="業務システム">業務システム</option>
+    <option value="LP・キャンペーン">LP・キャンペーン</option>
+    <option value="ポータル・コミュニティ">ポータル・コミュニティ</option>
+    <option value="おまかせ">おまかせ</option>
+  </select>
+
+  <label>各ページの目的</label>
+  <textarea id="pagePurposeInput" placeholder="未入力の場合はおまかせ"></textarea>
+
+  <label>ユーザー層・想定デバイス</label>
+  <select id="userTargetSelect">
+    <option value="一般ユーザー（20〜40代）">一般ユーザー（20〜40代）</option>
+    <option value="BtoB企業">BtoB企業</option>
+    <option value="管理者／社内利用">管理者／社内利用</option>
+    <option value="学生／若年層">学生／若年層</option>
+    <option value="高齢層中心">高齢層中心</option>
+    <option value="おまかせ">おまかせ</option>
+  </select>
+
+  <label>デザイン方針</label>
+  <select id="designSelect">
+    <option value="シンプル＆ミニマル">シンプル＆ミニマル</option>
+    <option value="ビジネス＆信頼重視">ビジネス＆信頼重視</option>
+    <option value="ポップ＆カジュアル">ポップ＆カジュアル</option>
+    <option value="高級・スタイリッシュ">高級・スタイリッシュ</option>
+    <option value="自然・ナチュラル">自然・ナチュラル</option>
+    <option value="おまかせ">おまかせ</option>
+  </select>
+
+  <label>データ・連携・管理要件</label>
+  <textarea id="dataRequirementInput" placeholder="未入力の場合はおまかせ"></textarea>
+
+  <label>運用・更新・公開</label>
+  <textarea id="operationInput" placeholder="更新方法や管理権限など、未入力の場合はおまかせ"></textarea>
+
+  <!-- 運用関連の選択式 -->
   <label>使用言語（複数選択可）</label>
   <label><input type="checkbox" id="lang_html" value="HTML">HTML</label>
   <label><input type="checkbox" id="lang_css" value="CSS">CSS</label>
@@ -49,7 +90,7 @@ pre { background:#f0f0f0; padding:10px; border-radius:6px; margin-top:10px; whit
   <label><input type="checkbox" id="lang_php" value="PHP">PHP</label>
   <label><input type="checkbox" id="lang_ruby" value="Ruby">Ruby</label>
 
-  <label>サーバー（一般的な無料〜有料）</label>
+  <label>サーバー（無料〜有料）</label>
   <select id="serverSelect">
     <option value="さくらレンタルサーバー">さくらレンタルサーバー</option>
     <option value="XServer">XServer</option>
@@ -84,6 +125,8 @@ pre { background:#f0f0f0; padding:10px; border-radius:6px; margin-top:10px; whit
     <option value="おまかせ">おまかせ</option>
   </select>
 
+  <label>公開・セキュリティ・拡張性</label>
+  <textarea id="securityInput" placeholder="未入力の場合はおまかせ"></textarea>
 </section>
 
 <section>
@@ -148,11 +191,18 @@ function deletePage(id) {
 function generateJSON() {
   const result = {
     projectOverview: document.getElementById('projectOverviewInput').value || "おまかせ",
+    pageType: document.getElementById('pageTypeSelect').value,
+    pagePurpose: document.getElementById('pagePurposeInput').value || "おまかせ",
+    userTarget: document.getElementById('userTargetSelect').value,
+    design: document.getElementById('designSelect').value,
+    dataRequirement: document.getElementById('dataRequirementInput').value || "おまかせ",
+    operation: document.getElementById('operationInput').value || "おまかせ",
     languages: [],
     server: document.getElementById('serverSelect').value,
     database: document.getElementById('databaseSelect').value,
     designFramework: document.getElementById('designFrameworkSelect').value,
     auth: document.getElementById('authSelect').value,
+    security: document.getElementById('securityInput').value || "おまかせ",
     pages: []
   };
 
