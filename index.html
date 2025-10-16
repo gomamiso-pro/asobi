@@ -133,43 +133,5 @@
   <pre id="jsonOutput">{}</pre>
 </section>
 <script src="script.js"></script>
-<script>
-  updateEstimate(){
-  const tbody = document.querySelector('#estimateTable tbody');
-  tbody.innerHTML = '';
-  let subtotal = 0;
-
-  // 基本設計
-  const basic = 50000;
-  subtotal += basic;
-  tbody.innerHTML += `<tr><td>基本設計</td><td>${basic}</td><td>1</td><td>${basic}</td></tr>`;
-
-  // ページ追加
-  const pageUnit = 30000;
-  const pages = document.querySelectorAll('.page-card').length;
-  subtotal += pageUnit * pages;
-  if(pages>0) tbody.innerHTML += `<tr><td>ページ追加</td><td>${pageUnit}</td><td>${pages}</td><td>${pageUnit*pages}</td></tr>`;
-
-  // 各セクション（ヘッダー・メニュー・ボディ・フッター） 1セクション1万
-  const sectionUnit = 10000;
-  let sectionCount = 0;
-  for(let i=1;i<=pageCount;i++){
-    const card = document.getElementById(`pageCard${i}`);
-    if(!card) continue;
-    sectionCount += card.querySelectorAll('input[type=checkbox]:checked').length;
-  }
-  subtotal += sectionUnit * sectionCount;
-  if(sectionCount>0) tbody.innerHTML += `<tr><td>セクション追加</td><td>${sectionUnit}</td><td>${sectionCount}</td><td>${sectionUnit*sectionCount}</td></tr>`;
-
-  // データベース・認証・フレームワークまとめて 2万
-  const extraUnit = 20000;
-  subtotal += extraUnit;
-  tbody.innerHTML += `<tr><td>データ・認証・フレームワーク設定</td><td>${extraUnit}</td><td>1</td><td>${extraUnit}</td></tr>`;
-
-  document.getElementById('subtotal').textContent = subtotal;
-  document.getElementById('total').textContent = Math.round(subtotal*1.1);
-}
-</script>
-
 </body>
   </html>
