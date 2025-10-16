@@ -3,28 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Web設計ヒアリングシート（詳細設定版）</title>
+<title>Web設計ヒアリングシート（詳細＋削除対応版）</title>
 <style>
 body { font-family:'Noto Sans JP', sans-serif; background:#fafafa; margin:0; padding:10px; color:#222; }
 h1 { text-align:center; margin-bottom:20px; }
 section { background:#fff; padding:15px; border-radius:10px; margin-top:10px; box-shadow:0 2px 6px rgba(0,0,0,0.05); }
 h2 { margin-top:20px; color:#1a73e8; font-size:1.2rem; padding:8px; background:#e8f0fe; border-radius:6px; }
-h3 { margin-top:10px; font-size:1rem; color:#333; }
+h3 { font-size:1rem; color:#333; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; }
 label { display:block; margin-top:5px; font-weight:700; }
-select, textarea { width:100%; padding:8px; margin-top:5px; border-radius:6px; border:1px solid #ccc; font-size:0.9rem; }
+select, textarea, input[type=text] { width:100%; padding:8px; margin-top:5px; border-radius:6px; border:1px solid #ccc; font-size:0.9rem; }
 input[type=checkbox] { margin-right:5px; }
-button { margin-top:15px; padding:10px 12px; border:none; border-radius:8px; background:#333; color:white; font-size:1rem; cursor:pointer; }
+button { margin-top:10px; padding:10px 12px; border:none; border-radius:8px; background:#333; color:white; font-size:1rem; cursor:pointer; }
 button:hover { background:#555; }
+.delete-btn { background:#e53935; margin:0; padding:3px 6px; font-size:0.8rem; border-radius:4px; }
+.delete-btn:hover { background:#b71c1c; }
 pre { background:#f0f0f0; padding:10px; border-radius:6px; margin-top:10px; white-space:pre-wrap; word-break:break-word; }
 .page-container { display:flex; overflow-x:auto; gap:10px; padding:10px 0; }
-.page-card { min-width:280px; background:#fdfdfd; border:1px solid #ddd; border-radius:8px; padding:10px; flex-shrink:0; }
-.page-card h3 { font-size:1rem; color:#333; margin-bottom:8px; }
+.page-card { min-width:280px; background:#fdfdfd; border:1px solid #ddd; border-radius:8px; padding:10px; flex-shrink:0; position:relative; }
 .section-title { font-weight:700; margin-top:8px; }
 @media screen and (max-width:600px){
   body { padding:5px; }
   h1 { font-size:1.4rem; }
   h2 { font-size:1rem; }
-  select, textarea { font-size:0.85rem; }
+  select, textarea, input[type=text] { font-size:0.85rem; }
   button { font-size:0.9rem; padding:8px; }
   .page-card { min-width:220px; }
 }
@@ -32,55 +33,57 @@ pre { background:#f0f0f0; padding:10px; border-radius:6px; margin-top:10px; whit
 </head>
 <body>
 
-<h1>Web設計ヒアリングシート（詳細設定版）</h1>
+<h1>Web設計ヒアリングシート（詳細＋削除対応版）</h1>
 
 <section>
   <h2>基本設定</h2>
+
   <label>プロジェクト概要（任意）</label>
   <textarea id="projectOverviewInput" placeholder="未入力の場合はおまかせ"></textarea>
 
-  <label>ページ分類</label>
-  <select id="pageTypeSelect">
-    <option value="コーポレート／ブランド">コーポレート／ブランド</option>
-    <option value="EC・販売サイト">EC・販売サイト</option>
-    <option value="メディア・ブログ">メディア・ブログ</option>
-    <option value="業務システム">業務システム</option>
-    <option value="LP・キャンペーン">LP・キャンペーン</option>
-    <option value="ポータル・コミュニティ">ポータル・コミュニティ</option>
+  <label>使用言語（複数選択可）</label>
+  <label><input type="checkbox" id="lang_html" value="HTML">HTML</label>
+  <label><input type="checkbox" id="lang_css" value="CSS">CSS</label>
+  <label><input type="checkbox" id="lang_js" value="JavaScript">JavaScript</label>
+  <label><input type="checkbox" id="lang_python" value="Python">Python</label>
+  <label><input type="checkbox" id="lang_php" value="PHP">PHP</label>
+  <label><input type="checkbox" id="lang_ruby" value="Ruby">Ruby</label>
+
+  <label>サーバー（一般的な無料〜有料）</label>
+  <select id="serverSelect">
+    <option value="さくらレンタルサーバー">さくらレンタルサーバー</option>
+    <option value="XServer">XServer</option>
+    <option value="AWS">AWS</option>
+    <option value="Firebase">Firebase</option>
+    <option value="Vercel">Vercel</option>
     <option value="おまかせ">おまかせ</option>
   </select>
 
-  <label>各ページの目的</label>
-  <textarea id="pagePurposeInput" placeholder="未入力の場合はおまかせ"></textarea>
-
-  <label>ユーザー層・想定デバイス</label>
-  <select id="userTargetSelect">
-    <option value="一般ユーザー（20〜40代）">一般ユーザー（20〜40代）</option>
-    <option value="BtoB企業">BtoB企業</option>
-    <option value="管理者／社内利用">管理者／社内利用</option>
-    <option value="学生／若年層">学生／若年層</option>
-    <option value="高齢層中心">高齢層中心</option>
+  <label>データベース</label>
+  <select id="databaseSelect">
+    <option value="MySQL">MySQL</option>
+    <option value="PostgreSQL">PostgreSQL</option>
+    <option value="SQLite">SQLite</option>
+    <option value="Firebase">Firebase</option>
     <option value="おまかせ">おまかせ</option>
   </select>
 
-  <label>デザイン方針</label>
-  <select id="designSelect">
-    <option value="シンプル＆ミニマル">シンプル＆ミニマル</option>
-    <option value="ビジネス＆信頼重視">ビジネス＆信頼重視</option>
-    <option value="ポップ＆カジュアル">ポップ＆カジュアル</option>
-    <option value="高級・スタイリッシュ">高級・スタイリッシュ</option>
-    <option value="自然・ナチュラル">自然・ナチュラル</option>
+  <label>デザインフレームワーク</label>
+  <select id="designFrameworkSelect">
+    <option value="Bootstrap">Bootstrap</option>
+    <option value="Tailwind">Tailwind</option>
+    <option value="Material UI">Material UI</option>
     <option value="おまかせ">おまかせ</option>
   </select>
 
-  <label>データ・連携・管理要件</label>
-  <textarea id="dataRequirementInput" placeholder="未入力の場合はおまかせ"></textarea>
+  <label>認証方式</label>
+  <select id="authSelect">
+    <option value="メール認証">メール認証</option>
+    <option value="OAuth">OAuth</option>
+    <option value="SSO">SSO</option>
+    <option value="おまかせ">おまかせ</option>
+  </select>
 
-  <label>運用・更新方法</label>
-  <textarea id="operationInput" placeholder="未入力の場合はおまかせ"></textarea>
-
-  <label>公開・セキュリティ・拡張性</label>
-  <textarea id="securityInput" placeholder="未入力の場合はおまかせ"></textarea>
 </section>
 
 <section>
@@ -121,7 +124,7 @@ function addPage() {
   card.id = `pageCard${pageCount}`;
   
   card.innerHTML = `
-    <h3>ページ${pageCount}</h3>
+    <h3>ページ${pageCount} <button class="delete-btn" onclick="deletePage(${pageCount})">削除</button></h3>
     <label>ページ名</label>
     <input type="text" id="pageName${pageCount}" placeholder="例: トップページ">
     
@@ -137,18 +140,26 @@ function addPage() {
   container.appendChild(card);
 }
 
+function deletePage(id) {
+  const card = document.getElementById(`pageCard${id}`);
+  if(card) card.remove();
+}
+
 function generateJSON() {
   const result = {
     projectOverview: document.getElementById('projectOverviewInput').value || "おまかせ",
-    pageType: document.getElementById('pageTypeSelect').value,
-    pagePurpose: document.getElementById('pagePurposeInput').value || "おまかせ",
-    userTarget: document.getElementById('userTargetSelect').value,
-    design: document.getElementById('designSelect').value,
-    dataRequirement: document.getElementById('dataRequirementInput').value || "おまかせ",
-    operation: document.getElementById('operationInput').value || "おまかせ",
-    security: document.getElementById('securityInput').value || "おまかせ",
+    languages: [],
+    server: document.getElementById('serverSelect').value,
+    database: document.getElementById('databaseSelect').value,
+    designFramework: document.getElementById('designFrameworkSelect').value,
+    auth: document.getElementById('authSelect').value,
     pages: []
   };
+
+  ["html","css","js","python","php","ruby"].forEach(lang=>{
+    const cb = document.getElementById(`lang_${lang}`);
+    if(cb && cb.checked) result.languages.push(cb.value);
+  });
   
   for(let i=1; i<=pageCount; i++){
     const pageCard = document.getElementById(`pageCard${i}`);
