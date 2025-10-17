@@ -186,12 +186,58 @@ iframe {
   box-shadow: 1px 2px 6px rgba(0,0,0,0.1);
 }
 
+/* ===== 設計書ブロック ===== */
+#designDocsContainer {
+  margin-top: 20px;
+  background: #f5f5f5;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: inset 1px 1px 5px rgba(0,0,0,0.05);
+}
+
+#designDocsContainer h3 {
+  color: #1976d2;
+  margin-top: 15px;
+}
+
+#designDocsContainer div {
+  margin: 8px 0;
+  padding-left: 10px;
+}
+
+#designDocsContainer ul {
+  margin: 5px 0 10px 20px;
+  padding-left: 0;
+}
+
+#designDocsContainer li {
+  margin-bottom: 3px;
+}
+
+/* ===== スマホ対応 ===== */
 @media screen and (max-width: 600px) {
-  body { padding: 15px; }
-  section { padding: 18px; margin: 15px auto; }
-  h1 { font-size: 1.4rem; padding: 12px; }
-  h2 { font-size: 1rem; }
-  select, textarea, input[type=text] { font-size: 0.9rem; }
-  button { font-size: 0.9rem; padding: 9px 12px; }
-  table { font-size: 0.85rem; }
+  body {
+    padding: 15px;
+  }
+  section {
+    padding: 18px;
+    margin: 15px auto;
+  }
+  h1 {
+    font-size: 1.4rem;
+    padding: 12px;
+  }
+  h2 {
+    font-size: 1rem;
+  }
+  select, textarea, input[type=text] {
+    font-size: 0.9rem;
+  }
+  button {
+    font-size: 0.9rem;
+    padding: 9px 12px;
+  }
+  table {
+    font-size: 0.85rem;
+  }
 }
