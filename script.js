@@ -152,13 +152,13 @@ function generateTransitionDiagram() {
 }
 // 各設計書の処理を呼び出し
 function generateDesignDocs() {
-  const designContainer = document.getElementById('designDocsContainer');
+  const designContainer = document.getElementById('generateFeatureList');
   designContainer.innerHTML = generateSystemDiagram(pages) + generateFeatureList(pages);
 
-  const tableDefinitionContainer = document.getElementById('tableDefinitionContainer');
+  const tableDefinitionContainer = document.getElementById('generateTableDefinition');
   tableDefinitionContainer.innerHTML = generateTableDefinition();
 
-  const transitionDiagramContainer = document.getElementById('transitionDiagramContainer');
+  const transitionDiagramContainer = document.getElementById('generateTransitionDiagram');
   transitionDiagramContainer.innerHTML = generateTransitionDiagram();
 }
 
