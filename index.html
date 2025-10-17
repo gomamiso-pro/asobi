@@ -51,7 +51,7 @@
   <textarea id="dataRequirementInput" placeholder="未入力の場合はおまかせ"></textarea>
 
   <label>運用・更新・公開</label>
-  <textarea id="operationInput" placeholder="更新方法や管理権限など、未入力の場合はおまかせ"></textarea>
+  <textarea id="operationInput" placeholder="未入力の場合はおまかせ"></textarea>
 
   <label>使用言語（複数選択可）</label>
   <label><input type="checkbox" id="lang_html" value="HTML">HTML</label>
@@ -110,7 +110,6 @@
   <h2>プレビュー</h2>
   <button onclick="showPreview()">プレビュー表示</button>
   <iframe id="iframePreview"></iframe>
-  <!-- 設計書表示 -->
   <div id="designDocsContainer"></div>
 </section>
 
@@ -131,6 +130,19 @@
 <section>
   <h2>生成結果（JSON形式）</h2>
   <pre id="jsonOutput">{}</pre>
+</section>
+
+<section>
+  <h2>AIコード生成指示</h2>
+  <textarea id="aiInstructions" rows="6" readonly>
+ここにヒアリング内容からAIにコード生成を依頼する指示文をまとめます
+  </textarea>
+  <button onclick="copyInstructions()">コピー</button>
+</section>
+
+<section>
+  <h2>生成コードプレビュー</h2>
+  <iframe id="codePreview"></iframe>
 </section>
 
 <script src="script.js"></script>
