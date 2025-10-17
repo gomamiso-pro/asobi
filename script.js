@@ -77,6 +77,11 @@ function updatePages() {
 function showPreview() {
 	updatePages();
 
+	if (pages.length === 0) {
+		alert("ページが1件もありません。まずページを追加してください。");
+		return;
+	}
+
 	let html = '';
 	pages.forEach(p => {
 		html += `<h2>${p.pageName}</h2>
@@ -98,37 +103,44 @@ function generateFunctionList(pages) {
 		<tr><th>分類</th><th>機能名</th><th>詳細</th></tr>
 	</thead><tbody>`;
 
+// 設計書（機能一覧）生成
+function generateFunctionList(pages) {
+	if (pages.length === 0) {
+		return "<p>ページが追加されていません。</p>";
+	}
+
+	let html = `<h3>機能一覧</h3>`;
+	html += `<table border="1" cellpadding="6" style="border-collapse: collapse; width: 100%;">
+	<thead>
+		<tr><th>分類</th><th>機能名</th><th>詳細</th></tr>
+	</thead><tbody>`;
+
 	// ページごとに処理
 	pages.forEach(p => {
 		const addRows = (area, name) => {
 			area.forEach(item => {
 				let detail = "";
-				let suffix = "";
 				switch(name){
 					case "ヘッダー":
 						if(item==="ロゴ") detail="トップページリンク付きロゴ";
 						else if(item==="検索ボックス") detail="サイト内検索ボックス設置";
 						else if(item==="通知アイコン") detail="通知アイコン表示";
 						else detail=item+"表示";
-						suffix="操作";
 						break;
 					case "メニュー":
 						if(item==="ドロップダウン") detail="カテゴリ別ドロップダウンメニュー";
 						else if(item==="パンくずリスト") detail="ページ階層表示";
 						else detail=item+"機能";
-						suffix="操作";
 						break;
 					case "ボディ":
 						if(item==="カルーセル") detail="トップページメインビジュアルカルーセル";
 						else if(item==="フォーム") detail="ユーザー入力フォーム設置";
 						else detail=item+"表示/操作";
-						suffix="表示/操作";
 						break;
 					case "フッター":
 						if(item==="SNSリンク") detail="フッターにSNSリンク";
 						else if(item==="コピーライト") detail="著作権情報表示";
 						else detail=item+"表示";
-						suffix="表示";
 						break;
 				}
 				html += `<tr><td>${name}</td><td>${item}</td><td>${detail}</td></tr>`;
@@ -142,7 +154,6 @@ function generateFunctionList(pages) {
 	html += `</tbody></table>`;
 	return html;
 }
-
 
 // テーブル定義書生成
 function generateTableDefinition(pages) {
@@ -205,14 +216,14 @@ function generateTransitionDiagram() {
 	return html;
 }
 
-// 設計書を生成
+// 設計書生成
 function generateDesignDocs() {
 	if (!document.getElementById('pageContainer')) {
-		// ページコンテナが無ければ処理を中止
 		return;
 	}
 
 	updatePages();
+
 	const functionListContainer = document.getElementById('generateFunctionList');
 	functionListContainer.innerHTML = generateFunctionList(pages);
 
@@ -294,6 +305,8 @@ function copyInstructions() {
 	alert("指示文をコピーしました！");
 }
 
-// 初期実行
-generateDesignDocs();
-updateEstimate();
+// 初期実行はページがある場合のみ
+if (pageCount > 0) {
+	generateDesignDocs();
+	updateEstimate();
+}
