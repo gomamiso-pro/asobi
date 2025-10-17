@@ -1,243 +1,105 @@
-/* Google Fontsの丸文字を使用 */
+/* Google Fonts 丸文字 */
 body {
   font-family: 'M PLUS Rounded 1c', 'Noto Sans JP', sans-serif;
-  background: linear-gradient(135deg, #fff9f9, #f9faff);
-  margin: 0;
-  padding: 20px;
-  color: #333;
-  box-sizing: border-box;
+  background: linear-gradient(135deg,#fff9f9,#f9faff);
+  margin:0; padding:20px; color:#333;
+  box-sizing:border-box;
 }
 
-* {
-  box-sizing: border-box;
+* { box-sizing:border-box; }
+
+h1{
+  text-align:center; margin-bottom:20px; font-weight:900;
+  color:#fff; background: linear-gradient(135deg,#ff80ab,#82b1ff);
+  padding:15px; border-radius:12px;
+  box-shadow:0 4px 8px rgba(0,0,0,0.15);
+  text-shadow:1px 2px 2px rgba(0,0,0,0.25);
 }
 
-h1 {
-  text-align: center;
-  margin-bottom: 20px;
-  font-weight: 900;
-  color: #fff;
-  background: linear-gradient(135deg, #ff80ab, #82b1ff);
-  padding: 15px;
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  text-shadow: 1px 2px 2px rgba(0, 0, 0, 0.25);
+section{
+  background:#fff; padding:20px; border-radius:15px; margin:20px auto;
+  box-shadow:0 4px 10px rgba(0,0,0,0.05); max-width:800px;
 }
 
-section {
-  background: #fff;
-  padding: 20px;
-  border-radius: 15px;
-  margin: 20px auto;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-  max-width: 800px;
+h2{
+  margin-top:10px; color:#fff; font-size:1.2rem; padding:10px 12px;
+  border-radius:10px; background:linear-gradient(145deg,#82b1ff,#64b5f6);
+  box-shadow: inset 2px 2px 5px rgba(255,255,255,0.6),3px 3px 6px rgba(0,0,0,0.1);
+  text-shadow:1px 1px 2px rgba(0,0,0,0.15);
 }
 
-h2 {
-  margin-top: 10px;
-  color: #fff;
-  font-size: 1.2rem;
-  padding: 10px 12px;
-  border-radius: 10px;
-  background: linear-gradient(145deg, #82b1ff, #64b5f6);
-  box-shadow: inset 2px 2px 5px rgba(255,255,255,0.6), 
-              3px 3px 6px rgba(0,0,0,0.1);
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.15);
+h3{
+  font-size:1rem; color:#333; margin-bottom:8px;
+  display:flex; justify-content:space-between; align-items:center;
 }
 
-h3 {
-  font-size: 1rem;
-  color: #333;
-  margin-bottom: 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-label {
-  display: block;
-  margin-top: 10px;
-  font-weight: 700;
-}
-
-select,
-textarea,
-input[type=text] {
-  width: 100%;
-  padding: 10px 12px;
-  margin-top: 6px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 0.95rem;
+label{ display:block; margin-top:10px; font-weight:700; }
+select, textarea, input[type=text]{
+  width:100%; padding:10px 12px; margin-top:6px;
+  border-radius:8px; border:1px solid #ccc; font-size:0.95rem;
   box-shadow: inset 1px 1px 3px rgba(0,0,0,0.05);
-  transition: all 0.2s ease;
-  background: #fff;
+  transition: all 0.2s ease; background:#fff;
 }
-
-select:focus,
-textarea:focus,
-input[type=text]:focus {
-  outline: none;
-  border-color: #64b5f6;
-  box-shadow: 0 0 6px #90caf9;
+select:focus, textarea:focus, input[type=text]:focus{
+  outline:none; border-color:#64b5f6; box-shadow:0 0 6px #90caf9;
 }
+input[type=checkbox]{ margin-right:5px; }
 
-input[type=checkbox] {
-  margin-right: 5px;
-}
-
-button {
-  margin-top: 12px;
-  padding: 10px 14px;
-  border: none;
-  border-radius: 8px;
-  background: linear-gradient(145deg, #64b5f6, #2196f3);
-  color: white;
-  font-size: 1rem;
-  cursor: pointer;
-  box-shadow: 2px 2px 6px rgba(0,0,0,0.15);
+button{
+  margin-top:12px; padding:10px 14px; border:none;
+  border-radius:8px; background:linear-gradient(145deg,#64b5f6,#2196f3);
+  color:white; font-size:1rem; cursor:pointer;
+  box-shadow:2px 2px 6px rgba(0,0,0,0.15);
   transition: all 0.2s;
 }
+button:hover{ background:linear-gradient(145deg,#2196f3,#1976d2); transform:translateY(-2px);}
+.delete-btn{
+  background: linear-gradient(145deg,#f44336,#d32f2f); margin:0;
+  padding:4px 8px; font-size:0.8rem; border-radius:6px;
+  box-shadow:1px 1px 3px rgba(0,0,0,0.2);
+}
+.delete-btn:hover{ background:linear-gradient(145deg,#d32f2f,#b71c1c); }
 
-button:hover {
-  background: linear-gradient(145deg, #2196f3, #1976d2);
-  transform: translateY(-2px);
+.page-container{ display:flex; overflow-x:auto; gap:10px; padding:10px 0; }
+.page-card{
+  flex:0 0 auto; min-width:220px; max-width:90vw; background:#fdfdfd;
+  border:1px solid #ddd; border-radius:12px; padding:10px;
+  box-shadow:2px 3px 6px rgba(0,0,0,0.05); position:relative;
+}
+.section-title{ font-weight:700; margin-top:8px; color:#2196f3; }
+
+#estimateTable{ display:block; width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+#estimateTable table{ width:100%; min-width:600px; border-collapse:collapse; }
+#estimateTable th, #estimateTable td{ border:1px solid #ddd; padding:8px; text-align:left; }
+#estimateTable th{ background: linear-gradient(135deg,#bbdefb,#e3f2fd); font-weight:700; }
+
+pre{ background:#f8f8f8; padding:10px; border-radius:6px; margin-top:10px;
+  white-space:pre-wrap; word-break:break-word; box-shadow:inset 1px 1px 3px rgba(0,0,0,0.05);
 }
 
-.delete-btn {
-  background: linear-gradient(145deg, #f44336, #d32f2f);
-  margin: 0;
-  padding: 4px 8px;
-  font-size: 0.8rem;
-  border-radius: 6px;
-  box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+iframe{ width:100%; height:300px; border:2px solid #bbdefb; border-radius:10px; margin-top:10px;
+  box-shadow:1px 2px 6px rgba(0,0,0,0.1);
 }
 
-.delete-btn:hover {
-  background: linear-gradient(145deg, #d32f2f, #b71c1c);
-}
+/* 設計書ブロック */
+#designDocsContainer{ margin-top:20px; background:#f5f5f5; padding:15px;
+  border-radius:10px; box-shadow:inset 1px 1px 5px rgba(0,0,0,0.05); }
+#designDocsContainer h3{ color:#1976d2; margin-top:15px; }
+#designDocsContainer div{ margin:8px 0; padding-left:10px; }
+#designDocsContainer ul{ margin:5px 0 10px 20px; padding-left:0; }
+#designDocsContainer li{ margin-bottom:3px; }
 
-.page-container {
-  display: flex;
-  overflow-x: auto;
-  gap: 10px;
-  padding: 10px 0;
-}
+/* AI指示文コピー */
+#aiInstructions{ width:100%; font-family:monospace; margin-top:5px; }
+#aiInstructions + button{ margin-top:5px; }
 
-.page-card {
-  flex: 0 0 auto;
-  min-width: 220px;
-  max-width: 90vw;
-  background: #fdfdfd;
-  border: 1px solid #ddd;
-  border-radius: 12px;
-  padding: 10px;
-  box-shadow: 2px 3px 6px rgba(0,0,0,0.05);
-  position: relative;
-}
-
-.section-title {
-  font-weight: 700;
-  margin-top: 8px;
-  color: #2196f3;
-}
-
-#estimateTable {
-  display: block;
-  width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-#estimateTable table {
-  width: 100%;
-  min-width: 600px;
-  border-collapse: collapse;
-}
-
-#estimateTable th,
-#estimateTable td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
-}
-
-#estimateTable th {
-  background: linear-gradient(135deg, #bbdefb, #e3f2fd);
-  font-weight: 700;
-}
-
-pre {
-  background: #f8f8f8;
-  padding: 10px;
-  border-radius: 6px;
-  margin-top: 10px;
-  white-space: pre-wrap;
-  word-break: break-word;
-  box-shadow: inset 1px 1px 3px rgba(0,0,0,0.05);
-}
-
-iframe {
-  width: 100%;
-  height: 300px;
-  border: 2px solid #bbdefb;
-  border-radius: 10px;
-  margin-top: 10px;
-  box-shadow: 1px 2px 6px rgba(0,0,0,0.1);
-}
-
-/* ===== 設計書ブロック ===== */
-#designDocsContainer {
-  margin-top: 20px;
-  background: #f5f5f5;
-  padding: 15px;
-  border-radius: 10px;
-  box-shadow: inset 1px 1px 5px rgba(0,0,0,0.05);
-}
-
-#designDocsContainer h3 {
-  color: #1976d2;
-  margin-top: 15px;
-}
-
-#designDocsContainer div {
-  margin: 8px 0;
-  padding-left: 10px;
-}
-
-#designDocsContainer ul {
-  margin: 5px 0 10px 20px;
-  padding-left: 0;
-}
-
-#designDocsContainer li {
-  margin-bottom: 3px;
-}
-
-/* ===== スマホ対応 ===== */
-@media screen and (max-width: 600px) {
-  body {
-    padding: 15px;
-  }
-  section {
-    padding: 18px;
-    margin: 15px auto;
-  }
-  h1 {
-    font-size: 1.4rem;
-    padding: 12px;
-  }
-  h2 {
-    font-size: 1rem;
-  }
-  select, textarea, input[type=text] {
-    font-size: 0.9rem;
-  }
-  button {
-    font-size: 0.9rem;
-    padding: 9px 12px;
-  }
-  table {
-    font-size: 0.85rem;
-  }
+/* スマホ対応 */
+@media screen and (max-width:600px){
+  body{ padding:15px; }
+  section{ padding:18px; margin:15px auto; }
+  h1{ font-size:1.4rem; padding:12px; }
+  h2{ font-size:1rem; }
+  select, textarea, input[type=text]{ font-size:0.9rem; }
+  button{ font-size:0.9rem; padding:9px 12px; }
+  table{ font-size:0.85rem; }
 }
