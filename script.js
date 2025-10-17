@@ -97,14 +97,6 @@ function showPreview() {
 
 // 設計書（機能一覧）生成
 function generateFunctionList(pages) {
-	let html = `<h3>機能一覧</h3>`;
-	html += `<table border="1" cellpadding="6" style="border-collapse: collapse; width: 100%;">
-	<thead>
-		<tr><th>分類</th><th>機能名</th><th>詳細</th></tr>
-	</thead><tbody>`;
-
-// 設計書（機能一覧）生成
-function generateFunctionList(pages) {
 	if (pages.length === 0) {
 		return "<p>ページが追加されていません。</p>";
 	}
