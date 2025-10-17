@@ -1,19 +1,22 @@
 let pageCount = 0;
+
 const sectionOptions = {
-  header: ["ロゴ", "検索ボックス", "通知アイコン", "言語切替", "ログインボタン"],
-  menu: ["カテゴリメニュー", "ドロップダウン", "パンくずリスト", "サイドメニュー"],
-  body: ["カルーセル", "新着商品一覧", "特集バナー", "記事リスト", "フォーム"],
-  footer: ["会社情報", "SNSリンク", "コピーライト", "フッターメニュー"]
+  header: ["ロゴ","検索ボックス","通知アイコン","言語切替","ログインボタン"],
+  menu: ["カテゴリメニュー","ドロップダウン","パンくずリスト","サイドメニュー"],
+  body: ["カルーセル","新着商品一覧","特集バナー","記事リスト","フォーム"],
+  footer: ["会社情報","SNSリンク","コピーライト","フッターメニュー"]
 };
 
+// チェックボックス作成
 function createSectionCheckboxes(sectionName, idPrefix, options){
   let html = `<div class="section-title">${sectionName}</div>`;
-  options.forEach((opt, i) => {
+  options.forEach((opt,i)=>{
     html += `<label><input type="checkbox" id="${idPrefix}_${i}" value="${opt}">${opt}</label>`;
   });
   return html;
 }
 
+// ページ追加
 function addPage() {
   pageCount++;
   const container = document.getElementById('pageContainer');
@@ -24,7 +27,7 @@ function addPage() {
     <h3>ページ${pageCount} <button class="delete-btn" onclick="deletePage(${pageCount})">削除</button></h3>
     <label>ページ名</label>
     <input type="text" id="pageName${pageCount}" placeholder="例: トップページ">
-    <label>ページの目的</label>
+    <label>ページ目的</label>
     <textarea id="pagePurpose${pageCount}" placeholder="ページの目的を入力"></textarea>
     ${createSectionCheckboxes("ヘッダー", `header${pageCount}`, sectionOptions.header)}
     ${createSectionCheckboxes("メニュー", `menu${pageCount}`, sectionOptions.menu)}
@@ -35,66 +38,102 @@ function addPage() {
   updateEstimate();
 }
 
-function deletePage(id) {
-  const card = document.getElementById(`pageCard${id}`);
+function deletePage(id){
+  const card=document.getElementById(`pageCard${id}`);
   if(card) card.remove();
   updateEstimate();
 }
 
-function showPreview() {
-  const pages = [];
+// プレビュー＋設計書生成
+function showPreview(){
+  const pages=[];
   for(let i=1;i<=pageCount;i++){
-    const card = document.getElementById(`pageCard${i}`);
+    const card=document.getElementById(`pageCard${i}`);
     if(!card) continue;
-    const pageName = document.getElementById(`pageName${i}`).value || `ページ${i}`;
-    const pagePurpose = document.getElementById(`pagePurpose${i}`).value || "おまかせ";
-    const header = Array.from(card.querySelectorAll(`[id^=header${i}_]:checked`)).map(e => e.value);
-    const menu = Array.from(card.querySelectorAll(`[id^=menu${i}_]:checked`)).map(e => e.value);
-    const body = Array.from(card.querySelectorAll(`[id^=body${i}_]:checked`)).map(e => e.value);
-    const footer = Array.from(card.querySelectorAll(`[id^=footer${i}_]:checked`)).map(e => e.value);
+    const pageName=document.getElementById(`pageName${i}`).value||`ページ${i}`;
+    const pagePurpose=document.getElementById(`pagePurpose${i}`).value||"おまかせ";
+    const header=Array.from(card.querySelectorAll(`[id^=header${i}_]:checked`)).map(e=>e.value);
+    const menu=Array.from(card.querySelectorAll(`[id^=menu${i}_]:checked`)).map(e=>e.value);
+    const body=Array.from(card.querySelectorAll(`[id^=body${i}_]:checked`)).map(e=>e.value);
+    const footer=Array.from(card.querySelectorAll(`[id^=footer${i}_]:checked`)).map(e=>e.value);
     pages.push({pageName, pagePurpose, header, menu, body, footer});
   }
 
-  // 簡易プレビュー表示
-  let html = '';
-  pages.forEach(p => {
-    html += `<h2>${p.pageName}</h2>`;
-    html += `<div><strong>目的:</strong> ${p.pagePurpose}</div>`;
-    html += `<div><strong>ヘッダー:</strong> ${p.header.join(", ") || "なし"}</div>`;
-    html += `<div><strong>メニュー:</strong> ${p.menu.join(", ") || "なし"}</div>`;
-    html += `<div><strong>ボディ:</strong> ${p.body.join(", ") || "なし"}</div>`;
-    html += `<div><strong>フッター:</strong> ${p.footer.join(", ") || "なし"}</div><hr>`;
+  // プレビュー表示
+  let html='';
+  pages.forEach(p=>{
+    html+=`<h2>${p.pageName}</h2>
+           <div><strong>目的:</strong> ${p.pagePurpose}</div>
+           <div><strong>ヘッダー:</strong> ${p.header.join(", ")||"なし"}</div>
+           <div><strong>メニュー:</strong> ${p.menu.join(", ")||"なし"}</div>
+           <div><strong>ボディ:</strong> ${p.body.join(", ")||"なし"}</div>
+           <div><strong>フッター:</strong> ${p.footer.join(", ")||"なし"}</div><hr>`;
   });
   document.getElementById('iframePreview').srcdoc = html;
 
-  // JSON出力
+  // 設計書生成
+  const designContainer = document.getElementById('designDocsContainer');
+  designContainer.innerHTML = ''; // クリア
+
+  // システム構造図
+  let systemHtml = `<h3>システム構造図</h3>`;
+  pages.forEach(p=>{
+    systemHtml += `<div>${p.pageName}構造図:<br>
+      ├─ ヘッダー: ${p.header.join(", ")||"なし"}<br>
+      ├─ メニュー: ${p.menu.join(", ")||"なし"}<br>
+      ├─ ボディ: ${p.body.join(", ")||"なし"}<br>
+      └─ フッター: ${p.footer.join(", ")||"なし"}</div>`;
+  });
+  designContainer.innerHTML += systemHtml;
+
+  // 機能一覧
+  let funcHtml = `<h3>機能一覧</h3>`;
+  pages.forEach(p=>{
+    funcHtml += `<div>${p.pageName}機能:<ul>`;
+    if(p.header.length) p.header.forEach(h=>funcHtml += `<li>${h}操作</li>`);
+    if(p.menu.length) p.menu.forEach(m=>funcHtml += `<li>${m}操作</li>`);
+    if(p.body.length) p.body.forEach(b=>funcHtml += `<li>${b}表示/操作</li>`);
+    if(p.footer.length) p.footer.forEach(f=>funcHtml += `<li>${f}表示</li>`);
+    funcHtml += `</ul></div>`;
+  });
+  designContainer.innerHTML += funcHtml;
+
+  // テーブル定義書（簡易サンプル）
+  let tableHtml = `<h3>テーブル定義書</h3>
+    <div>
+      <strong>users:</strong> id, name, email, password<br>
+      <strong>products:</strong> id, name, price, stock, category_id<br>
+      <strong>orders:</strong> id, user_id, total_price, status, created_at
+    </div>`;
+  designContainer.innerHTML += tableHtml;
+
+  // 画面遷移図
+  let transHtml = `<h3>画面遷移図</h3>`;
+  transHtml += `<div>トップページ → 商品ページ → カートページ → 注文確認ページ</div>`;
+  designContainer.innerHTML += transHtml;
+
+  // JSON生成
   const output = {
-    projectOverview: document.getElementById('projectOverviewInput').value || "おまかせ",
+    projectOverview: document.getElementById('projectOverviewInput').value||"おまかせ",
     pageType: document.getElementById('pageTypeSelect').value,
     userTarget: document.getElementById('userTargetSelect').value,
     design: document.getElementById('designSelect').value,
-    dataRequirement: document.getElementById('dataRequirementInput').value || "おまかせ",
-    operation: document.getElementById('operationInput').value || "おまかせ",
-    languages: Array.from(document.querySelectorAll('[id^=lang_]:checked')).map(e => e.value),
+    dataRequirement: document.getElementById('dataRequirementInput').value||"おまかせ",
+    operation: document.getElementById('operationInput').value||"おまかせ",
+    languages: Array.from(document.querySelectorAll('[id^=lang_]:checked')).map(e=>e.value),
     server: document.getElementById('serverSelect').value,
     database: document.getElementById('databaseSelect').value,
     designFramework: document.getElementById('designFrameworkSelect').value,
     auth: document.getElementById('authSelect').value,
-    security: document.getElementById('securityInput').value || "おまかせ",
-    pages: pages,
-    // 設計書サンプル
-    designDocuments: {
-      systemStructureDiagram: pages.map(p => p.pageName + "構造図"),
-      functionList: pages.map(p => p.pageName + "機能一覧"),
-      tableDefinition: pages.map(p => p.pageName + "テーブル定義書"),
-      screenTransitionDiagram: pages.map(p => p.pageName + "画面遷移図")
-    }
+    security: document.getElementById('securityInput').value||"おまかせ",
+    pages: pages
   };
+  document.getElementById('jsonOutput').textContent = JSON.stringify(output,null,2);
 
-  document.getElementById('jsonOutput').textContent = JSON.stringify(output, null, 2);
   updateEstimate();
 }
 
+// 見積計算
 function updateEstimate(){
   const tbody = document.querySelector('#estimateTable tbody');
   tbody.innerHTML = '';
@@ -111,7 +150,7 @@ function updateEstimate(){
   subtotal += pageUnit * pages;
   if(pages>0) tbody.innerHTML += `<tr><td>ページ追加</td><td>${pageUnit}</td><td>${pages}</td><td>${pageUnit*pages}</td></tr>`;
 
-  // 各セクション 1セクション1万円
+  // 各セクション（ヘッダー・メニュー・ボディ・フッター） 1セクション1万
   const sectionUnit = 10000;
   let sectionCount = 0;
   for(let i=1;i<=pageCount;i++){
@@ -122,7 +161,7 @@ function updateEstimate(){
   subtotal += sectionUnit * sectionCount;
   if(sectionCount>0) tbody.innerHTML += `<tr><td>セクション追加</td><td>${sectionUnit}</td><td>${sectionCount}</td><td>${sectionUnit*sectionCount}</td></tr>`;
 
-  // データ・認証・フレームワークまとめて 2万円
+  // データベース・認証・フレームワークまとめて 2万
   const extraUnit = 20000;
   subtotal += extraUnit;
   tbody.innerHTML += `<tr><td>データ・認証・フレームワーク設定</td><td>${extraUnit}</td><td>1</td><td>${extraUnit}</td></tr>`;
