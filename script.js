@@ -68,45 +68,87 @@ function showPreview(){
 
 // 機能一覧
 function generateFeatureList(pages) {
-  let funcHtml = `<h3>機能一覧</h3>`;
+  let html = `<h3>機能一覧</h3>`;
+  html += `<table border="1" cellpadding="6" style="border-collapse: collapse; width: 100%;">
+    <thead>
+      <tr><th>分類</th><th>機能名</th><th>詳細</th></tr>
+    </thead><tbody>`;
+  
   pages.forEach(p => {
-    funcHtml += `<div>${p.pageName}機能:<ul>`;
-    if (p.header.length) p.header.forEach(h => funcHtml += `<li>${h}操作</li>`);
-    if (p.menu.length) p.menu.forEach(m => funcHtml += `<li>${m}操作</li>`);
-    if (p.body.length) p.body.forEach(b => funcHtml += `<li>${b}表示/操作</li>`);
-    if (p.footer.length) p.footer.forEach(f => funcHtml += `<li>${f}表示</li>`);
-    funcHtml += `</ul></div>`;
+    const addRows = (area, name, suffix) => {
+      area.forEach(item => {
+        html += `<tr><td>${name}</td><td>${item}</td><td>${item}${suffix}</td></tr>`;
+      });
+    };
+    addRows(p.header, "ヘッダー", "操作");
+    addRows(p.menu, "メニュー", "操作");
+    addRows(p.body, "ボディ", "表示/操作");
+    addRows(p.footer, "フッター", "表示");
   });
-  return funcHtml;
+
+  html += `</tbody></table>`;
+  return html;
 }
+
 
 // テーブル定義書
 function generateTableDefinition() {
-  let tableHtml = `<h3>テーブル定義書</h3>`;
-  tableHtml += `<div><strong>users:</strong> id, name, email, password<br>
-                 <strong>products:</strong> id, name, price, stock, category_id<br>
-                 <strong>orders:</strong> id, user_id, total_price, status, created_at</div>`;
-  return tableHtml;
+  const tables = {
+    users: [
+      { field: "id", type: "INT", detail: "主キー" },
+      { field: "name", type: "VARCHAR", detail: "ユーザー名" },
+      { field: "email", type: "VARCHAR", detail: "メールアドレス" },
+      { field: "password", type: "VARCHAR", detail: "ハッシュ化されたパスワード" },
+    ],
+    products: [
+      { field: "id", type: "INT", detail: "主キー" },
+      { field: "name", type: "VARCHAR", detail: "商品名" },
+      { field: "price", type: "INT", detail: "価格（円）" },
+      { field: "stock", type: "INT", detail: "在庫数" },
+      { field: "category_id", type: "INT", detail: "カテゴリ外部キー" },
+    ],
+    orders: [
+      { field: "id", type: "INT", detail: "主キー" },
+      { field: "user_id", type: "INT", detail: "ユーザーID外部キー" },
+      { field: "total_price", type: "INT", detail: "合計金額" },
+      { field: "status", type: "VARCHAR", detail: "注文ステータス" },
+      { field: "created_at", type: "DATETIME", detail: "注文日時" },
+    ],
+  };
+
+  let html = `<h3>テーブル定義書</h3>`;
+  for (const [tableName, fields] of Object.entries(tables)) {
+    html += `<h4>${tableName} テーブル</h4>`;
+    html += `<table border="1" cellpadding="6" style="border-collapse: collapse; width: 100%;">
+      <thead><tr><th>フィールド名</th><th>型</th><th>詳細</th></tr></thead><tbody>`;
+    fields.forEach(f => {
+      html += `<tr><td>${f.field}</td><td>${f.type}</td><td>${f.detail}</td></tr>`;
+    });
+    html += `</tbody></table><br>`;
+  }
+  return html;
 }
+
 
 // 画面遷移図
 function generateTransitionDiagram() {
-  let transHtml = `<h3>画面遷移図</h3>`;
-  transHtml += `<svg width="100%" height="120">
-    <defs>
-      <marker id="arrow" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="auto" markerUnits="strokeWidth">
-        <path d="M0,0 L0,6 L9,3 z" fill="#2196f3" />
-      </marker>
-    </defs>
-    <line x1="50" y1="20" x2="250" y2="20" stroke="#2196f3" stroke-width="2" marker-end="url(#arrow)"/>
-    <line x1="250" y1="20" x2="450" y2="20" stroke="#2196f3" stroke-width="2" marker-end="url(#arrow)"/>
-    <line x1="450" y1="20" x2="650" y2="20" stroke="#2196f3" stroke-width="2" marker-end="url(#arrow)"/>
-    <text x="50" y="15" fill="#000">トップページ</text>
-    <text x="250" y="15" fill="#000">商品ページ</text>
-    <text x="450" y="15" fill="#000">カートページ</text>
-    <text x="650" y="15" fill="#000">注文確認ページ</text>
-  </svg>`;
-  return transHtml;
+  const screens = ["トップページ", "商品ページ", "カートページ", "注文確認ページ", "注文完了ページ"];
+  
+  let html = `<h3>画面遷移図</h3>`;
+  html += `<div style="display: flex; gap: 20px; overflow-x: auto; padding: 10px;">`;
+
+  screens.forEach((screen, index) => {
+    const next = screens[index + 1];
+    html += `
+      <div style="min-width: 200px; border: 1px solid #ccc; padding: 16px; border-radius: 8px; background: #f9f9f9; box-shadow: 0 0 4px #ccc;">
+        <h4>${screen}</h4>
+        ${next ? `<div style="text-align: center; margin-top: 10px;">↓ 遷移</div>` : ""}
+        ${next ? `<div style="margin-top: 10px;">→ <strong>${next}</strong></div>` : ""}
+      </div>`;
+  });
+
+  html += `</div>`;
+  return html;
 }
 // 各設計書の処理を呼び出し
 function generateDesignDocs() {
