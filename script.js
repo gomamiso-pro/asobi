@@ -98,25 +98,51 @@ function generateFunctionList(pages) {
 		<tr><th>分類</th><th>機能名</th><th>詳細</th></tr>
 	</thead><tbody>`;
 
+	// ページごとに処理
 	pages.forEach(p => {
-		const addRows = (area, name, suffix) => {
+		const addRows = (area, name) => {
 			area.forEach(item => {
-				html += `<tr>
-					<td>${name}</td>
-					<td>${item}</td>
-					<td>${item}${suffix}</td>
-				</tr>`;
+				let detail = "";
+				let suffix = "";
+				switch(name){
+					case "ヘッダー":
+						if(item==="ロゴ") detail="トップページリンク付きロゴ";
+						else if(item==="検索ボックス") detail="サイト内検索ボックス設置";
+						else if(item==="通知アイコン") detail="通知アイコン表示";
+						else detail=item+"表示";
+						suffix="操作";
+						break;
+					case "メニュー":
+						if(item==="ドロップダウン") detail="カテゴリ別ドロップダウンメニュー";
+						else if(item==="パンくずリスト") detail="ページ階層表示";
+						else detail=item+"機能";
+						suffix="操作";
+						break;
+					case "ボディ":
+						if(item==="カルーセル") detail="トップページメインビジュアルカルーセル";
+						else if(item==="フォーム") detail="ユーザー入力フォーム設置";
+						else detail=item+"表示/操作";
+						suffix="表示/操作";
+						break;
+					case "フッター":
+						if(item==="SNSリンク") detail="フッターにSNSリンク";
+						else if(item==="コピーライト") detail="著作権情報表示";
+						else detail=item+"表示";
+						suffix="表示";
+						break;
+				}
+				html += `<tr><td>${name}</td><td>${item}</td><td>${detail}</td></tr>`;
 			});
 		};
-		addRows(p.header, "ヘッダー", "操作");
-		addRows(p.menu, "メニュー", "操作");
-		addRows(p.body, "ボディ", "表示/操作");
-		addRows(p.footer, "フッター", "表示");
+		addRows(p.header, "ヘッダー");
+		addRows(p.menu, "メニュー");
+		addRows(p.body, "ボディ");
+		addRows(p.footer, "フッター");
 	});
-
 	html += `</tbody></table>`;
 	return html;
 }
+
 
 // テーブル定義書生成
 function generateTableDefinition(pages) {
