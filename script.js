@@ -7,7 +7,6 @@ const sectionOptions = {
   footer: ["会社情報","SNSリンク","コピーライト","フッターメニュー"]
 };
 
-// チェックボックス作成
 function createSectionCheckboxes(sectionName, idPrefix, options){
   let html = `<div class="section-title">${sectionName}</div>`;
   options.forEach((opt,i)=>{
@@ -16,8 +15,7 @@ function createSectionCheckboxes(sectionName, idPrefix, options){
   return html;
 }
 
-// ページ追加
-function addPage() {
+function addPage(){
   pageCount++;
   const container = document.getElementById('pageContainer');
   const card = document.createElement('div');
@@ -25,10 +23,8 @@ function addPage() {
   card.id = `pageCard${pageCount}`;
   card.innerHTML = `
     <h3>ページ${pageCount} <button class="delete-btn" onclick="deletePage(${pageCount})">削除</button></h3>
-    <label>ページ名</label>
-    <input type="text" id="pageName${pageCount}" placeholder="例: トップページ">
-    <label>ページ目的</label>
-    <textarea id="pagePurpose${pageCount}" placeholder="ページの目的を入力"></textarea>
+    <label>ページ名</label><input type="text" id="pageName${pageCount}" placeholder="例: トップページ">
+    <label>ページ目的</label><textarea id="pagePurpose${pageCount}" placeholder="ページの目的を入力"></textarea>
     ${createSectionCheckboxes("ヘッダー", `header${pageCount}`, sectionOptions.header)}
     ${createSectionCheckboxes("メニュー", `menu${pageCount}`, sectionOptions.menu)}
     ${createSectionCheckboxes("ボディ", `body${pageCount}`, sectionOptions.body)}
@@ -39,50 +35,49 @@ function addPage() {
 }
 
 function deletePage(id){
-  const card=document.getElementById(`pageCard${id}`);
+  const card = document.getElementById(`pageCard${id}`);
   if(card) card.remove();
   updateEstimate();
 }
 
-// プレビュー＋設計書生成
 function showPreview(){
-  const pages=[];
+  const pages = [];
   for(let i=1;i<=pageCount;i++){
-    const card=document.getElementById(`pageCard${i}`);
+    const card = document.getElementById(`pageCard${i}`);
     if(!card) continue;
-    const pageName=document.getElementById(`pageName${i}`).value||`ページ${i}`;
-    const pagePurpose=document.getElementById(`pagePurpose${i}`).value||"おまかせ";
-    const header=Array.from(card.querySelectorAll(`[id^=header${i}_]:checked`)).map(e=>e.value);
-    const menu=Array.from(card.querySelectorAll(`[id^=menu${i}_]:checked`)).map(e=>e.value);
-    const body=Array.from(card.querySelectorAll(`[id^=body${i}_]:checked`)).map(e=>e.value);
-    const footer=Array.from(card.querySelectorAll(`[id^=footer${i}_]:checked`)).map(e=>e.value);
+    const pageName = document.getElementById(`pageName${i}`).value || `ページ${i}`;
+    const pagePurpose = document.getElementById(`pagePurpose${i}`).value || "おまかせ";
+    const header = Array.from(card.querySelectorAll(`[id^=header${i}_]:checked`)).map(e=>e.value);
+    const menu = Array.from(card.querySelectorAll(`[id^=menu${i}_]:checked`)).map(e=>e.value);
+    const body = Array.from(card.querySelectorAll(`[id^=body${i}_]:checked`)).map(e=>e.value);
+    const footer = Array.from(card.querySelectorAll(`[id^=footer${i}_]:checked`)).map(e=>e.value);
     pages.push({pageName, pagePurpose, header, menu, body, footer});
   }
 
   // プレビュー表示
-  let html='';
+  let html = '';
   pages.forEach(p=>{
-    html+=`<h2>${p.pageName}</h2>
-           <div><strong>目的:</strong> ${p.pagePurpose}</div>
-           <div><strong>ヘッダー:</strong> ${p.header.join(", ")||"なし"}</div>
-           <div><strong>メニュー:</strong> ${p.menu.join(", ")||"なし"}</div>
-           <div><strong>ボディ:</strong> ${p.body.join(", ")||"なし"}</div>
-           <div><strong>フッター:</strong> ${p.footer.join(", ")||"なし"}</div><hr>`;
+    html += `<h2>${p.pageName}</h2>
+             <div><strong>目的:</strong> ${p.pagePurpose}</div>
+             <div><strong>ヘッダー:</strong> ${p.header.join(", ") || "なし"}</div>
+             <div><strong>メニュー:</strong> ${p.menu.join(", ") || "なし"}</div>
+             <div><strong>ボディ:</strong> ${p.body.join(", ") || "なし"}</div>
+             <div><strong>フッター:</strong> ${p.footer.join(", ") || "なし"}</div><hr>`;
   });
   document.getElementById('iframePreview').srcdoc = html;
 
   // 設計書生成
   const designContainer = document.getElementById('designDocsContainer');
-  designContainer.innerHTML = ''; // クリア
+  designContainer.innerHTML = '';
 
   // システム構造図
   let systemHtml = `<h3>システム構造図</h3>`;
   pages.forEach(p=>{
     systemHtml += `<div>${p.pageName}構造図:<br>
-      ├─ ヘッダー: ${p.header.join(", ")||"なし"}<br>
-      ├─ メニュー: ${p.menu.join(", ")||"なし"}<br>
-      ├─ ボディ: ${p.body.join(", ")||"なし"}<br>
-      └─ フッター: ${p.footer.join(", ")||"なし"}</div>`;
+      ├─ ヘッダー: ${p.header.join(", ") || "なし"}<br>
+      ├─ メニュー: ${p.menu.join(", ") || "なし"}<br>
+      ├─ ボディ: ${p.body.join(", ") || "なし"}<br>
+      └─ フッター: ${p.footer.join(", ") || "なし"}</div>`;
   });
   designContainer.innerHTML += systemHtml;
 
@@ -98,59 +93,74 @@ function showPreview(){
   });
   designContainer.innerHTML += funcHtml;
 
-  // テーブル定義書（簡易サンプル）
-  let tableHtml = `<h3>テーブル定義書</h3>
-    <div>
-      <strong>users:</strong> id, name, email, password<br>
-      <strong>products:</strong> id, name, price, stock, category_id<br>
-      <strong>orders:</strong> id, user_id, total_price, status, created_at
-    </div>`;
+  // テーブル定義書（サンプル）
+  let tableHtml = `<h3>テーブル定義書</h3>`;
+  tableHtml += `<div><strong>users:</strong> id, name, email, password<br>
+                 <strong>products:</strong> id, name, price, stock, category_id<br>
+                 <strong>orders:</strong> id, user_id, total_price, status, created_at</div>`;
   designContainer.innerHTML += tableHtml;
 
-  // 画面遷移図
+  // 画面遷移図（SVG）
   let transHtml = `<h3>画面遷移図</h3>`;
-  transHtml += `<div>トップページ → 商品ページ → カートページ → 注文確認ページ</div>`;
+  transHtml += `<svg width="100%" height="120">
+    <defs>
+      <marker id="arrow" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L0,6 L9,3 z" fill="#2196f3" />
+      </marker>
+    </defs>
+    <line x1="50" y1="20" x2="250" y2="20" stroke="#2196f3" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="250" y1="20" x2="450" y2="20" stroke="#2196f3" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="450" y1="20" x2="650" y2="20" stroke="#2196f3" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="50" y="15" fill="#000">トップページ</text>
+    <text x="250" y="15" fill="#000">商品ページ</text>
+    <text x="450" y="15" fill="#000">カートページ</text>
+    <text x="650" y="15" fill="#000">注文確認ページ</text>
+  </svg>`;
   designContainer.innerHTML += transHtml;
 
   // JSON生成
   const output = {
-    projectOverview: document.getElementById('projectOverviewInput').value||"おまかせ",
+    projectOverview: document.getElementById('projectOverviewInput').value || "おまかせ",
     pageType: document.getElementById('pageTypeSelect').value,
     userTarget: document.getElementById('userTargetSelect').value,
     design: document.getElementById('designSelect').value,
-    dataRequirement: document.getElementById('dataRequirementInput').value||"おまかせ",
-    operation: document.getElementById('operationInput').value||"おまかせ",
+    dataRequirement: document.getElementById('dataRequirementInput').value || "おまかせ",
+    operation: document.getElementById('operationInput').value || "おまかせ",
     languages: Array.from(document.querySelectorAll('[id^=lang_]:checked')).map(e=>e.value),
     server: document.getElementById('serverSelect').value,
     database: document.getElementById('databaseSelect').value,
     designFramework: document.getElementById('designFrameworkSelect').value,
     auth: document.getElementById('authSelect').value,
-    security: document.getElementById('securityInput').value||"おまかせ",
+    security: document.getElementById('securityInput').value || "おまかせ",
     pages: pages
   };
   document.getElementById('jsonOutput').textContent = JSON.stringify(output,null,2);
 
+  // AI指示文作成
+  document.getElementById('aiInstructions').value = `このプロジェクトに基づき、HTML/CSS/JSでウェブサイトを構築してください。\n
+ページ構成: ${pages.map(p=>p.pageName).join(", ")}\n
+機能: ${pages.map(p=>[...p.header,...p.menu,...p.body,...p.footer].join(", ")).join("; ")}\n
+デザイン方針: ${output.design}\n
+使用言語: ${output.languages.join(", ")}\n
+サーバ/DB/認証: ${output.server}/${output.database}/${output.auth}`;
+  
   updateEstimate();
 }
 
-// 見積計算
 function updateEstimate(){
   const tbody = document.querySelector('#estimateTable tbody');
-  tbody.innerHTML = '';
+  tbody.innerHTML='';
   let subtotal = 0;
 
-  // 基本設計
   const basic = 50000;
   subtotal += basic;
   tbody.innerHTML += `<tr><td>基本設計</td><td>${basic}</td><td>1</td><td>${basic}</td></tr>`;
 
-  // ページ追加
   const pageUnit = 30000;
   const pages = document.querySelectorAll('.page-card').length;
   subtotal += pageUnit * pages;
   if(pages>0) tbody.innerHTML += `<tr><td>ページ追加</td><td>${pageUnit}</td><td>${pages}</td><td>${pageUnit*pages}</td></tr>`;
 
-  // 各セクション（ヘッダー・メニュー・ボディ・フッター） 1セクション1万
   const sectionUnit = 10000;
   let sectionCount = 0;
   for(let i=1;i<=pageCount;i++){
@@ -161,11 +171,18 @@ function updateEstimate(){
   subtotal += sectionUnit * sectionCount;
   if(sectionCount>0) tbody.innerHTML += `<tr><td>セクション追加</td><td>${sectionUnit}</td><td>${sectionCount}</td><td>${sectionUnit*sectionCount}</td></tr>`;
 
-  // データベース・認証・フレームワークまとめて 2万
   const extraUnit = 20000;
   subtotal += extraUnit;
   tbody.innerHTML += `<tr><td>データ・認証・フレームワーク設定</td><td>${extraUnit}</td><td>1</td><td>${extraUnit}</td></tr>`;
 
   document.getElementById('subtotal').textContent = subtotal;
   document.getElementById('total').textContent = Math.round(subtotal*1.1);
+}
+
+// コピー機能
+function copyInstructions(){
+  const instr = document.getElementById('aiInstructions');
+  instr.select();
+  navigator.clipboard.writeText(instr.value);
+  alert("指示文をコピーしました！");
 }
