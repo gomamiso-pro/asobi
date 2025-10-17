@@ -181,6 +181,11 @@ function generateTransitionDiagram() {
 
 // 設計書を生成
 function generateDesignDocs() {
+	if (!document.getElementById('pageContainer')) {
+		// ページコンテナが無ければ処理を中止
+		return;
+	}
+
 	updatePages();
 	const functionListContainer = document.getElementById('generateFunctionList');
 	functionListContainer.innerHTML = generateFunctionList(pages);
