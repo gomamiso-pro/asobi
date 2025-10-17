@@ -66,41 +66,31 @@ function showPreview(){
   });
   document.getElementById('iframePreview').srcdoc = html;
 
-  // 設計書生成
-  const designContainer = document.getElementById('designDocsContainer');
-  designContainer.innerHTML = '';
-
-  // システム構造図
-  let systemHtml = `<h3>システム構造図</h3>`;
-  pages.forEach(p=>{
-    systemHtml += `<div>${p.pageName}構造図:<br>
-      ├─ ヘッダー: ${p.header.join(", ") || "なし"}<br>
-      ├─ メニュー: ${p.menu.join(", ") || "なし"}<br>
-      ├─ ボディ: ${p.body.join(", ") || "なし"}<br>
-      └─ フッター: ${p.footer.join(", ") || "なし"}</div>`;
-  });
-  designContainer.innerHTML += systemHtml;
-
-  // 機能一覧
+// 機能一覧
+function generateFeatureList(pages) {
   let funcHtml = `<h3>機能一覧</h3>`;
-  pages.forEach(p=>{
+  pages.forEach(p => {
     funcHtml += `<div>${p.pageName}機能:<ul>`;
-    if(p.header.length) p.header.forEach(h=>funcHtml += `<li>${h}操作</li>`);
-    if(p.menu.length) p.menu.forEach(m=>funcHtml += `<li>${m}操作</li>`);
-    if(p.body.length) p.body.forEach(b=>funcHtml += `<li>${b}表示/操作</li>`);
-    if(p.footer.length) p.footer.forEach(f=>funcHtml += `<li>${f}表示</li>`);
+    if (p.header.length) p.header.forEach(h => funcHtml += `<li>${h}操作</li>`);
+    if (p.menu.length) p.menu.forEach(m => funcHtml += `<li>${m}操作</li>`);
+    if (p.body.length) p.body.forEach(b => funcHtml += `<li>${b}表示/操作</li>`);
+    if (p.footer.length) p.footer.forEach(f => funcHtml += `<li>${f}表示</li>`);
     funcHtml += `</ul></div>`;
   });
-  designContainer.innerHTML += funcHtml;
+  return funcHtml;
+}
 
-  // テーブル定義書（サンプル）
+// テーブル定義書
+function generateTableDefinition() {
   let tableHtml = `<h3>テーブル定義書</h3>`;
   tableHtml += `<div><strong>users:</strong> id, name, email, password<br>
                  <strong>products:</strong> id, name, price, stock, category_id<br>
                  <strong>orders:</strong> id, user_id, total_price, status, created_at</div>`;
-  designContainer.innerHTML += tableHtml;
+  return tableHtml;
+}
 
-  // 画面遷移図（SVG）
+// 画面遷移図
+function generateTransitionDiagram() {
   let transHtml = `<h3>画面遷移図</h3>`;
   transHtml += `<svg width="100%" height="120">
     <defs>
@@ -116,8 +106,22 @@ function showPreview(){
     <text x="450" y="15" fill="#000">カートページ</text>
     <text x="650" y="15" fill="#000">注文確認ページ</text>
   </svg>`;
-  designContainer.innerHTML += transHtml;
+  return transHtml;
+}
+// 各設計書の処理を呼び出し
+function generateDesignDocs() {
+  const designContainer = document.getElementById('designDocsContainer');
+  designContainer.innerHTML = generateSystemDiagram(pages) + generateFeatureList(pages);
 
+  const tableDefinitionContainer = document.getElementById('tableDefinitionContainer');
+  tableDefinitionContainer.innerHTML = generateTableDefinition();
+
+  const transitionDiagramContainer = document.getElementById('transitionDiagramContainer');
+  transitionDiagramContainer.innerHTML = generateTransitionDiagram();
+}
+
+// 設計書の生成を実行
+generateDesignDocs();
   // JSON生成
   const output = {
     projectOverview: document.getElementById('projectOverviewInput').value || "おまかせ",
