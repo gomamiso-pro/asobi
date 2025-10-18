@@ -133,9 +133,12 @@ function downloadEstimate() {
   a.click();
 }
 
-/* ---------------- AI指示文生成 ---------------- */
+/* ========================
+   設計書生成指示文の作成
+======================== */
 function generateInstructions() {
   updatePages();
+
   const overview = document.getElementById("projectOverviewInput").value || "おまかせ";
   const pageType = document.getElementById("pageTypeSelect").value;
   const userTarget = document.getElementById("userTargetSelect").value;
@@ -147,7 +150,9 @@ function generateInstructions() {
   const framework = document.getElementById("designFrameworkSelect").value;
   const auth = document.getElementById("authSelect").value;
   const security = document.getElementById("securityInput").value || "おまかせ";
-  const langs = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value).join(", ") || "おまかせ";
+  const langs = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
+                     .map(cb => cb.value)
+                     .join(", ") || "おまかせ";
 
   const pageSummary = pages.length > 0 ? pages.map(p => {
     const sections = [].concat(
@@ -160,8 +165,7 @@ function generateInstructions() {
   }).join("\n") : "ページ設定は未作成です。";
 
   const instruct = `
-以下のヒアリング内容をもとに、Webサイト／Webアプリの設計書（機能一覧、テーブル定義書、画面遷移図）をMarkdown形式で作成してください。
-出力は表（Markdown表）あるいはコードブロックのHTMLでお願いします。必要に応じてテーブル定義はCREATE TABLE風の表も可。
+以下のヒアリング内容をもとに、Webサイト／Webアプリの設計書（機能一覧、テーブル定義書、画面遷移図）を作成してください。
 
 【基本設定】
 - プロジェクト概要: ${overview}
@@ -180,26 +184,59 @@ function generateInstructions() {
 【ページ設定】
 ${pageSummary}
 
-【出力フォーマット（必須）】
-1) 機能一覧（分類 / 機能名 / 処理詳細 / 必要なDBテーブル名）
-2) テーブル定義書（テーブル名 / 概要 / フィールド名 / 型 / 詳細）
-3) 画面遷移図（テキスト説明 or Mermaid形式）
+【出力フォーマット】
+1. 機能一覧（分類 / 機能名 / 処理詳細 / 必要なDBテーブル名）
+2. テーブル定義書（テーブル名 / 概要 / フィールド名 / 型 / 詳細）
+3. 画面遷移図（Mermaid形式 or テキスト）
 
-【追加指示（重要）】
-上記の設計書をもとに、**1つのHTMLファイル内にすべての章（機能一覧・テーブル定義書・画面遷移図）を描画**してください。
-
-- HTMLはブラウザ上で開くだけで、全設計書をきれいに閲覧できるようにしてください。
-- 各章（機能一覧／テーブル定義書／画面遷移図）はセクション見出し付きで明確に区分してください。
-- フォント、表の体裁、見出しデザイン、配色を統一し、読みやすいWeb設計書として仕上げてください。
-- MarkdownをHTMLに整形し、Mermaid記法が含まれる場合は `<script type="module">` で正しく描画できるようにしてください。
-- 図・表・リスト・見出しのレイアウトが整った完成度の高い設計書HTMLを生成してください。
-
-【最終出力】
-- Markdown形式の設計書（テキスト）
-- 上記内容を1ファイルにまとめたHTML設計書（ブラウザで開いて閲覧可能）
+【重要な追加指示】
+- Markdownではなく、最初から **完全なHTMLとして出力** してください。
+- HTMLファイル1枚にすべての設計書（機能一覧・テーブル定義書・画面遷移図）をきれいに描画してください。
+- 各章は `<section>` で区切り、タイトルを `<h2>` で表示。
+- CSSを含め、ブラウザで開いたときに整ったデザインで見えるようにしてください。
+- コードブロックやエスケープを行わず、純粋なHTML構造で返してください。
   `.trim();
 
   document.getElementById('aiInstructions').value = instruct;
+}
+
+/* ========================
+   設計書HTML描画処理
+======================== */
+function renderDesignDoc() {
+  const raw = document.getElementById("aiOutput").value.trim();
+  const target = document.getElementById("designDocsContainer");
+
+  if (!raw) {
+    alert("AIの出力を貼り付けてください。");
+    return;
+  }
+
+  // --- ① コードブロック除去（```html ... ``` or <pre><code> ... </code></pre>） ---
+  let htmlContent = raw;
+
+  // Markdown形式のコードブロックを除去
+  const mdBlock = /```html([\s\S]*?)```/i.exec(htmlContent);
+  if (mdBlock) htmlContent = mdBlock[1].trim();
+
+  // <pre><code>形式を除去
+  const codeBlock = /<pre><code[^>]*>([\s\S]*?)<\/code><\/pre>/i.exec(htmlContent);
+  if (codeBlock) htmlContent = codeBlock[1].trim();
+
+  // --- ② HTMLエスケープされている場合のデコード ---
+  htmlContent = htmlContent
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&amp;/g, "&");
+
+  // --- ③ 描画処理 ---
+  target.innerHTML = htmlContent;
+
+  // --- ④ Mermaid描画対応 ---
+  if (window.mermaid) {
+    mermaid.initialize({ startOnLoad: true, theme: "default" });
+    mermaid.init(undefined, target.querySelectorAll(".mermaid"));
+  }
 }
 
 function copyInstructions() {
