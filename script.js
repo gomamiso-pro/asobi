@@ -1,11 +1,11 @@
-/* ====== script.js ======
+/* ====== script.js (安定版 完全修正版) ======
    機能:
    - ページ追加/削除、ページ情報保持
    - 見積自動更新・ダウンロード（テキスト）
    - ヒアリング→AI指示文生成・コピー・ダウンロード
    - AIが生成した設計書を貼付けて描画（機能一覧／テーブル定義／画面遷移図）
    - ページ毎の簡易HTMLコード生成・プレビュー・ダウンロード（個別ファイル）
-   ================================== */
+   =========================================== */
 
 let pageCount = 0;
 let pages = [];
@@ -36,8 +36,13 @@ function addPage() {
     ${createSectionCheckboxes("フッター", `footer${pageCount}`, sectionOptions.footer)}
   `;
   container.appendChild(card);
+
   const inputs = card.querySelectorAll('input, textarea');
-  inputs.forEach(i => i.addEventListener('change', () => { updatePages(); updateEstimate(); }));
+  inputs.forEach(i => i.addEventListener('change', () => {
+    updatePages();
+    updateEstimate();
+  }));
+
   updatePages();
   updateEstimate();
 }
@@ -57,7 +62,7 @@ function deletePage(id) {
   updateEstimate();
 }
 
-function clearAllPages(){
+function clearAllPages() {
   document.getElementById('pageContainer').innerHTML = '';
   pageCount = 0;
   pages = [];
@@ -67,17 +72,17 @@ function clearAllPages(){
 /* ---------------- pages配列更新 ---------------- */
 function updatePages() {
   pages = [];
-  for (let i = 1; i <= pageCount; i++) {
-    const card = document.getElementById(`pageCard${i}`);
-    if (!card) continue;
-    const pageName = (document.getElementById(`pageName${i}`)?.value || `ページ${i}`).trim();
-    const pagePurpose = (document.getElementById(`pagePurpose${i}`)?.value || "おまかせ").trim();
-    const header = Array.from(card.querySelectorAll(`[id^=header${i}_]:checked`)).map(e => e.value);
-    const menu = Array.from(card.querySelectorAll(`[id^=menu${i}_]:checked`)).map(e => e.value);
-    const body = Array.from(card.querySelectorAll(`[id^=body${i}_]:checked`)).map(e => e.value);
-    const footer = Array.from(card.querySelectorAll(`[id^=footer${i}_]:checked`)).map(e => e.value);
+  const cards = document.querySelectorAll('.page-card');
+  cards.forEach(card => {
+    const id = card.id.replace('pageCard', '');
+    const pageName = (document.getElementById(`pageName${id}`)?.value || `ページ${id}`).trim();
+    const pagePurpose = (document.getElementById(`pagePurpose${id}`)?.value || "おまかせ").trim();
+    const header = Array.from(card.querySelectorAll(`[id^=header${id}_]:checked`)).map(e => e.value);
+    const menu = Array.from(card.querySelectorAll(`[id^=menu${id}_]:checked`)).map(e => e.value);
+    const body = Array.from(card.querySelectorAll(`[id^=body${id}_]:checked`)).map(e => e.value);
+    const footer = Array.from(card.querySelectorAll(`[id^=footer${id}_]:checked`)).map(e => e.value);
     pages.push({ pageName, pagePurpose, header, menu, body, footer });
-  }
+  });
 }
 
 /* ---------------- 見積 ---------------- */
@@ -112,20 +117,20 @@ function updateEstimate() {
   subtotal += extra;
   tbody.innerHTML += `<tr><td>データ・認証・フレームワーク設定</td><td>${extra}</td><td>1</td><td>${extra}</td></tr>`;
 
-  document.getElementById('subtotal').textContent = subtotal;
-  document.getElementById('total').textContent = Math.round(subtotal * 1.1);
+  document.getElementById('subtotal').textContent = subtotal.toLocaleString();
+  document.getElementById('total').textContent = Math.round(subtotal * 1.1).toLocaleString();
 }
 
 function downloadEstimate() {
   updateEstimate();
   const el = document.getElementById('estimateTable');
-  let text = '見積書\n\n';
+  let text = '見積書\r\n\r\n';
   const rows = el.querySelectorAll('tbody tr');
   rows.forEach(r => {
     const cells = r.querySelectorAll('td');
-    text += `${cells[0].textContent}\t単価:${cells[1].textContent}\t数量:${cells[2].textContent}\t小計:${cells[3].textContent}\n`;
+    text += `${cells[0].textContent}\t単価:${cells[1].textContent}\t数量:${cells[2].textContent}\t小計:${cells[3].textContent}\r\n`;
   });
-  text += `\n合計（税抜）: ${document.getElementById('subtotal').textContent}\n合計（税込10%）: ${document.getElementById('total').textContent}\n`;
+  text += `\r\n合計（税抜）: ${document.getElementById('subtotal').textContent}\r\n合計（税込10%）: ${document.getElementById('total').textContent}\r\n`;
   const blob = new Blob([text], { type: 'text/plain' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -150,7 +155,9 @@ window.generateInstructions = function() {
   const framework = document.getElementById("designFrameworkSelect").value;
   const auth = document.getElementById("authSelect").value;
   const security = document.getElementById("securityInput").value || "おまかせ";
-  const langs = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
+
+  // 言語チェックボックス（AI設定用）だけ取得
+  const langs = Array.from(document.querySelectorAll('#languageOptions input[type="checkbox"]:checked'))
                      .map(cb => cb.value)
                      .join(", ") || "おまかせ";
 
@@ -200,30 +207,12 @@ ${pageSummary}
   document.getElementById('aiInstructions').value = instruct;
 };
 
-/* ========================
-   設計書HTML描画処理
-======================== */
-function renderDesignDocs() {
-  const raw = document.getElementById('aiInstructions').value.trim(); // ← aiCodeInput → aiInstructions に変更
-  if (!raw) {
-    alert('AIが生成した設計書を貼り付けてください。');
-    return;
-  }
-
-  const preview = document.getElementById('designRenderPreview');
-  preview.innerHTML = raw;
-
-  if (window.mermaid) {
-    mermaid.initialize({ startOnLoad: true, theme: "default" });
-    mermaid.init(undefined, preview.querySelectorAll(".mermaid"));
-  }
-}
-
-
 function copyInstructions() {
   const el = document.getElementById('aiInstructions');
   el.select();
-  navigator.clipboard.writeText(el.value).then(() => alert('AI指示文をコピーしました！'), () => alert('コピーに失敗しました'));
+  navigator.clipboard.writeText(el.value)
+    .then(() => alert('AI指示文をコピーしました！'))
+    .catch(() => alert('コピーに失敗しました'));
 }
 
 function downloadInstructions() {
@@ -237,14 +226,6 @@ function downloadInstructions() {
 
 /* ========================
    設計書描画（⑤用 安定版）
-   ・④で貼り付けたAI生成HTMLを解析
-   ・機能一覧 / テーブル定義 / 画面遷移図に自動分離
-======================== */
-/* ========================
-   設計書描画（⑤用 安定版）
-   ・④で貼り付けたAI生成HTMLを解析
-   ・機能一覧 / テーブル定義 / 画面遷移図に自動分離
-   ・画面遷移図はMermaidで描画
 ======================== */
 function renderDesignDocs() {
   const rawHtml = document.getElementById('aiCodeInput').value.trim();
@@ -253,7 +234,6 @@ function renderDesignDocs() {
     return;
   }
 
-  // DOMに解析
   const parser = new DOMParser();
   const doc = parser.parseFromString(rawHtml, 'text/html');
 
@@ -273,34 +253,24 @@ function renderDesignDocs() {
     }
   });
 
-  // 各ブロックに描画
   document.getElementById('generateFunctionList').innerHTML = funcContent;
   document.getElementById('generateTableDefinition').innerHTML = tableContent;
   document.getElementById('generateTransitionDiagram').innerHTML = transContent;
 
-  // ④プレビューも更新
   document.getElementById('designRenderPreview').innerHTML = rawHtml;
 
-  // Mermaidレンダリング
+  // Mermaidレンダリング（初回のみ初期化）
   if (window.mermaid) {
-    mermaid.initialize({ startOnLoad: false, theme: "default" });
-    const mermaidBlocks = document.getElementById('generateTransitionDiagram').querySelectorAll('.mermaid');
-    mermaidBlocks.forEach(block => {
-      try { mermaid.init(undefined, block); } catch(e) { console.error(e); }
+    if (!window.mermaidInitialized) {
+      mermaid.initialize({ startOnLoad: false, theme: "default" });
+      window.mermaidInitialized = true;
+    }
+    const blocks = document.querySelectorAll('#generateTransitionDiagram .mermaid');
+    blocks.forEach(block => {
+      try { mermaid.init(undefined, block); } catch (e) { console.error(e); }
     });
   }
 }
-
-/* 補助: HTMLエスケープ */
-function escapeHtml(s) {
-  if (!s) return '';
-  return s.replace(/&/g,'&amp;')
-          .replace(/</g,'&lt;')
-          .replace(/>/g,'&gt;')
-          .replace(/"/g,'&quot;')
-          .replace(/'/g,'&#39;');
-}
-
 
 /* ---------------- HTML生成 ---------------- */
 function buildSinglePageHtml(pageObj) {
@@ -348,12 +318,17 @@ function buildSinglePageHtml(pageObj) {
   `;
 }
 
-/* ---------------- 補助 ---------------- */
+/* ---------------- 補助関数 ---------------- */
 function escapeHtml(s) {
   if (!s) return '';
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return s.replace(/&/g,'&amp;')
+          .replace(/</g,'&lt;')
+          .replace(/>/g,'&gt;')
+          .replace(/"/g,'&quot;')
+          .replace(/'/g,'&#39;');
 }
 
+/* ---------------- 初期化 ---------------- */
 document.addEventListener('DOMContentLoaded', () => {
   updatePages();
   updateEstimate();
