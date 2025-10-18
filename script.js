@@ -249,6 +249,18 @@ function ensureDesignBlock(id, title) {
 }
 
 function renderDesignDocs() {
+   const output =
+    document.getElementById("designOutputSection") ||
+    document.getElementById("designRenderPreview") ||
+    document.body;
+
+  if (!output) {
+    alert("描画先が見つかりません。HTMLに <div id='designOutputSection'></div> を追加してください。");
+    return;
+  }
+
+  output.innerHTML = ""; // ← エラーが出てた箇所
+
   const rawHtml = document.getElementById('aiCodeInput').value.trim();
   if (!rawHtml) {
     alert('AIが生成した設計書（HTML）を貼り付けてください。');
