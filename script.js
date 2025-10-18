@@ -247,46 +247,33 @@ function renderDesignDocs() {
     return;
   }
 
-  // 描画エリアをクリア
-  const funcEl = document.getElementById('generateFunctionList');
-  const tableEl = document.getElementById('generateTableDefinition');
-  const transEl = document.getElementById('generateTransitionDiagram');
-  funcEl.innerHTML = '';
-  tableEl.innerHTML = '';
-  transEl.innerHTML = '';
-
-  // 仮でHTMLをDOMとして解析
   const parser = new DOMParser();
   const doc = parser.parseFromString(rawHtml, 'text/html');
 
-  // セクション抽出
-  const sections = doc.querySelectorAll('h3, h2');
-  let current = '';
   let funcContent = '', tableContent = '', transContent = '';
-  
-  doc.body.childNodes.forEach(node => {
-    if (node.nodeType !== Node.ELEMENT_NODE) return;
+  let current = '';
 
-    const text = node.textContent.trim().toLowerCase();
-    if (/機能一覧|functions|feature list/.test(text)) { current='func'; return; }
-    if (/テーブル定義|table definition/.test(text)) { current='table'; return; }
-    if (/画面遷移|遷移図|diagram|flow/.test(text)) { current='trans'; return; }
-
-    const htmlString = node.outerHTML || node.textContent;
-
-    if (current==='func') funcContent += htmlString + '\n';
-    else if (current==='table') tableContent += htmlString + '\n';
-    else if (current==='trans') transContent += htmlString + '\n';
+  doc.body.querySelectorAll('*').forEach(node => {
+    if (node.tagName.match(/^H[1-6]$/)) {
+      const text = node.textContent.trim();
+      if (/機能一覧/.test(text)) current = 'func';
+      else if (/テーブル定義/.test(text)) current = 'table';
+      else if (/画面遷移/.test(text)) current = 'trans';
+    } else {
+      if (current === 'func') funcContent += node.outerHTML;
+      else if (current === 'table') tableContent += node.outerHTML;
+      else if (current === 'trans') transContent += node.outerHTML;
+    }
   });
 
-  // エスケープして描画
-  funcEl.innerHTML = `<h3>機能一覧</h3><pre>${escapeHtml(funcContent)}</pre>`;
-  tableEl.innerHTML = `<h3>テーブル定義書</h3><pre>${escapeHtml(tableContent)}</pre>`;
-  transEl.innerHTML = `<h3>画面遷移図</h3><pre>${escapeHtml(transContent)}</pre>`;
+  document.getElementById('generateFunctionList').innerHTML = funcContent;
+  document.getElementById('generateTableDefinition').innerHTML = tableContent;
+  document.getElementById('generateTransitionDiagram').innerHTML = transContent;
 
-  // ④プレビュー欄にもそのまま描画（オプション）
+  // オプションで④のプレビューにもそのまま表示
   document.getElementById('designRenderPreview').innerHTML = rawHtml;
 }
+
 
 /* 補助: HTMLエスケープ */
 function escapeHtml(s) {
