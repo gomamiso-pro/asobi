@@ -203,39 +203,23 @@ ${pageSummary}
 /* ========================
    設計書HTML描画処理
 ======================== */
-function renderDesignDoc() {
-  const raw = document.getElementById("aiOutput").value.trim();
-  const target = document.getElementById("designDocsContainer");
-
+function renderDesignDocs() {
+  const raw = document.getElementById('aiCodeInput').value.trim();
   if (!raw) {
-    alert("AIの出力を貼り付けてください。");
+    alert('AIが生成した設計書を貼り付けてください。');
     return;
   }
 
-  // --- ① コードブロック除去（```html ... ``` or <pre><code> ... </code></pre>） ---
-  let htmlContent = raw;
+  // 描画先
+  const preview = document.getElementById('designRenderPreview');
 
-  // Markdown形式のコードブロックを除去
-  const mdBlock = /```html([\s\S]*?)```/i.exec(htmlContent);
-  if (mdBlock) htmlContent = mdBlock[1].trim();
+  // HTML形式ならそのまま描画
+  preview.innerHTML = raw;
 
-  // <pre><code>形式を除去
-  const codeBlock = /<pre><code[^>]*>([\s\S]*?)<\/code><\/pre>/i.exec(htmlContent);
-  if (codeBlock) htmlContent = codeBlock[1].trim();
-
-  // --- ② HTMLエスケープされている場合のデコード ---
-  htmlContent = htmlContent
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&amp;/g, "&");
-
-  // --- ③ 描画処理 ---
-  target.innerHTML = htmlContent;
-
-  // --- ④ Mermaid描画対応 ---
+  // Mermaid描画対応
   if (window.mermaid) {
     mermaid.initialize({ startOnLoad: true, theme: "default" });
-    mermaid.init(undefined, target.querySelectorAll(".mermaid"));
+    mermaid.init(undefined, preview.querySelectorAll(".mermaid"));
   }
 }
 
