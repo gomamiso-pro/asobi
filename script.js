@@ -1,11 +1,12 @@
-/* ====== script.js (安定版 完全修正版) ======
-   機能:
-   - ページ追加/削除、ページ情報保持
-   - 見積自動更新・ダウンロード（テキスト）
-   - ヒアリング→AI指示文生成・コピー・ダウンロード
-   - AIが生成した設計書を貼付けて描画（機能一覧／テーブル定義／画面遷移図）
-   - ページ毎の簡易HTMLコード生成・プレビュー・ダウンロード（個別ファイル）
-   =========================================== */
+/* ====== script.js (設計書描画対応版 完全修正版) ======
+   変更点:
+   - renderDesignDocs() が ④ のプレビュー（aiCodeInput）を解析し、⑤の designOutputSection 内に
+     機能一覧 / テーブル定義 / 遷移図ブロックを自動で作成・出力します（HTMLの編集不要）。
+   - 描画クリア、コピー、ダウンロード、全まとめダウンロード機能を追加。
+   - generatePageCode / downloadPageCode を実装し、iframe プレビューと個別ファイルDLを提供。
+
+   既存機能はそのまま維持。
+*/
 
 let pageCount = 0;
 let pages = [];
@@ -225,8 +226,28 @@ function downloadInstructions() {
 }
 
 /* ========================
-   設計書描画（⑤用 安定版）
+   設計書描画（⑤用 改良版）
+   - ④の入力（aiCodeInput）を解析して、⑤のブロックへ出力
+   - HTMLのコメントアウトを編集する必要はありません（動的に要素を作成します）
 ======================== */
+function ensureDesignBlock(id, title) {
+  let el = document.getElementById(id);
+  if (!el) {
+    el = document.createElement('div');
+    el.id = id;
+    el.className = 'design-block';
+    const section = document.getElementById('designOutputSection') || document.body;
+    section.appendChild(el);
+  }
+  // 先頭にタイトルが無ければ追加
+  if (!el.querySelector('h3')) {
+    const h = document.createElement('h3');
+    h.textContent = title;
+    el.insertBefore(h, el.firstChild);
+  }
+  return el;
+}
+
 function renderDesignDocs() {
   const rawHtml = document.getElementById('aiCodeInput').value.trim();
   if (!rawHtml) {
@@ -240,12 +261,14 @@ function renderDesignDocs() {
   let funcContent = '', tableContent = '', transContent = '';
   let current = '';
 
+  // 単純なセクション検出（見出しテキストに機能一覧 / テーブル定義 / 画面遷移 を含める）
   doc.body.querySelectorAll('*').forEach(node => {
-    if (node.tagName.match(/^H[1-6]$/)) {
+    if (node.tagName && node.tagName.match(/^H[1-6]$/)) {
       const text = node.textContent.trim();
       if (/機能一覧/.test(text)) current = 'func';
       else if (/テーブル定義/.test(text)) current = 'table';
       else if (/画面遷移/.test(text)) current = 'trans';
+      else if (/画面遷移図|遷移図|遷移/.test(text)) current = 'trans';
     } else {
       if (current === 'func') funcContent += node.outerHTML;
       else if (current === 'table') tableContent += node.outerHTML;
@@ -253,16 +276,29 @@ function renderDesignDocs() {
     }
   });
 
-  document.getElementById('generateFunctionList').innerHTML = funcContent;
-  document.getElementById('generateTableDefinition').innerHTML = tableContent;
-  document.getElementById('generateTransitionDiagram').innerHTML = transContent;
+  // ブロックを確保
+  const funcEl = ensureDesignBlock('generateFunctionList', '機能一覧');
+  const tableEl = ensureDesignBlock('generateTableDefinition', 'テーブル定義');
+  const transEl = ensureDesignBlock('generateTransitionDiagram', '画面遷移図');
 
-  document.getElementById('designRenderPreview').innerHTML = rawHtml;
+  // 内容を入れる（もし空なら、rawHtml 全文を表示）
+  funcEl.innerHTML = '<h3>機能一覧</h3>' + (funcContent || '<p>機能一覧が見つかりませんでした。以下は元データの抜粋です。</p>' + rawHtml);
+  tableEl.innerHTML = '<h3>テーブル定義</h3>' + (tableContent || '<p>テーブル定義が見つかりませんでした。以下は元データの抜粋です。</p>');
+  transEl.innerHTML = '<h3>画面遷移図</h3>' + (transContent || '<p>遷移図が見つかりませんでした。以下は元データの抜粋です。</p>');
 
-  // Mermaidレンダリング（初回のみ初期化）
+  // それぞれのブロックに元データの要約を足す（trans には mermaid が含まれることが多い）
+  if (!funcContent && !tableContent && !transContent) {
+    // 全く分割できなかった場合は、designRenderPreview に rawHtml を入れる
+    document.getElementById('designRenderPreview').innerHTML = rawHtml;
+  } else {
+    // 可能であれば元HTMLもプレビューに入れておく
+    document.getElementById('designRenderPreview').innerHTML = rawHtml;
+  }
+
+  // Mermaid の初期化（ある場合のみ）
   if (window.mermaid) {
     if (!window.mermaidInitialized) {
-      mermaid.initialize({ startOnLoad: false, theme: "default" });
+      try { mermaid.initialize({ startOnLoad: false, theme: 'default' }); } catch (e) { console.error(e); }
       window.mermaidInitialized = true;
     }
     const blocks = document.querySelectorAll('#generateTransitionDiagram .mermaid');
@@ -272,7 +308,62 @@ function renderDesignDocs() {
   }
 }
 
-/* ---------------- HTML生成 ---------------- */
+function clearRenderedDesigns() {
+  ['generateFunctionList','generateTableDefinition','generateTransitionDiagram'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.innerHTML = '';
+      el.remove();
+    }
+  });
+  const preview = document.getElementById('designRenderPreview');
+  if (preview) preview.innerHTML = '';
+}
+
+/* ---------------- コピー・ダウンロード補助 ---------------- */
+function copyRendered(id) {
+  const el = document.getElementById(id);
+  if (!el) { alert('コピー対象が見つかりません: ' + id); return; }
+  const text = el.innerText || el.textContent;
+  navigator.clipboard.writeText(text).then(() => alert('内容をクリップボードにコピーしました')).catch(() => alert('コピーに失敗しました'));
+}
+
+function downloadRendered(kind) {
+  // kind: functionList | tableDefinition | transitionDiagram
+  const map = {
+    functionList: 'generateFunctionList',
+    tableDefinition: 'generateTableDefinition',
+    transitionDiagram: 'generateTransitionDiagram'
+  };
+  const id = map[kind];
+  const el = document.getElementById(id);
+  if (!el) { alert('ダウンロードする内容が見つかりません: ' + kind); return; }
+  const html = el.innerHTML || el.textContent || '';
+  const blob = new Blob([html], { type: 'text/html' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${kind}.html`;
+  a.click();
+}
+
+function downloadAllDesigns() {
+  const blocks = ['generateFunctionList','generateTableDefinition','generateTransitionDiagram'];
+  let any = false;
+  blocks.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      any = true;
+      const blob = new Blob([el.innerHTML], { type: 'text/html' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${id}.html`;
+      a.click();
+    }
+  });
+  if (!any) alert('ダウンロードできる設計書が見つかりません。');
+}
+
+/* ---------------- ページ毎の HTML 生成・プレビュー・ダウンロード ---------------- */
 function buildSinglePageHtml(pageObj) {
   const css = `
     body{ font-family: 'M PLUS Rounded 1c', 'Noto Sans JP', sans-serif; padding:20px; line-height:1.6; }
@@ -281,7 +372,7 @@ function buildSinglePageHtml(pageObj) {
     nav{ background:#f7fbff; }
     .section-title{ font-weight:700; color:#1976d2; margin-bottom:6px; }
   `;
-  const makeList = (arr) => arr && arr.length ? `<ul>${arr.map(a => `<li>${a}</li>`).join('')}</ul>` : '<p>なし</p>';
+  const makeList = (arr) => arr && arr.length ? `<ul>${arr.map(a => `<li>${escapeHtml(a)}</li>`).join('')}</ul>` : '<p>なし</p>';
   return `
   <!doctype html>
   <html lang="ja">
@@ -318,6 +409,31 @@ function buildSinglePageHtml(pageObj) {
   `;
 }
 
+function generatePageCode() {
+  updatePages();
+  if (!pages || pages.length === 0) { alert('ページがありません。ページを追加してください。'); return; }
+  const generated = pages.map(p => ({ name: p.pageName, html: buildSinglePageHtml(p) }));
+  window.generatedPages = generated; // 保存
+  // プレビュー: 最初のページを iframe に表示
+  const iframe = document.getElementById('pagePreview');
+  if (iframe) {
+    iframe.srcdoc = generated[0].html;
+  }
+  alert('ページコードを生成しました（プレビューは最初のページ）。');
+}
+
+function downloadPageCode() {
+  if (!window.generatedPages || window.generatedPages.length === 0) { alert('生成されたページコードがありません。まず「ページコード生成」を実行してください。'); return; }
+  window.generatedPages.forEach(pg => {
+    const blob = new Blob([pg.html], { type: 'text/html' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    const safeName = pg.name.replace(/[^a-zA-Z0-9\-_\u3000-\u303F\u4E00-\u9FFF]/g, '_');
+    a.download = `${safeName}.html`;
+    a.click();
+  });
+}
+
 /* ---------------- 補助関数 ---------------- */
 function escapeHtml(s) {
   if (!s) return '';
@@ -333,3 +449,5 @@ document.addEventListener('DOMContentLoaded', () => {
   updatePages();
   updateEstimate();
 });
+
+// EOF
