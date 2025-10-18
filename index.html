@@ -142,11 +142,20 @@
 <!-- ④ AI生成コード貼付け -->
 <section id="designImportSection">
   <h2>④ AI生成コード（設計書）を貼付け → 描画</h2>
-  <p class="hint">AI（ChatGPT等）で生成した設計書（Markdown / プレーンテキスト / JSON）をここに貼り付けて「設計書を描画」してください。</p>
-  <textarea id="aiCodeInput" rows="10" placeholder="AIが生成した設計書をここに貼り付け"></textarea>
+  <p class="hint">
+    AI（ChatGPT等）で生成した設計書（Markdown / HTML）をここに貼り付けて「設計書を描画」してください。
+    <br>
+    ※HTML形式で出力されていれば、Markdown変換なしでそのまま描画されます。
+  </p>
+  <textarea id="aiCodeInput" rows="10" placeholder="AIが生成した設計書（HTML形式推奨）をここに貼り付け"></textarea>
   <div class="design-import-actions">
     <button onclick="renderDesignDocs()">設計書を描画</button>
     <button onclick="clearRenderedDesigns()">描画をクリア</button>
+  </div>
+
+  <!-- 描画結果 -->
+  <div id="designRenderPreview" style="margin-top:20px; border:1px solid #ccc; padding:10px; border-radius:6px;">
+    <!-- AI生成設計書がここに描画されます -->
   </div>
 </section>
 
