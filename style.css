@@ -81,6 +81,43 @@ iframe{ width:100%; height:360px; border:2px solid #bbdefb; border-radius:10px; 
 }
 
 /* 設計書ブロック */
+/* 設計書ブロック内の見出しと内容の調整 */
+#designOutputSection {
+  padding: 20px;
+  background: #f0f4ff;
+  border-radius: 12px;
+}
+
+#designOutputSection .design-block {
+  margin-top: 16px;       /* ブロック同士の間隔 */
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: inset 1px 1px 4px rgba(0,0,0,0.05);
+}
+
+#designOutputSection .design-block h3 {
+  margin-top: 0;           /* 見出しの上余白をリセット */
+  margin-bottom: 12px;     /* 下余白で内容と離す */
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #1565c0;
+}
+
+#designOutputSection .design-block ul {
+  padding-left: 20px;
+  margin-top: 0;
+}
+
+#designOutputSection .design-block pre.mermaid {
+  padding: 12px;
+  background: #f4f6fb;
+  border-radius: 6px;
+  overflow: auto;
+  margin-top: 8px;
+}
+
 .design-block { margin-top:14px; background:#f5f5f5; padding:12px; border-radius:10px; box-shadow: inset 1px 1px 5px rgba(0,0,0,0.03); }
 .design-block h3{ color:#1976d2; }
 
