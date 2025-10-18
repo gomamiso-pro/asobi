@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Web制作支援ツール（14）</title>
+<title>Web制作支援ツール（15）</title>
 <link rel="stylesheet" href="style.css" />
 <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
@@ -153,19 +153,19 @@
     <button onclick="clearRenderedDesigns()">描画をクリア</button>
   </div>
 
-  <!-- 描画結果　--> 
-  <!-- <div id="designRenderPreview" style="margin-top:20px; border:1px solid #ccc; padding:10px; border-radius:6px;">-->
-    <!-- AI生成設計書がここに描画されます -->
-  <!-- </div>-->
+
 </section>
 
 <!-- ⑤ 設計書描画 -->
 <section id="designOutputSection">
   <h2>⑤ 設計書（描画）</h2>
-
-  <div id="generateFunctionList" class="design-block"></div>
-  <div id="generateTableDefinition" class="design-block"></div>
-  <div id="generateTransitionDiagram" class="design-block"></div>
+  <!-- 描画結果　--> 
+  <div id="designRenderPreview" style="margin-top:20px; border:1px solid #ccc; padding:10px; border-radius:6px;">
+    <!-- AI生成設計書がここに描画されます -->
+  </div>
+  <!-- <div id="generateFunctionList" class="design-block"></div> -->
+  <!-- <div id="generateTableDefinition" class="design-block"></div> -->
+  <!-- <div id="generateTransitionDiagram" class="design-block"></div> -->
 
   <div class="design-actions">
     <button onclick="copyRendered('generateFunctionList')">機能一覧をコピー</button>
