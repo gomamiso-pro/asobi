@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Web制作支援ツール（22）</title>
+<title>Web制作支援ツール（１）</title>
 <link rel="stylesheet" href="style.css" />
 <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
@@ -142,20 +142,33 @@
 <!-- ④ AI生成コード貼付け -->
 <section id="designImportSection">
   <h2>④ AI生成コード（設計書）を貼付け → 描画</h2>
-  <p class="hint">
-    AI（ChatGPT等）で生成した設計書（Markdown / HTML）をここに貼り付けて「設計書を描画」してください。
-    <br>
-    ※HTML形式で出力されていれば、Markdown変換なしでそのまま描画されます。
-  </p>
-  <textarea id="aiCodeInput" rows="10" placeholder="AIが生成した設計書（HTML形式推奨）をここに貼り付け"></textarea>
+  <p class="hint">AI（ChatGPT等）で生成した設計書（Markdown / プレーンテキスト / JSON）をここに貼り付けて「設計書を描画」してください。</p>
+  <textarea id="aiCodeInput" rows="10" placeholder="AIが生成した設計書をここに貼り付け"></textarea>
   <div class="design-import-actions">
     <button onclick="renderDesignDocs()">設計書を描画</button>
     <button onclick="clearRenderedDesigns()">描画をクリア</button>
   </div>
-  <!-- 描画結果　--> 
+</section>
+
+<!-- ⑤ 設計書描画 -->
+<section id="designOutputSection">
   <h2>⑤ 設計書（描画）</h2>
-  <div id="designOutputSection" style="margin-top:20px; border:1px solid #ccc; padding:10px; border-radius:6px;">
-    <!-- AI生成設計書がここに描画されます -->
+
+  <div id="generateFunctionList" class="design-block"></div>
+  <div id="generateTableDefinition" class="design-block"></div>
+  <div id="generateTransitionDiagram" class="design-block"></div>
+
+  <div class="design-actions">
+    <button onclick="copyRendered('generateFunctionList')">機能一覧をコピー</button>
+    <button onclick="downloadRendered('functionList')">機能一覧ダウンロード</button>
+
+    <button onclick="copyRendered('generateTableDefinition')">テーブル定義をコピー</button>
+    <button onclick="downloadRendered('tableDefinition')">テーブル定義ダウンロード</button>
+
+    <button onclick="copyRendered('generateTransitionDiagram')">遷移図をコピー</button>
+    <button onclick="downloadRendered('transitionDiagram')">遷移図ダウンロード</button>
+
+    <button onclick="downloadAllDesigns()">すべての設計書をまとめてダウンロード</button>
   </div>
 </section>
 
