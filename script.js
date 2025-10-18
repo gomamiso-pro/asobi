@@ -240,6 +240,12 @@ function downloadInstructions() {
    ・④で貼り付けたAI生成HTMLを解析
    ・機能一覧 / テーブル定義 / 画面遷移図に自動分離
 ======================== */
+/* ========================
+   設計書描画（⑤用 安定版）
+   ・④で貼り付けたAI生成HTMLを解析
+   ・機能一覧 / テーブル定義 / 画面遷移図に自動分離
+   ・画面遷移図はMermaidで描画
+======================== */
 function renderDesignDocs() {
   const rawHtml = document.getElementById('aiCodeInput').value.trim();
   if (!rawHtml) {
@@ -247,6 +253,7 @@ function renderDesignDocs() {
     return;
   }
 
+  // DOMに解析
   const parser = new DOMParser();
   const doc = parser.parseFromString(rawHtml, 'text/html');
 
@@ -266,14 +273,23 @@ function renderDesignDocs() {
     }
   });
 
+  // 各ブロックに描画
   document.getElementById('generateFunctionList').innerHTML = funcContent;
   document.getElementById('generateTableDefinition').innerHTML = tableContent;
   document.getElementById('generateTransitionDiagram').innerHTML = transContent;
 
-  // オプションで④のプレビューにもそのまま表示
+  // ④プレビューも更新
   document.getElementById('designRenderPreview').innerHTML = rawHtml;
-}
 
+  // Mermaidレンダリング
+  if (window.mermaid) {
+    mermaid.initialize({ startOnLoad: false, theme: "default" });
+    const mermaidBlocks = document.getElementById('generateTransitionDiagram').querySelectorAll('.mermaid');
+    mermaidBlocks.forEach(block => {
+      try { mermaid.init(undefined, block); } catch(e) { console.error(e); }
+    });
+  }
+}
 
 /* 補助: HTMLエスケープ */
 function escapeHtml(s) {
