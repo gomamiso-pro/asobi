@@ -148,6 +148,10 @@
     ※HTML形式で出力されていれば、Markdown変換なしでそのまま描画されます。
   </p>
   <textarea id="aiCodeInput" rows="10" placeholder="AIが生成した設計書（HTML形式推奨）をここに貼り付け"></textarea>
+  <!-- 描画結果　--> 
+  <div id="designRenderPreview" style="margin-top:20px; border:1px solid #ccc; padding:10px; border-radius:6px;">
+    <!-- AI生成設計書がここに描画されます -->
+  </div>
   <div class="design-import-actions">
     <button onclick="renderDesignDocs()">設計書を描画</button>
     <button onclick="clearRenderedDesigns()">描画をクリア</button>
@@ -159,10 +163,6 @@
 <!-- ⑤ 設計書描画 -->
 <section id="designOutputSection">
   <h2>⑤ 設計書（描画）</h2>
-  <!-- 描画結果　--> 
-  <div id="designRenderPreview" style="margin-top:20px; border:1px solid #ccc; padding:10px; border-radius:6px;">
-    <!-- AI生成設計書がここに描画されます -->
-  </div>
   <!-- <div id="generateFunctionList" class="design-block"></div> -->
   <!-- <div id="generateTableDefinition" class="design-block"></div> -->
   <!-- <div id="generateTransitionDiagram" class="design-block"></div> -->
