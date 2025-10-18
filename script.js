@@ -165,7 +165,7 @@ window.generateInstructions = function() {
   }).join("\n") : "ページ設定は未作成です。";
 
   const instruct = `
-以下のヒアリング内容をもとに、Webサイト／Webアプリの設計書（機能一覧、テーブル定義書、画面遷移図）を作成してください。
+以下のヒアリング内容をもとに、Webサイト／Webアプリの設計書を作成してください。
 
 【基本設定】
 - プロジェクト概要: ${overview}
@@ -183,18 +183,6 @@ window.generateInstructions = function() {
 
 【ページ設定】
 ${pageSummary}
-
-【出力フォーマット】
-1. 機能一覧（分類 / 機能名 / 処理詳細 / 必要なDBテーブル名）
-2. テーブル定義書（テーブル名 / 概要 / フィールド名 / 型 / 詳細）
-3. 画面遷移図（Mermaid形式 or テキスト）
-
-【重要な追加指示】
-- Markdownではなく、最初から **完全なHTMLとして出力** してください。
-- HTMLファイル1枚にすべての設計書（機能一覧・テーブル定義書・画面遷移図）をきれいに描画してください。
-- 各章は <section> で区切り、タイトルを <h2> で表示。
-- CSSを含め、ブラウザで開いたときに整ったデザインで見えるようにしてください。
-- コードブロックやエスケープを行わず、純粋なHTML構造で返してください。
   `.trim();
 
   document.getElementById('aiInstructions').value = instruct;
