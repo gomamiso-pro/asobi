@@ -249,46 +249,35 @@ function ensureDesignBlock(id, title) {
 }
 
 function renderDesignDocs() {
-  // 1) 出力先を探す（既存のIDを優先）
-  let output = document.getElementById("designOutputSection") || document.getElementById("designRenderPreview");
-
-  // 2) 見つからなければ安全に作る（designImportSection の直下に作る）
+  let output = document.getElementById("designOutputSection");
   if (!output) {
     const parent = document.getElementById('designImportSection') || document.body;
     output = document.createElement('div');
     output.id = 'designOutputSection';
-    output.className = 'design-block';
     output.style.marginTop = '20px';
     output.style.border = '1px solid #ccc';
     output.style.padding = '10px';
     output.style.borderRadius = '6px';
     parent.appendChild(output);
-    console.warn("renderDesignDocs: designOutputSection が見つからなかったため自動作成しました。");
-  } else {
-    console.log("renderDesignDocs: 出力先を発見:", output);
   }
+  output.innerHTML = "";
 
-  // 3) 空にする（ここで安全に innerHTML を呼べる）
-  try {
-    output.innerHTML = "";
-  } catch (err) {
-    console.error("renderDesignDocs: 出力先のクリアに失敗しました:", err, output);
-    alert("描画先の初期化でエラーが発生しました。コンソールを確認してください。");
-    return;
-  }
-
-  // 4) AI出力を取得
   const rawHtml = (document.getElementById('aiCodeInput')?.value || "").trim();
   if (!rawHtml) {
     output.innerHTML = "<p style='color:crimson;'>⚠️ AIが生成した設計書（HTML）を貼り付けてください。</p>";
     return;
   }
 
-  // 5) DOMParser でパースしてセクション分割（既存のロジックを保持）
   const parser = new DOMParser();
   const doc = parser.parseFromString(rawHtml, 'text/html');
 
-  let funcContent = '', tableContent = '', transContent = '';
+  // ① 機能一覧
+  let funcContent = '';
+  // ② テーブル定義
+  let tableContentBasic = '';
+  let tableContentPages = '';
+  // ③ 画面遷移図
+  let transContent = '';
   let current = '';
 
   doc.body.querySelectorAll('*').forEach(node => {
@@ -296,49 +285,51 @@ function renderDesignDocs() {
       const text = node.textContent.trim();
       if (/機能一覧/.test(text)) current = 'func';
       else if (/テーブル定義/.test(text)) current = 'table';
-      else if (/画面遷移/.test(text)) current = 'trans';
-      else if (/画面遷移図|遷移図|遷移/.test(text)) current = 'trans';
+      else if (/画面遷移/.test(text) || /遷移図/.test(text)) current = 'trans';
+      else if (/ページ設定/.test(text)) current = 'tablePage';
     } else {
       if (current === 'func') funcContent += node.outerHTML;
-      else if (current === 'table') tableContent += node.outerHTML;
+      else if (current === 'table') tableContentBasic += node.outerHTML;
+      else if (current === 'tablePage') tableContentPages += node.outerHTML;
       else if (current === 'trans') transContent += node.outerHTML;
     }
   });
 
-  // 6) ブロック確保（ensureDesignBlock を使う既存ロジックと連携）
-  const funcEl = ensureDesignBlock('generateFunctionList', '機能一覧');
-  const tableEl = ensureDesignBlock('generateTableDefinition', 'テーブル定義');
-  const transEl = ensureDesignBlock('generateTransitionDiagram', '画面遷移図');
+  // 機能一覧ブロック
+  const funcEl = document.createElement('section');
+  funcEl.innerHTML = `<h2>機能一覧</h2>` + (funcContent || '<p>機能一覧が見つかりませんでした。</p>');
+  output.appendChild(funcEl);
 
-  // 7) 内容を入れる（見つからなかったら元データの抜粋を見せる）
-  funcEl.innerHTML = '<h3>機能一覧</h3>' + (funcContent || '<p>機能一覧が見つかりませんでした。以下は元データの抜粋です。</p>' + rawHtml);
-  tableEl.innerHTML = '<h3>テーブル定義</h3>' + (tableContent || '<p>テーブル定義が見つかりませんでした。以下は元データの抜粋です。</p>');
-  transEl.innerHTML = '<h3>画面遷移図</h3>' + (transContent || '<p>遷移図が見つかりませんでした。以下は元データの抜粋です。</p>');
+  // テーブル定義ブロック
+  const tableEl = document.createElement('section');
+  tableEl.innerHTML = `<h2>テーブル定義書</h2>` +
+    `<div class="table-basic"><h3>基本設定</h3>${tableContentBasic || '<p>基本設定情報が見つかりません</p>'}</div>` +
+    `<div class="table-pages"><h3>ページ設定</h3>${tableContentPages || '<p>ページ情報が見つかりません</p>'}</div>`;
+  output.appendChild(tableEl);
 
-  // 8) preview エリア（designRenderPreview）もなければ安全に作る
+  // ページごとにページ名・目的を見出し化（h4）
+  const pages = document.querySelectorAll('.page-card');
+  pages.forEach((card, i) => {
+    const pageName = document.getElementById(`pageName${i+1}`)?.value || `ページ${i+1}`;
+    const pagePurpose = document.getElementById(`pagePurpose${i+1}`)?.value || '目的未設定';
+    const div = document.createElement('div');
+    div.innerHTML = `<h4>${pageName}</h4><p>${pagePurpose}</p>`;
+    tableEl.appendChild(div);
+  });
+
+  // 画面遷移図ブロック
+  const transEl = document.createElement('section');
+  transEl.innerHTML = `<h2>画面遷移図</h2>` + (transContent || '<p>遷移図が見つかりませんでした。</p>');
+  output.appendChild(transEl);
+
+  // preview にも元データを表示
   let preview = document.getElementById('designRenderPreview');
   if (!preview) {
     preview = document.createElement('div');
     preview.id = 'designRenderPreview';
-    // 生成した output の直後に差し込む
     output.parentNode.insertBefore(preview, output.nextSibling);
-    console.warn("renderDesignDocs: designRenderPreview が無かったため生成しました。");
   }
   preview.innerHTML = rawHtml;
-
-  // 9) Mermaid があれば初期化を試みる
-  if (window.mermaid) {
-    if (!window.mermaidInitialized) {
-      try { mermaid.initialize({ startOnLoad: false, theme: 'default' }); } catch (e) { console.error(e); }
-      window.mermaidInitialized = true;
-    }
-    const blocks = document.querySelectorAll('#generateTransitionDiagram .mermaid');
-    blocks.forEach(block => {
-      try { mermaid.init(undefined, block); } catch (e) { console.error(e); }
-    });
-  }
-
-  console.log("renderDesignDocs: 描画完了");
 }
 
 function clearRenderedDesigns() {
