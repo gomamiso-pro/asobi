@@ -8,7 +8,7 @@
    ================================== */
 
 let pageCount = 0;
-let pages = []; // { pageName, pagePurpose, header[], menu[], body[], footer[] }
+let pages = [];
 
 const sectionOptions = {
   header: ["ロゴ","検索ボックス","通知アイコン","言語切替","ログインボタン"],
@@ -186,14 +186,13 @@ ${pageSummary}
 3) 画面遷移図（テキスト説明 or Mermaid形式）
 
 【追加指示（重要）】
-上記の設計書をもとに、**同じ内容を見やすく描画するHTMLファイル（1枚）も生成**してください。  
-- HTML内でMarkdownを整ったレイアウトに変換して表示できるようにしてください。  
-- フォント・配色・表の体裁・セクション構成は統一感のあるデザインにしてください。  
-- 3つの章（機能一覧／テーブル定義書／画面遷移図）を見出し付きで分けてください。  
-- Mermaid記法の図が含まれる場合は <script type="module"> で描画可能にしてください。  
-- 生成されたHTMLをブラウザで開くと設計書がきれいに閲覧できるようにしてください。
-
-以上をMarkdownとHTMLの両方で出力してください。
+上記の設計書をもとに、**同じ内容を見やすく描画するHTMLファイル（1枚）も生成**してください。
+- HTML内でMarkdownを整ったレイアウトに変換して表示できるようにしてください。
+- フォント・配色・表の体裁・セクション構成は統一感のあるデザインにしてください。
+- 3つの章（機能一覧／テーブル定義書／画面遷移図）を見出し付きで分けてください。
+- Mermaid記法の図が含まれる場合は <script type="module"> で描画可能にしてください。
+- **生成されたHTMLをブラウザで開くと設計書がきれいに閲覧できるようにしてください。**
+- 出力結果は「Markdown形式の設計書」と「HTML表示用設計書」の両方を提示してください。
   `.trim();
 
   document.getElementById('aiInstructions').value = instruct;
@@ -226,9 +225,9 @@ function renderDesignDocs() {
   let funcPart = '', tablePart = '', transPart = '';
 
   const markers = {
-    func: ['機能一覧', '機能リスト', 'functions', 'feature list'],
-    table: ['テーブル定義', 'テーブル定義書', 'table definition', 'tables'],
-    trans: ['画面遷移', '画面遷移図', '遷移図', 'diagram', 'flow']
+    func: ['機能一覧', 'functions', 'feature list'],
+    table: ['テーブル定義', 'table definition'],
+    trans: ['画面遷移', 'diagram', 'flow']
   };
 
   const lines = raw.split(/\r?\n/);
@@ -243,43 +242,15 @@ function renderDesignDocs() {
     if (current === 'func') funcPart += line + '\n';
     else if (current === 'table') tablePart += line + '\n';
     else if (current === 'trans') transPart += line + '\n';
-    else {
-      if (!funcPart) funcPart += line + '\n';
-      else if (!tablePart) tablePart += line + '\n';
-      else transPart += line + '\n';
-    }
   });
 
-  if (!funcPart) funcPart = raw;
-  if (!tablePart) tablePart = raw;
-  if (!transPart) transPart = raw;
-
-  document.getElementById('generateFunctionList').innerHTML = `<h3>機能一覧（AI出力より）</h3><pre>${escapeHtml(funcPart)}</pre>`;
-  document.getElementById('generateTableDefinition').innerHTML = `<h3>テーブル定義書（AI出力より）</h3><pre>${escapeHtml(tablePart)}</pre>`;
-  document.getElementById('generateTransitionDiagram').innerHTML = `<h3>画面遷移図（AI出力より）</h3><pre>${escapeHtml(transPart)}</pre>`;
+  document.getElementById('generateFunctionList').innerHTML = `<h3>機能一覧</h3><pre>${escapeHtml(funcPart)}</pre>`;
+  document.getElementById('generateTableDefinition').innerHTML = `<h3>テーブル定義書</h3><pre>${escapeHtml(tablePart)}</pre>`;
+  document.getElementById('generateTransitionDiagram').innerHTML = `<h3>画面遷移図</h3><pre>${escapeHtml(transPart)}</pre>`;
 }
 
-/* ---------------- ページHTML生成 ---------------- */
-function generatePageCode() {
-  updatePages();
-  if (pages.length === 0) {
-    alert('ページがまだありません。ページを追加してください。');
-    return;
-  }
-  const results = pages.map((p, idx) => {
-    const html = buildSinglePageHtml(p, idx + 1);
-    return { filename: `${sanitizeFilename(p.pageName || 'page')}.html`, content: html };
-  });
-
-  if (results.length > 0) {
-    const first = results[0];
-    document.getElementById('pagePreview').srcdoc = first.content;
-    window.__generatedPages = results;
-    alert('ページコードを生成しました。プレビューは最初のページです。');
-  }
-}
-
-function buildSinglePageHtml(pageObj, pageIndex) {
+/* ---------------- HTML生成 ---------------- */
+function buildSinglePageHtml(pageObj) {
   const css = `
     body{ font-family: 'M PLUS Rounded 1c', 'Noto Sans JP', sans-serif; padding:20px; line-height:1.6; }
     header, nav, main, footer{ padding:12px; border-radius:8px; margin-bottom:12px; border:1px solid #e6e6e6; background:#fff; }
@@ -322,26 +293,6 @@ function buildSinglePageHtml(pageObj, pageIndex) {
   </body>
   </html>
   `;
-}
-
-function sanitizeFilename(name) {
-  return name.replace(/[\/\\?%*:|"<>]/g, '_').replace(/\s+/g, '_');
-}
-
-function downloadPageCode() {
-  const pages = window.__generatedPages;
-  if (!pages || !pages.length) {
-    alert('まず「ページコード生成」を押してください。');
-    return;
-  }
-  pages.forEach(p => {
-    const blob = new Blob([p.content], { type: 'text/html' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = p.filename;
-    a.click();
-  });
-  alert('ダウンロードを開始しました。ブラウザ設定で複数DLがブロックされる場合があります。');
 }
 
 /* ---------------- 補助 ---------------- */
