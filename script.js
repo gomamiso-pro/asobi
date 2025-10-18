@@ -192,24 +192,21 @@ ${pageSummary}
    設計書HTML描画処理
 ======================== */
 function renderDesignDocs() {
-  const raw = document.getElementById('aiCodeInput').value.trim();
+  const raw = document.getElementById('aiInstructions').value.trim(); // ← aiCodeInput → aiInstructions に変更
   if (!raw) {
     alert('AIが生成した設計書を貼り付けてください。');
     return;
   }
 
-  // 描画先
   const preview = document.getElementById('designRenderPreview');
-
-  // HTML形式ならそのまま描画
   preview.innerHTML = raw;
 
-  // Mermaid描画対応
   if (window.mermaid) {
     mermaid.initialize({ startOnLoad: true, theme: "default" });
     mermaid.init(undefined, preview.querySelectorAll(".mermaid"));
   }
 }
+
 
 function copyInstructions() {
   const el = document.getElementById('aiInstructions');
