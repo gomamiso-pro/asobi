@@ -249,31 +249,48 @@ function ensureDesignBlock(id, title) {
 }
 
 function renderDesignDocs() {
-   const output =
-    document.getElementById("designOutputSection") ||
-    document.getElementById("designRenderPreview") ||
-    document.body;
+  // 1) 出力先を探す（既存のIDを優先）
+  let output = document.getElementById("designOutputSection") || document.getElementById("designRenderPreview");
 
+  // 2) 見つからなければ安全に作る（designImportSection の直下に作る）
   if (!output) {
-    alert("描画先が見つかりません。HTMLに <div id='designOutputSection'></div> を追加してください。");
+    const parent = document.getElementById('designImportSection') || document.body;
+    output = document.createElement('div');
+    output.id = 'designOutputSection';
+    output.className = 'design-block';
+    output.style.marginTop = '20px';
+    output.style.border = '1px solid #ccc';
+    output.style.padding = '10px';
+    output.style.borderRadius = '6px';
+    parent.appendChild(output);
+    console.warn("renderDesignDocs: designOutputSection が見つからなかったため自動作成しました。");
+  } else {
+    console.log("renderDesignDocs: 出力先を発見:", output);
+  }
+
+  // 3) 空にする（ここで安全に innerHTML を呼べる）
+  try {
+    output.innerHTML = "";
+  } catch (err) {
+    console.error("renderDesignDocs: 出力先のクリアに失敗しました:", err, output);
+    alert("描画先の初期化でエラーが発生しました。コンソールを確認してください。");
     return;
   }
 
-  output.innerHTML = ""; // ← エラーが出てた箇所
-
-  const rawHtml = document.getElementById('aiCodeInput').value.trim();
+  // 4) AI出力を取得
+  const rawHtml = (document.getElementById('aiCodeInput')?.value || "").trim();
   if (!rawHtml) {
-    alert('AIが生成した設計書（HTML）を貼り付けてください。');
+    output.innerHTML = "<p style='color:crimson;'>⚠️ AIが生成した設計書（HTML）を貼り付けてください。</p>";
     return;
   }
 
+  // 5) DOMParser でパースしてセクション分割（既存のロジックを保持）
   const parser = new DOMParser();
   const doc = parser.parseFromString(rawHtml, 'text/html');
 
   let funcContent = '', tableContent = '', transContent = '';
   let current = '';
 
-  // 単純なセクション検出（見出しテキストに機能一覧 / テーブル定義 / 画面遷移 を含める）
   doc.body.querySelectorAll('*').forEach(node => {
     if (node.tagName && node.tagName.match(/^H[1-6]$/)) {
       const text = node.textContent.trim();
@@ -288,26 +305,28 @@ function renderDesignDocs() {
     }
   });
 
-  // ブロックを確保
+  // 6) ブロック確保（ensureDesignBlock を使う既存ロジックと連携）
   const funcEl = ensureDesignBlock('generateFunctionList', '機能一覧');
   const tableEl = ensureDesignBlock('generateTableDefinition', 'テーブル定義');
   const transEl = ensureDesignBlock('generateTransitionDiagram', '画面遷移図');
 
-  // 内容を入れる（もし空なら、rawHtml 全文を表示）
+  // 7) 内容を入れる（見つからなかったら元データの抜粋を見せる）
   funcEl.innerHTML = '<h3>機能一覧</h3>' + (funcContent || '<p>機能一覧が見つかりませんでした。以下は元データの抜粋です。</p>' + rawHtml);
   tableEl.innerHTML = '<h3>テーブル定義</h3>' + (tableContent || '<p>テーブル定義が見つかりませんでした。以下は元データの抜粋です。</p>');
   transEl.innerHTML = '<h3>画面遷移図</h3>' + (transContent || '<p>遷移図が見つかりませんでした。以下は元データの抜粋です。</p>');
 
-  // それぞれのブロックに元データの要約を足す（trans には mermaid が含まれることが多い）
-  if (!funcContent && !tableContent && !transContent) {
-    // 全く分割できなかった場合は、designRenderPreview に rawHtml を入れる
-    document.getElementById('designRenderPreview').innerHTML = rawHtml;
-  } else {
-    // 可能であれば元HTMLもプレビューに入れておく
-    document.getElementById('designRenderPreview').innerHTML = rawHtml;
+  // 8) preview エリア（designRenderPreview）もなければ安全に作る
+  let preview = document.getElementById('designRenderPreview');
+  if (!preview) {
+    preview = document.createElement('div');
+    preview.id = 'designRenderPreview';
+    // 生成した output の直後に差し込む
+    output.parentNode.insertBefore(preview, output.nextSibling);
+    console.warn("renderDesignDocs: designRenderPreview が無かったため生成しました。");
   }
+  preview.innerHTML = rawHtml;
 
-  // Mermaid の初期化（ある場合のみ）
+  // 9) Mermaid があれば初期化を試みる
   if (window.mermaid) {
     if (!window.mermaidInitialized) {
       try { mermaid.initialize({ startOnLoad: false, theme: 'default' }); } catch (e) { console.error(e); }
@@ -318,6 +337,8 @@ function renderDesignDocs() {
       try { mermaid.init(undefined, block); } catch (e) { console.error(e); }
     });
   }
+
+  console.log("renderDesignDocs: 描画完了");
 }
 
 function clearRenderedDesigns() {
