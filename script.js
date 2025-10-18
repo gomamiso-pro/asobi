@@ -223,41 +223,69 @@ function downloadInstructions() {
   a.click();
 }
 
-/* ---------------- 設計書描画 ---------------- */
+/* ========================
+   設計書描画（⑤用 安定版）
+   ・④で貼り付けたAI生成HTMLを解析
+   ・機能一覧 / テーブル定義 / 画面遷移図に自動分離
+======================== */
 function renderDesignDocs() {
-  const raw = document.getElementById('aiCodeInput').value.trim();
-  if (!raw) {
-    alert('AIが生成した設計書を貼り付けてください。');
+  const rawHtml = document.getElementById('aiCodeInput').value.trim();
+  if (!rawHtml) {
+    alert('AIが生成した設計書（HTML）を貼り付けてください。');
     return;
   }
 
-  const lower = raw.toLowerCase();
-  let funcPart = '', tablePart = '', transPart = '';
+  // 描画エリアをクリア
+  const funcEl = document.getElementById('generateFunctionList');
+  const tableEl = document.getElementById('generateTableDefinition');
+  const transEl = document.getElementById('generateTransitionDiagram');
+  funcEl.innerHTML = '';
+  tableEl.innerHTML = '';
+  transEl.innerHTML = '';
 
-  const markers = {
-    func: ['機能一覧', 'functions', 'feature list'],
-    table: ['テーブル定義', 'table definition'],
-    trans: ['画面遷移', 'diagram', 'flow']
-  };
+  // 仮でHTMLをDOMとして解析
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(rawHtml, 'text/html');
 
-  const lines = raw.split(/\r?\n/);
-  let current = 'other';
-  lines.forEach(line => {
-    const l = line.trim();
-    if (!l) return;
-    const check = (arr) => arr.some(m => l.indexOf(m) !== -1);
-    if (check(markers.func)) { current = 'func'; return; }
-    if (check(markers.table)) { current = 'table'; return; }
-    if (check(markers.trans)) { current = 'trans'; return; }
-    if (current === 'func') funcPart += line + '\n';
-    else if (current === 'table') tablePart += line + '\n';
-    else if (current === 'trans') transPart += line + '\n';
+  // セクション抽出
+  const sections = doc.querySelectorAll('h3, h2');
+  let current = '';
+  let funcContent = '', tableContent = '', transContent = '';
+  
+  doc.body.childNodes.forEach(node => {
+    if (node.nodeType !== Node.ELEMENT_NODE) return;
+
+    const text = node.textContent.trim().toLowerCase();
+    if (/機能一覧|functions|feature list/.test(text)) { current='func'; return; }
+    if (/テーブル定義|table definition/.test(text)) { current='table'; return; }
+    if (/画面遷移|遷移図|diagram|flow/.test(text)) { current='trans'; return; }
+
+    const htmlString = node.outerHTML || node.textContent;
+
+    if (current==='func') funcContent += htmlString + '\n';
+    else if (current==='table') tableContent += htmlString + '\n';
+    else if (current==='trans') transContent += htmlString + '\n';
   });
 
-  document.getElementById('generateFunctionList').innerHTML = `<h3>機能一覧</h3><pre>${escapeHtml(funcPart)}</pre>`;
-  document.getElementById('generateTableDefinition').innerHTML = `<h3>テーブル定義書</h3><pre>${escapeHtml(tablePart)}</pre>`;
-  document.getElementById('generateTransitionDiagram').innerHTML = `<h3>画面遷移図</h3><pre>${escapeHtml(transPart)}</pre>`;
+  // エスケープして描画
+  funcEl.innerHTML = `<h3>機能一覧</h3><pre>${escapeHtml(funcContent)}</pre>`;
+  tableEl.innerHTML = `<h3>テーブル定義書</h3><pre>${escapeHtml(tableContent)}</pre>`;
+  transEl.innerHTML = `<h3>画面遷移図</h3><pre>${escapeHtml(transContent)}</pre>`;
+
+  // ④プレビュー欄にもそのまま描画（オプション）
+  document.getElementById('designRenderPreview').innerHTML = rawHtml;
 }
+
+/* 補助: HTMLエスケープ */
+function escapeHtml(s) {
+  if (!s) return '';
+  return s.replace(/&/g,'&amp;')
+          .replace(/</g,'&lt;')
+          .replace(/>/g,'&gt;')
+          .replace(/"/g,'&quot;')
+          .replace(/'/g,'&#39;');
+}
+
 
 /* ---------------- HTML生成 ---------------- */
 function buildSinglePageHtml(pageObj) {
