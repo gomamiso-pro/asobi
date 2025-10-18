@@ -136,7 +136,7 @@ function downloadEstimate() {
 /* ========================
    設計書生成指示文の作成
 ======================== */
-function generateInstructions() {
+window.generateInstructions = function() {
   updatePages();
 
   const overview = document.getElementById("projectOverviewInput").value || "おまかせ";
@@ -192,13 +192,13 @@ ${pageSummary}
 【重要な追加指示】
 - Markdownではなく、最初から **完全なHTMLとして出力** してください。
 - HTMLファイル1枚にすべての設計書（機能一覧・テーブル定義書・画面遷移図）をきれいに描画してください。
-- 各章は `<section>` で区切り、タイトルを `<h2>` で表示。
+- 各章は <section> で区切り、タイトルを <h2> で表示。
 - CSSを含め、ブラウザで開いたときに整ったデザインで見えるようにしてください。
 - コードブロックやエスケープを行わず、純粋なHTML構造で返してください。
   `.trim();
 
   document.getElementById('aiInstructions').value = instruct;
-}
+};
 
 /* ========================
    設計書HTML描画処理
