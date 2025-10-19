@@ -151,13 +151,21 @@
 
 
 <section id="pagePreviewSection">
-  <h2>⑤ 各ページのコード生成・プレビュー・ダウンロード</h2>
-  <p class="hint">「ページコード生成」で、各ページごとの簡易HTML/CSS/JSを自動生成します（プレビューは最初のページ）。</p>
-  <div class="pagecode-actions">
-    <button onclick="generatePageCode()">ページコード生成</button>
-    <button onclick="downloadPageCode()">生成コードを全ページダウンロード</button>
+  <h2>⑤ 各ページのコードプレビューと切り替え</h2>
+  <p class="hint">AIが生成した**`page_codes.txt`**のコードブロック全体を以下のテキストエリアに貼り付け、「Webページプレビュー」を押すと、全ページを切り替えてプレビューできます。</p>
+  
+  <textarea id="aiPageCodeInput" rows="10" placeholder="AIが生成した page_codes.txt のコードブロック（```txt...```を含む）をここに貼り付け"></textarea>
+
+  <div class="d-flex align-items-center mb-3 pagecode-actions">
+    <button class="btn btn-primary me-3" onclick="loadAndRenderPageCodes()">Webページプレビュー</button>
   </div>
-  <iframe id="pagePreview"></iframe>
+
+  <div class="d-flex align-items-center mb-3" id="pageSelectorContainer" style="display:none;">
+    <label for="pageSelector" class="form-label me-3 mb-0">ページ切り替え:</label>
+        <button class="btn btn-secondary btn-sm ms-auto" onclick="downloadPageCode()">生成コードを全ページダウンロード</button>
+  </div>
+
+  <iframe id="pagePreview" style="width:100%; height:400px; border:1px solid #007bff; border-radius: 4px;"></iframe>
 </section>
 
 <footer style="text-align:center; margin:18px 0 60px 0;">
