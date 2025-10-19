@@ -202,6 +202,7 @@ ${pageSummary}
   document.getElementById('aiInstructions').value = instruct;
 }
 
+
 function copyInstructions() {
   const el = document.getElementById('aiInstructions');
   el.select();
