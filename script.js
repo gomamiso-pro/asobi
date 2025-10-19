@@ -219,43 +219,123 @@ function downloadInstructions() {
 }
 
 /* ---------------- 設計書描画 ---------------- */
-/* ---------------- 設計書描画 ---------------- */
 function renderDesignDocs() {
-  const raw = document.getElementById('aiCodeInput').value.trim();
-  if (!raw) {
-    alert('AIが生成した設計書を貼り付けてください。');
-    return;
-  }
+    const raw = document.getElementById('aiCodeInput').value.trim();
+    if (!raw) {
+        alert('AIが生成した設計書を貼り付けてください。');
+        return;
+    }
 
-  const lower = raw.toLowerCase();
-  let funcPart = '', tablePart = '', transPart = '';
+    let funcPart = '', tablePart = '', transPart = '';
+    const markers = {
+        func: ['機能一覧', 'functions', 'feature list'],
+        table: ['テーブル定義', 'table definition'],
+        trans: ['画面遷移', 'diagram', 'flow']
+    };
 
-  const markers = {
-    func: ['機能一覧', 'functions', 'feature list'],
-    table: ['テーブル定義', 'table definition'],
-    trans: ['画面遷移', 'diagram', 'flow']
-  };
+    const lines = raw.split(/\r?\n/);
+    let current = 'other';
+    lines.forEach(line => {
+        const l = line.trim();
+        if (!l) return;
+        const check = (arr) => arr.some(m => line.toLowerCase().indexOf(m.toLowerCase()) !== -1);
+        
+        // セクションの見出しを検出
+        if (check(markers.func)) { current = 'func'; return; }
+        if (check(markers.table)) { current = 'table'; return; }
+        if (check(markers.trans)) { current = 'trans'; return; }
 
-  const lines = raw.split(/\r?\n/);
-  let current = 'other';
-  lines.forEach(line => {
-    const l = line.trim();
-    if (!l) return;
-    const check = (arr) => arr.some(m => l.indexOf(m) !== -1);
-    if (check(markers.func)) { current = 'func'; return; }
-    if (check(markers.table)) { current = 'table'; return; }
-    if (check(markers.trans)) { current = 'trans'; return; }
-    if (current === 'func') funcPart += line + '\n';
-    else if (current === 'table') tablePart += line + '\n';
-    else if (current === 'trans') transPart += line + '\n';
-  });
+        if (current === 'func') funcPart += line + '\n';
+        else if (current === 'table') tablePart += line + '\n';
+        else if (current === 'trans') transPart += line + '\n';
+    });
 
-    // 【★★★ 修正箇所: escapeHtml() と <pre> タグを削除し、生のHTMLとして挿入 ★★★】
-  document.getElementById('generateFunctionList').innerHTML = `<h3>機能一覧</h3>${funcPart}`;
-  document.getElementById('generateTableDefinition').innerHTML = `<h3>テーブル定義書</h3>${tablePart}`;
-  document.getElementById('generateTransitionDiagram').innerHTML = `<h3>画面遷移図</h3>${transPart}`;
+    // --- 各セクションのHTML変換処理 ---
+
+    // 1. 機能一覧: Markdown表 または 生のHTMLテーブルに対応
+    let funcHtml = funcPart;
+    // Markdown表（| で始まる行）を処理するための簡易的な処理
+    if (funcPart.trim().startsWith('|')) {
+        funcHtml = convertMarkdownTableToHtml(funcPart);
+    }
+    // AIが出力したHTMLテーブルコードもそのままレンダリングされる (エスケープしないため)
+    document.getElementById('generateFunctionList').innerHTML = `<h3>機能一覧</h3>${funcHtml}`;
+
+
+    // 2. テーブル定義書: Markdown表 または 生のHTMLテーブルに対応
+    let tableHtml = tablePart;
+    if (tablePart.trim().startsWith('|') || tablePart.trim().toLowerCase().startsWith('create table')) {
+        // テーブル定義書は複数の表を含む可能性が高いため、ここは簡易的にMarkdown表変換を適用
+        tableHtml = convertMarkdownTableToHtml(tablePart); 
+    }
+    document.getElementById('generateTableDefinition').innerHTML = `<h3>テーブル定義書</h3>${tableHtml}`;
+
+
+    // 3. 画面遷移図: Mermaidコードブロックを<pre class="mermaid">で囲む
+    let transHtml = transPart;
+    if (transPart.trim().toLowerCase().startsWith('graph')) {
+        // Mermaid記法（graph TD など）で始まっている場合、<pre class="mermaid">で囲む
+        transHtml = `<div class="mermaid-container"><pre class="mermaid">${transPart.trim()}</pre></div>`;
+        
+        // Mermaidの再実行を試みる (HTML内にscript moduleがあれば実行されるはずだが、再描画の保険)
+        if (typeof mermaid !== 'undefined') {
+             mermaid.init();
+        }
+    } else {
+        // Mermaid以外は生のテキストとして表示
+        transHtml = `<pre>${escapeHtml(transPart)}</pre>`;
+    }
+    document.getElementById('generateTransitionDiagram').innerHTML = `<h3>画面遷移図</h3>${transHtml}`;
 }
 
+// 簡易 Markdown Table -> HTML Table 変換関数
+// AIのMarkdown表（|で区切られたもの）をHTMLテーブルに変換します。
+function convertMarkdownTableToHtml(markdown) {
+    let html = '<table class="table table-bordered table-sm">';
+    const lines = markdown.split(/\r?\n/).filter(line => line.trim().startsWith('|'));
+    
+    if (lines.length < 2) return markdown; // 表として認識できない場合はそのまま返す
+
+    // 1行目: ヘッダー
+    const headerCells = lines[0].split('|').map(c => c.trim()).filter(c => c);
+    if (headerCells.length > 0) {
+        html += '<thead><tr>';
+        headerCells.forEach(cell => {
+            html += `<th scope="col">${cell.replace(/\*\*/g, '')}</th>`; // ** を除去
+        });
+        html += '</tr></thead><tbody>';
+    }
+
+    // 2行目は区切り線なのでスキップ (lines[1])
+
+    // 3行目以降: ボディ
+    for (let i = 2; i < lines.length; i++) {
+        const bodyCells = lines[i].split('|').map(c => c.trim()).filter(c => c);
+        if (bodyCells.length > 0) {
+            html += '<tr>';
+            bodyCells.forEach(cell => {
+                html += `<td>${cell.replace(/\*\*/g, '<strong>')}</td>`; // ** を <strong> に変換
+            });
+            html += '</tr>';
+        }
+    }
+    
+    html += '</tbody></table>';
+
+    // 複数テーブル定義が混ざっている可能性があるため、元のテキストも念のため含めておく
+    if (markdown.indexOf('テーブル:') !== -1) {
+        return markdown; // 複数テーブル定義を完璧に処理できないため、生のMarkdownも残す
+    }
+    
+    return html;
+}
+
+/* ---------------- 補助 ---------------- */
+function escapeHtml(s) {
+    if (!s) return '';
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+// ... 既存の他の関数（updatePages, generateInstructionsなど）は変更しないでください ...
 /* ---------------- HTML生成 ---------------- */
 function buildSinglePageHtml(pageObj) {
   const css = `
