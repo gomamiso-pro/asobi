@@ -392,3 +392,20 @@ document.addEventListener('DOMContentLoaded', () => {
   updatePages();
   updateEstimate();
 });
+
+/* ---------------- AI生成HTMLプレビュー ---------------- */
+function renderHtmlPreview() {
+    const html = document.getElementById('aiHtmlInput').value.trim();
+    if (!html) {
+        alert('AI生成HTMLを貼り付けてください');
+        return;
+    }
+    const iframe = document.getElementById('htmlPreview');
+    iframe.srcdoc = html;
+}
+
+function clearHtmlPreview() {
+    const iframe = document.getElementById('htmlPreview');
+    iframe.srcdoc = '';
+    document.getElementById('aiHtmlInput').value = '';
+}
