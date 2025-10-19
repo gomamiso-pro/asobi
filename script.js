@@ -219,39 +219,41 @@ function downloadInstructions() {
 }
 
 /* ---------------- 設計書描画 ---------------- */
+/* ---------------- 設計書描画 ---------------- */
 function renderDesignDocs() {
-  const raw = document.getElementById('aiCodeInput').value.trim();
-  if (!raw) {
-    alert('AIが生成した設計書を貼り付けてください。');
-    return;
-  }
+  const raw = document.getElementById('aiCodeInput').value.trim();
+  if (!raw) {
+    alert('AIが生成した設計書を貼り付けてください。');
+    return;
+  }
 
-  const lower = raw.toLowerCase();
-  let funcPart = '', tablePart = '', transPart = '';
+  const lower = raw.toLowerCase();
+  let funcPart = '', tablePart = '', transPart = '';
 
-  const markers = {
-    func: ['機能一覧', 'functions', 'feature list'],
-    table: ['テーブル定義', 'table definition'],
-    trans: ['画面遷移', 'diagram', 'flow']
-  };
+  const markers = {
+    func: ['機能一覧', 'functions', 'feature list'],
+    table: ['テーブル定義', 'table definition'],
+    trans: ['画面遷移', 'diagram', 'flow']
+  };
 
-  const lines = raw.split(/\r?\n/);
-  let current = 'other';
-  lines.forEach(line => {
-    const l = line.trim();
-    if (!l) return;
-    const check = (arr) => arr.some(m => l.indexOf(m) !== -1);
-    if (check(markers.func)) { current = 'func'; return; }
-    if (check(markers.table)) { current = 'table'; return; }
-    if (check(markers.trans)) { current = 'trans'; return; }
-    if (current === 'func') funcPart += line + '\n';
-    else if (current === 'table') tablePart += line + '\n';
-    else if (current === 'trans') transPart += line + '\n';
-  });
+  const lines = raw.split(/\r?\n/);
+  let current = 'other';
+  lines.forEach(line => {
+    const l = line.trim();
+    if (!l) return;
+    const check = (arr) => arr.some(m => l.indexOf(m) !== -1);
+    if (check(markers.func)) { current = 'func'; return; }
+    if (check(markers.table)) { current = 'table'; return; }
+    if (check(markers.trans)) { current = 'trans'; return; }
+    if (current === 'func') funcPart += line + '\n';
+    else if (current === 'table') tablePart += line + '\n';
+    else if (current === 'trans') transPart += line + '\n';
+  });
 
-  document.getElementById('generateFunctionList').innerHTML = `<h3>機能一覧</h3><pre>${escapeHtml(funcPart)}</pre>`;
-  document.getElementById('generateTableDefinition').innerHTML = `<h3>テーブル定義書</h3><pre>${escapeHtml(tablePart)}</pre>`;
-  document.getElementById('generateTransitionDiagram').innerHTML = `<h3>画面遷移図</h3><pre>${escapeHtml(transPart)}</pre>`;
+    // 【★★★ 修正箇所: escapeHtml() と <pre> タグを削除し、生のHTMLとして挿入 ★★★】
+  document.getElementById('generateFunctionList').innerHTML = `<h3>機能一覧</h3>${funcPart}`;
+  document.getElementById('generateTableDefinition').innerHTML = `<h3>テーブル定義書</h3>${tablePart}`;
+  document.getElementById('generateTransitionDiagram').innerHTML = `<h3>画面遷移図</h3>${transPart}`;
 }
 
 /* ---------------- HTML生成 ---------------- */
