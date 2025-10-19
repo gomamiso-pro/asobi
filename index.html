@@ -148,18 +148,8 @@
   </div>
 </section>
 
-<section id="designRenderSection">
-    <h2>⑤ 設計書描画プレビュー</h2>
-    <div id="designContainer" style="padding: 10px; border: 1px solid #ddd; min-height: 200px;">
-        <p>ここにAIが生成したMarkdown設計書が描画されます。</p>
-        <section id="generateFunctionList" class="rendered-section"></section>
-        <section id="generateTableDefinition" class="rendered-section"></section>
-        <section id="generateTransitionDiagram" class="rendered-section"></section>
-    </div>
-</section>
-
 <section id="htmlPreviewSection">
-  <h2>⑥ AI生成HTMLプレビュー</h2>
+  <h2>⑤ AI生成HTMLプレビュー</h2>
   <p class="hint">AI生成HTMLを貼り付けて「プレビュー」を押すと、この枠内に表示されます。</p>
   <textarea id="aiHtmlInput" rows="10" placeholder="AIが生成したHTMLコードをここに貼り付け"></textarea>
   <div class="preview-actions">
@@ -171,7 +161,7 @@
 
 
 <section id="pagePreviewSection">
-  <h2>⑦ 各ページのコード生成・プレビュー・ダウンロード</h2>
+  <h2>⑥ 各ページのコード生成・プレビュー・ダウンロード</h2>
   <p class="hint">「ページコード生成」で、各ページごとの簡易HTML/CSS/JSを自動生成します（プレビューは最初のページ）。</p>
   <div class="pagecode-actions">
     <button onclick="generatePageCode()">ページコード生成</button>
@@ -185,14 +175,6 @@
 </footer>
 <script src="script.js"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // MermaidをDOMロード後に初期化
-    mermaid.initialize({ startOnLoad: true });
-  });
-</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
 </body>
