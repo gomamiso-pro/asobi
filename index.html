@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Web制作支援ツール（１）</title>
+<title>Web制作支援ツール（２）</title>
 <link rel="stylesheet" href="style.css" />
 <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
@@ -131,7 +131,7 @@
 <!-- ③ AI指示 -->
 <section id="instructionSection">
   <h2>③ 設計書作成用 AI 指示文（自動生成）</h2>
-    <button onclick="generateInstructions()">AI指示文を生成</button>
+  <button onclick="generateInstructions()">AI指示文を生成</button>
   <br>
   <textarea id="aiInstructions" rows="8" readonly>ここにヒアリング情報を基にしたAI指示文が表示されます</textarea>
   <div class="instruction-actions">
@@ -153,24 +153,8 @@
 
 <!-- ⑤ 設計書描画 -->
 <section id="designOutputSection">
-  <h2>⑤ 設計書（描画）</h2>
-
-  <div id="generateFunctionList" class="design-block"></div>
-  <div id="generateTableDefinition" class="design-block"></div>
-  <div id="generateTransitionDiagram" class="design-block"></div>
-
-  <div class="design-actions">
-    <button onclick="copyRendered('generateFunctionList')">機能一覧をコピー</button>
-    <button onclick="downloadRendered('functionList')">機能一覧ダウンロード</button>
-
-    <button onclick="copyRendered('generateTableDefinition')">テーブル定義をコピー</button>
-    <button onclick="downloadRendered('tableDefinition')">テーブル定義ダウンロード</button>
-
-    <button onclick="copyRendered('generateTransitionDiagram')">遷移図をコピー</button>
-    <button onclick="downloadRendered('transitionDiagram')">遷移図ダウンロード</button>
-
-    <button onclick="downloadAllDesigns()">すべての設計書をまとめてダウンロード</button>
-  </div>
+  <h2>⑤ 設計書（プレビュー）</h2>
+  <div id="designPreview" class="design-block"></div>
 </section>
 
 <!-- ⑥ ページコード生成とプレビュー -->
@@ -187,18 +171,13 @@
 <footer style="text-align:center; margin:18px 0 60px 0;">
   <small>ツール提供 — Web制作アシスタント（簡易版）</small>
 </footer>
-<!-- あなたのメインスクリプト（先に読み込む） -->
+
 <script src="script.js"></script>
-
-<!-- Mermaidライブラリ（後で読み込む） -->
 <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-
-<!-- Mermaid初期化（最後） -->
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     mermaid.initialize({ startOnLoad: true });
   });
 </script>
-
 </body>
 </html>
