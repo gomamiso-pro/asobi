@@ -187,12 +187,18 @@
 <footer style="text-align:center; margin:18px 0 60px 0;">
   <small>ツール提供 — Web制作アシスタント（簡易版）</small>
 </footer>
+<!-- あなたのメインスクリプト（先に読み込む） -->
+<script src="script.js"></script>
+
+<!-- Mermaidライブラリ（後で読み込む） -->
 <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+
+<!-- Mermaid初期化（最後） -->
 <script>
-    // DOMContentLoaded後にMermaidを実行
-    document.addEventListener('DOMContentLoaded', function() {
-        mermaid.initialize({ startOnLoad: true });
-    });
+  document.addEventListener('DOMContentLoaded', function() {
+    mermaid.initialize({ startOnLoad: true });
+  });
 </script>
+
 </body>
 </html>
