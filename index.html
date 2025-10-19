@@ -138,19 +138,9 @@
   </div>
 </section>
 
-<section id="designImportSection">
-  <h2>④ AI生成コード（設計書）を貼付け → 描画</h2>
-  <p class="hint">AI（ChatGPT等）で生成した設計書（Markdown / プレーンテキスト / JSON）をここに貼り付けて「設計書を描画」してください。</p>
-  <textarea id="aiCodeInput" rows="10" placeholder="AIが生成した設計書をここに貼り付け"></textarea>
-  <div class="design-import-actions">
-    <button onclick="renderDesignDocs()">設計書を描画</button>
-    <button onclick="clearRenderedDesigns()">描画をクリア</button>
-  </div>
-</section>
-
 <section id="htmlPreviewSection">
-  <h2>⑤ AI生成HTMLプレビュー</h2>
-  <p class="hint">AI生成HTMLを貼り付けて「プレビュー」を押すと、この枠内に表示されます。</p>
+  <h2>④ AI生成HTMLプレビュー</h2>
+  <p class="hint">AI生成HTML（Mermaid.jsを含む完全な設計書HTML）を貼り付けて「プレビューを表示」を押すと、この枠内に表示されます。</p>
   <textarea id="aiHtmlInput" rows="10" placeholder="AIが生成したHTMLコードをここに貼り付け"></textarea>
   <div class="preview-actions">
     <button onclick="renderHtmlPreview()">プレビューを表示</button>
@@ -161,7 +151,7 @@
 
 
 <section id="pagePreviewSection">
-  <h2>⑥ 各ページのコード生成・プレビュー・ダウンロード</h2>
+  <h2>⑤ 各ページのコード生成・プレビュー・ダウンロード</h2>
   <p class="hint">「ページコード生成」で、各ページごとの簡易HTML/CSS/JSを自動生成します（プレビューは最初のページ）。</p>
   <div class="pagecode-actions">
     <button onclick="generatePageCode()">ページコード生成</button>
