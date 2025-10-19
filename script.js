@@ -133,35 +133,41 @@ function downloadEstimate() {
   a.click();
 }
 
-/* ---------------- AI指示文生成 ---------------- */
+/* ---------------- AI指示文生成 (修正版) ---------------- */
 function generateInstructions() {
-  updatePages();
-  const overview = document.getElementById("projectOverviewInput").value || "おまかせ";
-  const pageType = document.getElementById("pageTypeSelect").value;
-  const userTarget = document.getElementById("userTargetSelect").value;
-  const design = document.getElementById("designSelect").value;
-  const dataReq = document.getElementById("dataRequirementInput").value || "おまかせ";
-  const operation = document.getElementById("operationInput").value || "おまかせ";
-  const server = document.getElementById("serverSelect").value;
-  const db = document.getElementById("databaseSelect").value;
-  const framework = document.getElementById("designFrameworkSelect").value;
-  const auth = document.getElementById("authSelect").value;
-  const security = document.getElementById("securityInput").value || "おまかせ";
-  const langs = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value).join(", ") || "おまかせ";
+    updatePages();
+    const overview = document.getElementById("projectOverviewInput").value || "一般的なコーポレートサイト"; // デフォルトを具体化
+    const pageType = document.getElementById("pageTypeSelect").value;
+    const userTarget = document.getElementById("userTargetSelect").value;
+    const design = document.getElementById("designSelect").value;
+    const dataReq = document.getElementById("dataRequirementInput").value || "顧客データの管理、および問い合わせデータの記録";
+    const operation = document.getElementById("operationInput").value || "静的コンテンツの定期的な更新とニュース機能の運用";
+    const server = document.getElementById("serverSelect").value;
+    const db = document.getElementById("databaseSelect").value;
+    const framework = document.getElementById("designFrameworkSelect").value;
+    const auth = document.getElementById("authSelect").value;
+    const security = document.getElementById("securityInput").value || "一般的なSSL/TLSによる通信暗号化、定期的なバックアップ";
+    const langs = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value).join(", ") || "HTML, CSS, JavaScript (フロントエンド) / PHP (バックエンド)"; // デフォルトを具体化
 
-  const pageSummary = pages.length > 0 ? pages.map(p => {
-    const sections = [].concat(
-      p.header.map(x => `ヘッダー:${x}`),
-      p.menu.map(x => `メニュー:${x}`),
-      p.body.map(x => `ボディ:${x}`),
-      p.footer.map(x => `フッター:${x}`)
-    ).join(", ");
-    return `- ${p.pageName}（目的: ${p.pagePurpose}） → ${sections || "構成未定"}`;
-  }).join("\n") : "ページ設定は未作成です。";
+    let pageSummary;
+    if (pages.length > 0) {
+        pageSummary = pages.map(p => {
+            const sections = [].concat(
+                p.header.map(x => `ヘッダー:${x}`),
+                p.menu.map(x => `メニュー:${x}`),
+                p.body.map(x => `ボディ:${x}`),
+                p.footer.map(x => `フッター:${x}`)
+            ).join(", ");
+            return `- ${p.pageName}（目的: ${p.pagePurpose}） → ${sections || "構成未定"}`;
+        }).join("\n");
+    } else {
+        // ページ設定がない場合の補完指示を強化
+        pageSummary = "ページ設定は未作成です。あなたは**コーポレートサイトの標準構成（トップページ、企業情報、サービス、ニュース一覧、お問い合わせ）**を自動で作成・定義し、設計書に反映させてください。";
+    }
 
-  const instruct = `
-以下のヒアリング内容をもとに、Webサイト／Webアプリの設計書（機能一覧、テーブル定義書、画面遷移図）をMarkdown形式で作成してください。
-出力は表（Markdown表）あるいはコードブロックのHTMLでお願いします。必要に応じてテーブル定義はCREATE TABLE風の表も可。
+    const instruct = `
+あなたは、Webサイトの要件定義と設計に精通した**エキスパートのWebエンジニア**です。
+以下のヒアリング内容に基づき、不足している情報は**一般的なWeb標準構成として適切に補完・定義**した上で、Webサイト／Webアプリの設計書（機能一覧、テーブル定義書、画面遷移図）をMarkdown形式で作成してください。
 
 【基本設定】
 - プロジェクト概要: ${overview}
@@ -181,27 +187,32 @@ function generateInstructions() {
 ${pageSummary}
 
 【出力フォーマット（必須）】
-1) 機能一覧（分類 / 機能名 / 処理詳細 / 必要なDBテーブル名）
-2) テーブル定義書（テーブル名 / 概要 / フィールド名 / 型 / 詳細）
-3) 画面遷移図（テキスト説明 or Mermaid形式）
+**厳密にこの形式に従って、以下の3つのセクションを続けて出力してください。**
+
+1) **機能一覧**（分類 / 機能名 / 処理詳細 / 必要なDBテーブル名）: 
+    - **必ずMarkdownテーブルとして出力してください。**
+
+2) **テーブル定義書**: 
+    - **Markdownテーブル**として出力するか、**CREATE TABLE文**のコードブロックを含めてください。
+    - 複数のテーブルがある場合は、テーブルごとに見出し(例: \`#### userテーブル\`)を付けてください。
+
+3) **画面遷移図**: 
+    - **必ずMermaid形式**のコードブロック（\`\`\`mermaid... \`\`\`)として出力し、視覚的なフローチャート (\`graph TD\`) を定義してください。
 
 【追加指示（重要）】
-上記の設計書をもとに、**1つのHTMLファイル内にすべての章（機能一覧・テーブル定義書・画面遷移図）を描画**してください。
+上記の設計書 Markdownをもとに、**1つのHTMLファイル内にすべての章（機能一覧・テーブル定義書・画面遷移図）を描画するための完全なHTMLコード**を続けて出力してください。
 
-- HTMLはブラウザ上で開くだけで、全設計書をきれいに閲覧できるようにしてください。
-- 各章（機能一覧／テーブル定義書／画面遷移図）はセクション見出し付きで明確に区分してください。
-- フォント、表の体裁、見出しデザイン、配色を統一し、読みやすいWeb設計書として仕上げてください。
-- MarkdownをHTMLに整形し、Mermaid記法が含まれる場合は \`<script type="module">\` で正しく描画できるようにしてください。
+- HTMLはBootstrapとMermaid.jsを利用し、ブラウザ上で開くだけで全設計書をきれいに閲覧できるようにしてください。
+- 各章（機能一覧／テーブル定義書／画面遷移図）はセクション見出し付きで明確に区分し、**美しいデザイン**で仕上げてください。
 - 図・表・リスト・見出しのレイアウトが整った完成度の高い設計書HTMLを生成してください。
 
 【最終出力】
-- Markdown形式の設計書（テキスト）
-- 上記内容を1ファイルにまとめたHTML設計書（ブラウザで開いて閲覧可能）
-  `.trim();
+1. Markdown形式の設計書（テキスト）
+2. 上記内容を1ファイルにまとめたHTML設計書（ブラウザで開いて閲覧可能）
+    `.trim();
 
-  document.getElementById('aiInstructions').value = instruct;
+    document.getElementById('aiInstructions').value = instruct;
 }
-
 
 function copyInstructions() {
   const el = document.getElementById('aiInstructions');
