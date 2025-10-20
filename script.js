@@ -133,41 +133,50 @@ function downloadEstimate() {
   a.click();
 }
 
-/* ---------------- AI指示文生成 (強化版 - ページコード生成指示を完全統合) ---------------- */
+/* ---------------- AI指示文生成 (強化版修正版) ---------------- */
 function generateInstructions() {
-    updatePages();
-    const overview = document.getElementById("projectOverviewInput").value || "一般的なコーポレートサイト"; // デフォルトを具体化
-    const pageType = document.getElementById("pageTypeSelect").value;
-    const userTarget = document.getElementById("userTargetSelect").value;
-    const design = document.getElementById("designSelect").value;
-    const dataReq = document.getElementById("dataRequirementInput").value || "顧客データの管理、および問い合わせデータの記録";
-    const operation = document.getElementById("operationInput").value || "静的コンテンツの定期的な更新とニュース機能の運用";
-    const server = document.getElementById("serverSelect").value;
-    const db = document.getElementById("databaseSelect").value;
-    const framework = document.getElementById("designFrameworkSelect").value;
-    const auth = document.getElementById("authSelect").value;
-    const security = document.getElementById("securityInput").value || "一般的なSSL/TLSによる通信暗号化、定期的なバックアップ";
-    const langs = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value).join(", ") || "HTML, CSS, JavaScript (フロントエンド) / PHP (バックエンド)";
+    updatePages(); // pages配列を最新化
 
-    let pageSummary;
+    // 基本設定の取得（未入力の場合はデフォルト値を設定）
+    const overview = document.getElementById("projectOverviewInput")?.value.trim() || "一般的なコーポレートサイト";
+    const pageType = document.getElementById("pageTypeSelect")?.value || "コーポレート／ブランド";
+    const userTarget = document.getElementById("userTargetSelect")?.value || "一般ユーザー（20〜40代）";
+    const design = document.getElementById("designSelect")?.value || "高級・スタイリッシュ";
+    const dataReq = document.getElementById("dataRequirementInput")?.value.trim() || "顧客データの管理、および問い合わせデータの記録";
+    const operation = document.getElementById("operationInput")?.value.trim() || "静的コンテンツの定期的な更新とニュース機能の運用";
+    const server = document.getElementById("serverSelect")?.value || "さくらレンタルサーバー";
+    const db = document.getElementById("databaseSelect")?.value || "MySQL";
+    const framework = document.getElementById("designFrameworkSelect")?.value || "Bootstrap";
+    const auth = document.getElementById("authSelect")?.value || "メール認証";
+    const security = document.getElementById("securityInput")?.value.trim() || "一般的なSSL/TLSによる通信暗号化、定期的なバックアップ";
+
+    // 使用言語の取得
+    const langs = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
+        .map(cb => cb.value)
+        .join(", ") || "HTML, CSS, JavaScript (フロントエンド) / PHP (バックエンド)";
+
+    // ページ設定のまとめ
+    let pageSummary = "";
     let pageListForCode = [];
-    if (pages.length > 0) {
+
+    if (Array.isArray(pages) && pages.length > 0) {
         pageSummary = pages.map(p => {
             const sections = [].concat(
-                p.header.map(x => `ヘッダー:${x}`),
-                p.menu.map(x => `メニュー:${x}`),
-                p.body.map(x => `ボディ:${x}`),
-                p.footer.map(x => `フッター:${x}`)
-            ).join(", ");
-            pageListForCode.push(`- ページ名: ${p.pageName}\n  - 構成: ${sections || "構成未定"}`);
-            return `- ${p.pageName}（目的: ${p.pagePurpose}） → ${sections || "構成未定"}`;
+                p.header || [],
+                p.menu || [],
+                p.body || [],
+                p.footer || []
+            ).map(s => s ? `${s.type || ""}:${s.name || s}` : "").filter(Boolean).join(", ");
+            pageListForCode.push(`- ページ名: ${p.pageName || "未定"}\n  - 構成: ${sections || "構成未定"}`);
+            return `- ${p.pageName || "未定"}（目的: ${p.pagePurpose || "目的未定"}） → ${sections || "構成未定"}`;
         }).join("\n");
     } else {
         pageSummary = "ページ設定は未作成です。あなたは**コーポレートサイトの標準構成（トップページ、企業情報、サービス、ニュース一覧、お問い合わせ）**を自動で作成・定義し、設計書に反映させてください。";
         pageListForCode.push("設計書で定義した標準構成ページ（トップ、企業情報、サービス、ニュース、お問い合わせ）");
     }
 
-const instruct = `
+    // AI指示文の生成
+    const instruct = `
 あなたは、Webサイトの要件定義と設計に精通した**エキスパートのWebエンジニア**です。
 以下のヒアリング内容に基づき、不足している情報は**一般的なWeb標準構成として適切に補完・定義**した上で、Webサイト／Webアプリの設計書（機能一覧、テーブル定義書、画面遷移図）をMarkdown形式で作成してください。
 
@@ -189,31 +198,21 @@ const instruct = `
 ${pageSummary}
 
 【出力フォーマット（必須）】
-**厳密にこの形式に従って、以下の3つのセクションを続けて出力してください。**
-
-1) **機能一覧**（分類 / 機能名 / 処理詳細 / 必要なDBテーブル名）: 
-    - **必ずMarkdownテーブルとして出力してください。**
-
-2) **テーブル定義書**: 
-    - **Markdownテーブルとして出力するか、CREATE TABLE文のコードブロックを含めてください。**
-    - **HTML上ではBootstrapテーブル形式で見やすく表示してください。**
-    - 複数のテーブルがある場合は、テーブルごとに見出し(例: \`#### userテーブル\`)を付けてください。
-
-3) **画面遷移図**: 
-    - **必ずMermaid形式のコードブロックで描画し、視覚的なフローチャート（graph TD）を定義してください。**
+1) **機能一覧**（分類 / 機能名 / 処理詳細 / 必要なDBテーブル名）: Markdownテーブルで出力
+2) **テーブル定義書**: MarkdownまたはCREATE TABLE文。HTML上ではBootstrapテーブルで見やすく
+3) **画面遷移図**: Mermaid形式でgraph TDとして出力
 
 【追加指示（Webページプレビューのデザイン）】
-- ページプレビューはヒアリング内容に基づき、**ヘッダー・メニュー・ボディ・フッターの構成がブレないようにすること**。
-- Bootstrapのグリッド・ユーティリティを活用し、**レスポンシブで見やすく美しいデザイン**にすること。
+- ヘッダー・メニュー・ボディ・フッター構成を厳守
+- Bootstrapグリッド・ユーティリティ活用、レスポンシブで美しいデザイン
 - ヘッダー：ロゴ左、ログインボタン右
 - メニュー：サイドメニューは左固定、カテゴリメニューは水平リスト
-- ボディ：トップページはフォーム中心、商品紹介ページはカルーセル中心
-- フッター：フッターメニューや会社情報を横並びで整列
-- 余白・パディング・背景色などを活用してコンテンツを際立たせること
+- ボディ：トップはフォーム中心、商品紹介はカルーセル中心
+- フッター：フッターメニューや会社情報を横並び
 
-【ページコード生成指示（新規統合）】
-- 設計書で定義した全ページについて、**page_codes.txt**として1つのテキストファイルにまとめる。
-- 各ページは以下のフォーマットで出力：
+【ページコード生成指示】
+- 設計書で定義した全ページを **page_codes.txt** にまとめる
+- フォーマット：
 <pre>
 --- ページ開始: [ページ名] ---
 &lt;!DOCTYPE html&gt;
@@ -222,17 +221,24 @@ ${pageSummary}
 &lt;/html&gt;
 --- ページ終了: [ページ名] ---
 </pre>
-- 対象ページ: 
+- 対象ページ:
 ${pageListForCode.join("\n")}
 
 【最終出力】
-1. Markdown形式の設計書（テキスト）
-2. 上記内容を1ファイルにまとめたHTML設計書（ブラウザで閲覧可能）
-3. 設計書で定義した全ページのHTMLコードをまとめた **page_codes.txt**
+1. Markdown形式設計書
+2. HTML設計書（ブラウザで閲覧可能）
+3. page_codes.txt（全ページコード統合）
 `.trim();
 
-document.getElementById('aiInstructions').value = instruct;
+    // AI指示文をtextareaやinputにセット
+    const aiInstructionsElement = document.getElementById('aiInstructions');
+    if(aiInstructionsElement) {
+        aiInstructionsElement.value = instruct;
+    } else {
+        console.warn("AI指示文を表示する要素が見つかりません。");
+    }
 }
+
 
 
 function copyInstructions() {
