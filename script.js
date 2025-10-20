@@ -133,43 +133,41 @@ function downloadEstimate() {
   a.click();
 }
 
-/* ---------------- AI指示文生成 (修正版 - ページコード生成指示を追加) ---------------- */
+/* ---------------- AI指示文生成 (強化版 - ページコード生成指示を完全統合) ---------------- */
 function generateInstructions() {
-    updatePages();
-    const overview = document.getElementById("projectOverviewInput").value || "一般的なコーポレートサイト"; // デフォルトを具体化
-    const pageType = document.getElementById("pageTypeSelect").value;
-    const userTarget = document.getElementById("userTargetSelect").value;
-    const design = document.getElementById("designSelect").value;
-    const dataReq = document.getElementById("dataRequirementInput").value || "顧客データの管理、および問い合わせデータの記録";
-    const operation = document.getElementById("operationInput").value || "静的コンテンツの定期的な更新とニュース機能の運用";
-    const server = document.getElementById("serverSelect").value;
-    const db = document.getElementById("databaseSelect").value;
-    const framework = document.getElementById("designFrameworkSelect").value;
-    const auth = document.getElementById("authSelect").value;
-    const security = document.getElementById("securityInput").value || "一般的なSSL/TLSによる通信暗号化、定期的なバックアップ";
-    const langs = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value).join(", ") || "HTML, CSS, JavaScript (フロントエンド) / PHP (バックエンド)"; // デフォルトを具体化
+    updatePages();
+    const overview = document.getElementById("projectOverviewInput").value || "一般的なコーポレートサイト"; // デフォルトを具体化
+    const pageType = document.getElementById("pageTypeSelect").value;
+    const userTarget = document.getElementById("userTargetSelect").value;
+    const design = document.getElementById("designSelect").value;
+    const dataReq = document.getElementById("dataRequirementInput").value || "顧客データの管理、および問い合わせデータの記録";
+    const operation = document.getElementById("operationInput").value || "静的コンテンツの定期的な更新とニュース機能の運用";
+    const server = document.getElementById("serverSelect").value;
+    const db = document.getElementById("databaseSelect").value;
+    const framework = document.getElementById("designFrameworkSelect").value;
+    const auth = document.getElementById("authSelect").value;
+    const security = document.getElementById("securityInput").value || "一般的なSSL/TLSによる通信暗号化、定期的なバックアップ";
+    const langs = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value).join(", ") || "HTML, CSS, JavaScript (フロントエンド) / PHP (バックエンド)";
 
-    let pageSummary;
-    let pageListForCode = [];
-    if (pages.length > 0) {
-        pageSummary = pages.map(p => {
-            const sections = [].concat(
-                p.header.map(x => `ヘッダー:${x}`),
-                p.menu.map(x => `メニュー:${x}`),
-                p.body.map(x => `ボディ:${x}`),
-                p.footer.map(x => `フッター:${x}`)
-            ).join(", ");
-            // ページコード生成用のリストを別途作成
-            pageListForCode.push(`- ページ名: ${p.pageName}\n  - 構成: ${sections || "構成未定"}`);
-            return `- ${p.pageName}（目的: ${p.pagePurpose}） → ${sections || "構成未定"}`;
-        }).join("\n");
-    } else {
-        // ページ設定がない場合の補完指示を強化
-        pageSummary = "ページ設定は未作成です。あなたは**コーポレートサイトの標準構成（トップページ、企業情報、サービス、ニュース一覧、お問い合わせ）**を自動で作成・定義し、設計書に反映させてください。";
-        pageListForCode.push("設計書で定義した標準構成ページ（トップ、企業情報、サービス、ニュース、お問い合わせ）");
-    }
+    let pageSummary;
+    let pageListForCode = [];
+    if (pages.length > 0) {
+        pageSummary = pages.map(p => {
+            const sections = [].concat(
+                p.header.map(x => `ヘッダー:${x}`),
+                p.menu.map(x => `メニュー:${x}`),
+                p.body.map(x => `ボディ:${x}`),
+                p.footer.map(x => `フッター:${x}`)
+            ).join(", ");
+            pageListForCode.push(`- ページ名: ${p.pageName}\n  - 構成: ${sections || "構成未定"}`);
+            return `- ${p.pageName}（目的: ${p.pagePurpose}） → ${sections || "構成未定"}`;
+        }).join("\n");
+    } else {
+        pageSummary = "ページ設定は未作成です。あなたは**コーポレートサイトの標準構成（トップページ、企業情報、サービス、ニュース一覧、お問い合わせ）**を自動で作成・定義し、設計書に反映させてください。";
+        pageListForCode.push("設計書で定義した標準構成ページ（トップ、企業情報、サービス、ニュース、お問い合わせ）");
+    }
 
-    const instruct = `
+    const instruct = `
 あなたは、Webサイトの要件定義と設計に精通した**エキスパートのWebエンジニア**です。
 以下のヒアリング内容に基づき、不足している情報は**一般的なWeb標準構成として適切に補完・定義**した上で、Webサイト／Webアプリの設計書（機能一覧、テーブル定義書、画面遷移図）をMarkdown形式で作成してください。
 
@@ -193,45 +191,44 @@ ${pageSummary}
 【出力フォーマット（必須）】
 **厳密にこの形式に従って、以下の3つのセクションを続けて出力してください。**
 
-1) **機能一覧**（分類 / 機能名 / 処理詳細 / 必要なDBテーブル名）: 
+1) **機能一覧**（分類 / 機能名 / 処理詳細 / 必要なDBテーブル名）: 
     - **必ずMarkdownテーブルとして出力してください。**
 
-2) **テーブル定義書**: 
+2) **テーブル定義書**: 
     - **Markdownテーブル**として出力するか、**CREATE TABLE文**のコードブロックを含めてください。
     - 複数のテーブルがある場合は、テーブルごとに見出し(例: \`#### userテーブル\`)を付けてください。
 
-3) **画面遷移図**: 
-    - **必ずMermaid形式**のコードブロック（\`\`\`mermaid... \`\`\`)として出力し、視覚的なフローチャート (\`graph TD\`) を定義してください。
+3) **画面遷移図**: 
+    - **必ずMermaid形式**のコードブロック（\`\`\`mermaid ... \`\`\`）として出力し、視覚的なフローチャート (\`graph TD\`) を定義してください。
 
 【追加指示（重要）】
-上記の設計書 Markdownをもとに、**1つのHTMLファイル内にすべての章（機能一覧・テーブル定義書・画面遷移図）を描画するための完全なHTMLコード**を続けて出力してください。
+- 上記設計書 Markdownをもとに、**1つのHTMLファイル内にすべての章（機能一覧・テーブル定義書・画面遷移図）を描画する完全なHTMLコード**を続けて出力してください。
+- HTMLはBootstrapとMermaid.jsを利用し、ブラウザ上で開くだけで全設計書をきれいに閲覧可能としてください。
+- 各章（機能一覧／テーブル定義書／画面遷移図）はセクション見出し付きで明確に区分し、**美しいデザイン**で出力してください。
 
-- HTMLはBootstrapとMermaid.jsを利用し、ブラウザ上で開くだけで全設計書をきれいに閲覧できるようにしてください。
-- 各章（機能一覧／テーブル定義書／画面遷移図）はセクション見出し付きで明確に区分し、**美しいデザイン**で仕上げてください。
-- 図・表・リスト・見出しのレイアウトが整った完成度の高い設計書HTMLを生成してください。
+【ページコード生成指示（新規統合）】
+- 設計書で定義した全ページについて、**page_codes.txt**として1つのテキストファイルにまとめる。
+- 各ページは以下のフォーマットで出力：
+<pre>
+--- ページ開始: [ページ名] ---
+&lt;!DOCTYPE html&gt;
+&lt;html lang="ja"&gt;
+... ページのHTML/CSS/JSコード（Bootstrap使用） ...
+&lt;/html&gt;
+--- ページ終了: [ページ名] ---
+</pre>
+- 対象ページ: 
+${pageListForCode.join("\n")}
 
 【最終出力】
 1. Markdown形式の設計書（テキスト）
-2. 上記内容を1ファイルにまとめたHTML設計書（ブラウザで開いて閲覧可能）
-3. **設計書で定義した全ページ**について、以下の内容を含む**Markdownコードブロック**を続けて出力してください。
-   - **\`page_codes.txt\`**というファイル名で、全ページのHTMLコード（CSS/JS含む）を一つのテキストファイルとして出力してください。
-   - 各ページは以下のフォーマットで記述し、Bootstrapを活用したデザインにしてください。
-   
-   <pre>
-   --- ページ開始: [ページ名] ---
-   &lt;!DOCTYPE html&gt;
-   &lt;html lang="ja"&gt;
-   ... ページのHTML/CSS/JSコード ...
-   &lt;/html&gt;
-   --- ページ終了: [ページ名] ---
-   </pre>
-   
-   **対象ページ:**
-   ${pageListForCode.join("\n")}
-   `.trim();
+2. 上記内容を1ファイルにまとめたHTML設計書（ブラウザで閲覧可能）
+3. 設計書で定義した全ページのHTMLコードをまとめた **page_codes.txt**
+`.trim();
 
-    document.getElementById('aiInstructions').value = instruct;
+    document.getElementById('aiInstructions').value = instruct;
 }
+
 
 function copyInstructions() {
   const el = document.getElementById('aiInstructions');
