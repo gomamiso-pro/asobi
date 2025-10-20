@@ -1,556 +1,207 @@
-/* ====== script.js ======
-   機能:
-   - ページ追加/削除、ページ情報保持
-   - 見積自動更新・ダウンロード（テキスト）
-   - ヒアリング→AI指示文生成・コピー・ダウンロード
-   - AIが生成した設計書を貼付けて描画（機能一覧／テーブル定義／画面遷移図）
-   - ページ毎の簡易HTMLコード生成・プレビュー・ダウンロード（個別ファイル）
-   ================================== */
-
-let pageCount = 0;
 let pages = [];
 
-const sectionOptions = {
-  header: ["ロゴ","検索ボックス","通知アイコン","言語切替","ログインボタン"],
-  menu: ["カテゴリメニュー","ドロップダウン","パンくずリスト","サイドメニュー"],
-  body: ["カルーセル","新着商品一覧","特集バナー","記事リスト","フォーム"],
-  footer: ["会社情報","SNSリンク","コピーライト","フッターメニュー"]
-};
-
-/* ---------------- ページ操作 ---------------- */
+// ---------------- ページ管理 ----------------
 function addPage() {
-  pageCount++;
-  const container = document.getElementById('pageContainer');
-  const card = document.createElement('div');
-  card.className = 'page-card';
-  card.id = `pageCard${pageCount}`;
-  card.innerHTML = `
-    <h3>ページ${pageCount} <button class="delete-btn" onclick="deletePage(${pageCount})">削除</button></h3>
-    <label>ページ名</label>
-    <input type="text" id="pageName${pageCount}" placeholder="例: トップページ">
-    <label>ページの目的</label>
-    <textarea id="pagePurpose${pageCount}" placeholder="ページの目的"></textarea>
-    ${createSectionCheckboxes("ヘッダー", `header${pageCount}`, sectionOptions.header)}
-    ${createSectionCheckboxes("メニュー", `menu${pageCount}`, sectionOptions.menu)}
-    ${createSectionCheckboxes("ボディ", `body${pageCount}`, sectionOptions.body)}
-    ${createSectionCheckboxes("フッター", `footer${pageCount}`, sectionOptions.footer)}
-  `;
-  container.appendChild(card);
-  const inputs = card.querySelectorAll('input, textarea');
-  inputs.forEach(i => i.addEventListener('change', () => { updatePages(); updateEstimate(); }));
-  updatePages();
-  updateEstimate();
+    const pageIndex = pages.length;
+    const page = {
+        pageName: "新規ページ" + (pageIndex + 1),
+        pagePurpose: "",
+        header: [],
+        menu: [],
+        body: [],
+        footer: []
+    };
+    pages.push(page);
+    renderPages();
 }
 
-function createSectionCheckboxes(title, prefix, opts) {
-  let html = `<div class="section-title">${title}</div>`;
-  opts.forEach((opt, i) => {
-    html += `<label><input type="checkbox" id="${prefix}_${i}" value="${opt}">${opt}</label>`;
-  });
-  return html;
-}
-
-function deletePage(id) {
-  const el = document.getElementById(`pageCard${id}`);
-  if (el) el.remove();
-  updatePages();
-  updateEstimate();
-}
-
-function clearAllPages(){
-  document.getElementById('pageContainer').innerHTML = '';
-  pageCount = 0;
-  pages = [];
-  updateEstimate();
-}
-
-/* ---------------- pages配列更新 ---------------- */
-function updatePages() {
-  pages = [];
-  for (let i = 1; i <= pageCount; i++) {
-    const card = document.getElementById(`pageCard${i}`);
-    if (!card) continue;
-    const pageName = (document.getElementById(`pageName${i}`)?.value || `ページ${i}`).trim();
-    const pagePurpose = (document.getElementById(`pagePurpose${i}`)?.value || "おまかせ").trim();
-    const header = Array.from(card.querySelectorAll(`[id^=header${i}_]:checked`)).map(e => e.value);
-    const menu = Array.from(card.querySelectorAll(`[id^=menu${i}_]:checked`)).map(e => e.value);
-    const body = Array.from(card.querySelectorAll(`[id^=body${i}_]:checked`)).map(e => e.value);
-    const footer = Array.from(card.querySelectorAll(`[id^=footer${i}_]:checked`)).map(e => e.value);
-    pages.push({ pageName, pagePurpose, header, menu, body, footer });
-  }
-}
-
-/* ---------------- 見積 ---------------- */
-function updateEstimate() {
-  updatePages();
-  const tbody = document.querySelector('#estimateTable tbody');
-  tbody.innerHTML = '';
-  let subtotal = 0;
-
-  const basic = 50000;
-  subtotal += basic;
-  tbody.innerHTML += `<tr><td>基本設計</td><td>${basic.toLocaleString()}</td><td>1</td><td>${basic.toLocaleString()}</td></tr>`;
-
-  const pageUnit = 30000;
-  const pageCountReal = pages.length;
-  if (pageCountReal > 0) {
-    tbody.innerHTML += `<tr><td>ページ追加</td><td>${pageUnit.toLocaleString()}</td><td>${pageCountReal}</td><td>${(pageUnit * pageCountReal).toLocaleString()}</td></tr>`;
-    subtotal += pageUnit * pageCountReal;
-  }
-
-  const sectionUnit = 10000;
-  let sectionCount = 0;
-  pages.forEach(p => {
-    sectionCount += p.header.length + p.menu.length + p.body.length + p.footer.length;
-  });
-  if (sectionCount > 0) {
-    tbody.innerHTML += `<tr><td>セクション追加</td><td>${sectionUnit.toLocaleString()}</td><td>${sectionCount}</td><td>${(sectionUnit * sectionCount).toLocaleString()}</td></tr>`;
-    subtotal += sectionUnit * sectionCount;
-  }
-
-  const extra = 20000;
-  subtotal += extra;
-  tbody.innerHTML += `<tr><td>データ・認証・フレームワーク設定</td><td>${extra.toLocaleString()}</td><td>1</td><td>${extra.toLocaleString()}</td></tr>`;
-
-  document.getElementById('subtotal').textContent = subtotal.toLocaleString();
-  document.getElementById('total').textContent = Math.round(subtotal * 1.1).toLocaleString();
-}
-
-function downloadEstimate() {
-  updateEstimate();
-  const el = document.getElementById('estimateTable');
-  let text = '見積書\n\n';
-  const rows = el.querySelectorAll('tbody tr');
-  rows.forEach(r => {
-    const cells = r.querySelectorAll('td');
-    text += `${cells[0].textContent}\t単価:${cells[1].textContent}\t数量:${cells[2].textContent}\t小計:${cells[3].textContent}\n`;
-  });
-  text += `\n合計（税抜）: ${document.getElementById('subtotal').textContent}\n合計（税込10%）: ${document.getElementById('total').textContent}\n`;
-  const blob = new Blob([text], { type: 'text/plain' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = '見積書.txt';
-  a.click();
-}
-
-/* ---------------- AI指示文生成 (修正版 - ページコード生成指示を追加) ---------------- */
-function generateInstructions() {
-    updatePages();
-    const overview = document.getElementById("projectOverviewInput").value || "一般的なコーポレートサイト"; // デフォルトを具体化
-    const pageType = document.getElementById("pageTypeSelect").value;
-    const userTarget = document.getElementById("userTargetSelect").value;
-    const design = document.getElementById("designSelect").value;
-    const dataReq = document.getElementById("dataRequirementInput").value || "顧客データの管理、および問い合わせデータの記録";
-    const operation = document.getElementById("operationInput").value || "静的コンテンツの定期的な更新とニュース機能の運用";
-    const server = document.getElementById("serverSelect").value;
-    const db = document.getElementById("databaseSelect").value;
-    const framework = document.getElementById("designFrameworkSelect").value;
-    const auth = document.getElementById("authSelect").value;
-    const security = document.getElementById("securityInput").value || "一般的なSSL/TLSによる通信暗号化、定期的なバックアップ";
-    const langs = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value).join(", ") || "HTML, CSS, JavaScript (フロントエンド) / PHP (バックエンド)"; // デフォルトを具体化
-
-    let pageSummary;
-    let pageListForCode = [];
-    if (pages.length > 0) {
-        pageSummary = pages.map(p => {
-            const sections = [].concat(
-                p.header.map(x => `ヘッダー:${x}`),
-                p.menu.map(x => `メニュー:${x}`),
-                p.body.map(x => `ボディ:${x}`),
-                p.footer.map(x => `フッター:${x}`)
-            ).join(", ");
-            // ページコード生成用のリストを別途作成
-            pageListForCode.push(`- ページ名: ${p.pageName}\n  - 構成: ${sections || "構成未定"}`);
-            return `- ${p.pageName}（目的: ${p.pagePurpose}） → ${sections || "構成未定"}`;
-        }).join("\n");
-    } else {
-        // ページ設定がない場合の補完指示を強化
-        pageSummary = "ページ設定は未作成です。あなたは**コーポレートサイトの標準構成（トップページ、企業情報、サービス、ニュース一覧、お問い合わせ）**を自動で作成・定義し、設計書に反映させてください。";
-        pageListForCode.push("設計書で定義した標準構成ページ（トップ、企業情報、サービス、ニュース、お問い合わせ）");
-    }
-
-    const instruct = `
-あなたは、Webサイトの要件定義と設計に精通した**エキスパートのWebエンジニア**です。
-以下のヒアリング内容に基づき、不足している情報は**一般的なWeb標準構成として適切に補完・定義**した上で、Webサイト／Webアプリの設計書（機能一覧、テーブル定義書、画面遷移図）をMarkdown形式で作成してください。
-
-【基本設定】
-- プロジェクト概要: ${overview}
-- ページ分類: ${pageType}
-- ユーザー層・想定デバイス: ${userTarget}
-- デザイン方針: ${design}
-- 使用言語: ${langs}
-- サーバー: ${server}
-- データベース: ${db}
-- フレームワーク: ${framework}
-- 認証方式: ${auth}
-- データ・連携・管理要件: ${dataReq}
-- 運用・更新: ${operation}
-- 公開・セキュリティ・拡張性: ${security}
-
-【ページ設定】
-${pageSummary}
-
-【出力フォーマット（必須）】
-**厳密にこの形式に従って、以下の3つのセクションを続けて出力してください。**
-
-1) **機能一覧**（分類 / 機能名 / 処理詳細 / 必要なDBテーブル名）: 
-    - **必ずMarkdownテーブルとして出力してください。**
-
-2) **テーブル定義書**: 
-    - **Markdownテーブル**として出力するか、**CREATE TABLE文**のコードブロックを含めてください。
-    - 複数のテーブルがある場合は、テーブルごとに見出し(例: \`#### userテーブル\`)を付けてください。
-
-3) **画面遷移図**: 
-    - **必ずMermaid形式**のコードブロック（\`\`\`mermaid... \`\`\`)として出力し、視覚的なフローチャート (\`graph TD\`) を定義してください。
-
-【追加指示（重要）】
-上記の設計書 Markdownをもとに、**1つのHTMLファイル内にすべての章（機能一覧・テーブル定義書・画面遷移図）を描画するための完全なHTMLコード**を続けて出力してください。
-
-- HTMLはBootstrapとMermaid.jsを利用し、ブラウザ上で開くだけで全設計書をきれいに閲覧できるようにしてください。
-- 各章（機能一覧／テーブル定義書／画面遷移図）はセクション見出し付きで明確に区分し、**美しいデザイン**で仕上げてください。
-- 図・表・リスト・見出しのレイアウトが整った完成度の高い設計書HTMLを生成してください。
-
-【最終出力】
-1. Markdown形式の設計書（テキスト）
-2. 上記内容を1ファイルにまとめたHTML設計書（ブラウザで開いて閲覧可能）
-3. **設計書で定義した全ページ**について、以下の内容を含む**Markdownコードブロック**を続けて出力してください。
-   - **\`page_codes.txt\`**というファイル名で、全ページのHTMLコード（CSS/JS含む）を一つのテキストファイルとして出力してください。
-   - 各ページは以下のフォーマットで記述し、Bootstrapを活用したデザインにしてください。
-   
-   <pre>
-   --- ページ開始: [ページ名] ---
-   &lt;!DOCTYPE html&gt;
-   &lt;html lang="ja"&gt;
-   ... ページのHTML/CSS/JSコード ...
-   &lt;/html&gt;
-   --- ページ終了: [ページ名] ---
-   </pre>
-   
-   **対象ページ:**
-   ${pageListForCode.join("\n")}
-   `.trim();
-
-    document.getElementById('aiInstructions').value = instruct;
-}
-
-function copyInstructions() {
-  const el = document.getElementById('aiInstructions');
-  el.select();
-  navigator.clipboard.writeText(el.value).then(() => alert('AI指示文をコピーしました！'), () => alert('コピーに失敗しました'));
-}
-
-function downloadInstructions() {
-  const text = document.getElementById('aiInstructions').value;
-  const blob = new Blob([text], { type: 'text/plain' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'AI指示文.txt';
-  a.click();
-}
-
-/* ---------------- 設計書描画 ---------------- */
-function renderDesignDocs() {
-    const raw = document.getElementById('aiCodeInput').value.trim();
-    if (!raw) {
-        alert('AIが生成した設計書を貼り付けてください。');
-        return;
-    }
-
-    // Mermaidの描画を一旦リセット
-    const transContainer = document.getElementById('generateTransitionDiagram');
-    if (transContainer) {
-      transContainer.innerHTML = '';
-    }
-    
-    let funcPart = '', tablePart = '', transPart = '';
-    let inMermaidBlock = false; // Mermaidコードブロック内フラグ
-
-    const markers = {
-        func: ['機能一覧', 'functions', 'feature list'],
-        table: ['テーブル定義', 'table definition'],
-        trans: ['画面遷移', 'diagram', 'flow']
-    };
-
-    const lines = raw.split(/\r?\n/);
-    let current = 'other';
-    lines.forEach(line => {
-        const l = line.trim();
-        // Mermaidコードブロックの開始/終了を検出
-        if (l.startsWith('```mermaid')) {
-          inMermaidBlock = true;
-          return; // コードブロック開始行自体はスキップ
-        }
-        if (l.startsWith('```')) {
-          inMermaidBlock = false;
-          return; // コードブロック終了行はスキップ
-        }
-
-        if (inMermaidBlock) {
-          transPart += line + '\n';
-          return;
-        }
-        
-        const check = (arr) => arr.some(m => line.toLowerCase().indexOf(m.toLowerCase()) !== -1);
-        
-        // セクションの見出しを検出
-        if (check(markers.func)) { current = 'func'; return; }
-        if (check(markers.table)) { current = 'table'; return; }
-        if (check(markers.trans)) { current = 'trans'; return; }
-
-        if (current === 'func') funcPart += line + '\n';
-        else if (current === 'table') tablePart += line + '\n';
-        else if (current === 'trans') transPart += line + '\n';
-    });
-
-    // --- 各セクションのHTML変換処理 ---
-
-    // 1. 機能一覧: Markdown表をHTMLに変換
-    const funcHtml = convertMarkdownTableToHtml(funcPart, '機能一覧');
-    document.getElementById('generateFunctionList').innerHTML = funcHtml;
-
-    // 2. テーブル定義書: Markdown表とサブ見出し、SQLコードを処理
-    const tableHtml = convertMarkdownTableToHtml(tablePart, 'テーブル定義書');
-    document.getElementById('generateTableDefinition').innerHTML = tableHtml;
-
-    // 3. 画面遷移図: Mermaidコードブロックを<pre class="mermaid">で囲む
-    let finalTransHtml = `<h3>画面遷移図</h3>`;
-    const mermaidCode = transPart.trim();
-    
-    if (mermaidCode.toLowerCase().startsWith('graph') || mermaidCode.toLowerCase().startsWith('flowchart')) {
-        // Mermaid記法の場合、<pre class="mermaid">で囲む
-        finalTransHtml += `<div class="mermaid-container"><pre class="mermaid">${mermaidCode}</pre></div>`;
-    } else {
-        // Mermaid以外は生のテキストとして表示
-        finalTransHtml += `<pre>${escapeHtml(mermaidCode || transPart)}</pre>`;
-    }
-    document.getElementById('generateTransitionDiagram').innerHTML = finalTransHtml;
-    
-    // 描画後にMermaidを強制的に再実行し、新しく挿入されたコードを図にする
-    if (typeof mermaid !== 'undefined') {
-      // コンテナ内の既存のSVGをクリアしてから初期化
-      const elements = document.getElementById('generateTransitionDiagram').querySelectorAll('.mermaid');
-      elements.forEach(el => el.removeAttribute('data-processed'));
-      mermaid.init(undefined, elements);
-    }
-}
-
-// 簡易 Markdown Table -> HTML Table 変換関数 (タイトル処理を追加)
-function convertMarkdownTableToHtml(markdown, mainTitle) {
-    const lines = markdown.split(/\r?\n/).filter(line => line.trim());
-    let html = '';
-    let currentTable = '';
-
-    const processTable = (tableLines) => {
-        if (tableLines.length < 2 || !tableLines[0].trim().startsWith('|')) return ''; // 表ではない
-
-        let tableHtml = '<table class="table table-bordered table-sm mt-3">';
-        
-        // ヘッダー
-        const headerCells = tableLines[0].split('|').map(c => c.trim()).filter(c => c);
-        if (headerCells.length > 0) {
-            tableHtml += '<thead><tr>';
-            headerCells.forEach(cell => {
-                tableHtml += `<th scope="col">${cell.replace(/\*\*/g, '').trim()}</th>`;
-            });
-            tableHtml += '</tr></thead><tbody>';
-        }
-
-        // ボディ (2行目: 区切り線スキップ, 3行目から)
-        for (let i = 2; i < tableLines.length; i++) {
-            const bodyCells = tableLines[i].split('|').map(c => c.trim()).filter(c => c);
-            if (bodyCells.length > 0) {
-                tableHtml += '<tr>';
-                bodyCells.forEach(cell => {
-                    // **を<strong>、`を<code>に変換
-                    tableHtml += `<td>${cell.replace(/\*\*/g, '<strong>').replace(/`/g, '<code>')}</td>`;
-                });
-                tableHtml += '</tr>';
-            }
-        }
-        
-        tableHtml += '</tbody></table>';
-        return tableHtml;
-    };
-    
-    html += `<h3>${mainTitle}</h3>`;
-
-    let tableLines = [];
-    for (const line of lines) {
-        const l = line.trim();
-        if (l.startsWith('####')) { // 小見出し
-            html += processTable(tableLines);
-            tableLines = [];
-            html += `<h4>${l.replace('####', '').trim()}</h4>`;
-        } else if (l.startsWith('|')) { // 表の行
-            tableLines.push(line);
-        } else if (l.toLowerCase().startsWith('create table')) { // SQLコード
-            html += processTable(tableLines);
-            tableLines = [];
-            html += `<div class="sql-code"><pre><code>${escapeHtml(l)}</code></pre></div>`;
-        } else if (l.startsWith('---') || l.startsWith('***')) {
-            // 区切り線はスキップ
-        }
-    }
-    // 最後に残ったテーブルを処理
-    html += processTable(tableLines);
-
-    return html;
-}
-
-
-/* ---------------- 補助 ---------------- */
-function escapeHtml(s) {
-    if (!s) return '';
-    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-function clearRenderedDesigns() {
-    document.getElementById('aiCodeInput').value = '';
-    document.getElementById('generateFunctionList').innerHTML = '';
-    document.getElementById('generateTableDefinition').innerHTML = '';
-    document.getElementById('generateTransitionDiagram').innerHTML = '';
-    alert('描画内容をクリアしました。');
-}
-
-// ... 既存の他の関数（updatePages, generateInstructionsなど）は変更しないでください ...
-/* ---------------- HTML生成 ---------------- */
-function buildSinglePageHtml(pageObj) {
-  const css = `
-    body{ font-family: 'M PLUS Rounded 1c', 'Noto Sans JP', sans-serif; padding:20px; line-height:1.6; }
-    header, nav, main, footer{ padding:12px; border-radius:8px; margin-bottom:12px; border:1px solid #e6e6e6; background:#fff; }
-    header{ background:linear-gradient(145deg,#82b1ff,#64b5f6); color:#fff; }
-    nav{ background:#f7fbff; }
-    .section-title{ font-weight:700; color:#1976d2; margin-bottom:6px; }
-  `;
-  const makeList = (arr) => arr && arr.length ? `<ul>${arr.map(a => `<li>${a}</li>`).join('')}</ul>` : '<p>なし</p>';
-  return `
-  <!doctype html>
-  <html lang="ja">
-  <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <title>${escapeHtml(pageObj.pageName)}</title>
-    <style>${css}</style>
-  </head>
-  <body>
-    <header>
-      <h1>${escapeHtml(pageObj.pageName)}</h1>
-      <p>${escapeHtml(pageObj.pagePurpose)}</p>
-    </header>
-
-    <nav>
-      <div class="section-title">ヘッダー</div>
-      ${makeList(pageObj.header)}
-      <div class="section-title">メニュー</div>
-      ${makeList(pageObj.menu)}
-    </nav>
-
-    <main>
-      <div class="section-title">ボディ構成</div>
-      ${makeList(pageObj.body)}
-    </main>
-
-    <footer>
-      <div class="section-title">フッター</div>
-      ${makeList(pageObj.footer)}
-    </footer>
-  </body>
-  </html>
-  `;
-}
-
-
-document.addEventListener('DOMContentLoaded', () => {
-  updatePages();
-  updateEstimate();
-});
-
-/* ---------------- AI生成HTMLプレビュー ---------------- */
-function renderHtmlPreview() {
-    const html = document.getElementById('aiHtmlInput').value.trim();
-    if (!html) {
-        alert('AI生成HTMLを貼り付けてください');
-        return;
-    }
-    const iframe = document.getElementById('htmlPreview');
-    iframe.srcdoc = html;
-}
-
-function clearHtmlPreview() {
-    const iframe = document.getElementById('htmlPreview');
-    iframe.srcdoc = '';
-    document.getElementById('aiHtmlInput').value = '';
-}
-
-// ページコード生成とダウンロード関数
-function generatePageCode() {
-    updatePages();
-    const rawCodeInput = document.getElementById('aiCodeInput').value; // AI設計書入力欄を使用
-    const rawHtmlInput = document.getElementById('aiHtmlInput').value; // AI生成HTML入力欄を使用
-
-    // どちらの入力欄にページコードブロックが含まれているかチェック
-    const sourceCode = rawCodeInput.includes('page_codes.txt') ? rawCodeInput : (rawHtmlInput.includes('page_codes.txt') ? rawHtmlInput : null);
-
-    if (!sourceCode) {
-        alert('AI生成コード欄に「page_codes.txt」を含むコードブロックがありません。\nAI指示文を生成・実行して、再度貼り付けてください。');
-        return;
-    }
-
-    // 'page_codes.txt' の Markdown コードブロックを抽出
-    const match = sourceCode.match(/```(?:txt|text)\n(.*page_codes\.txt.*?\n)([\s\S]*?)```/);
-    if (!match || match.length < 3) {
-        alert('「page_codes.txt」のコードブロックが見つかりませんでした。');
-        return;
-    }
-
-    const pageCodesText = match[2];
-    
-    // 最初のページのHTMLを抽出してプレビューに表示
-    const firstPageMatch = pageCodesText.match(/--- ページ開始: (.*?)\s*---\s*([\s\S]*?)--- ページ終了: \1\s*---/);
-    
-    if (firstPageMatch && firstPageMatch.length >= 3) {
-        const firstPageHtml = firstPageMatch[2].trim();
-        document.getElementById('pagePreview').srcdoc = firstPageHtml;
-        alert(`最初のページ「${firstPageMatch[1]}」のコードを生成し、プレビューに表示しました。`);
-    } else if (pages.length > 0) {
-        // AIの出力が期待通りでない場合、自前で生成した簡易HTMLをフォールバックとして表示
-        const firstPageHtml = buildSinglePageHtml(pages[0]);
-        document.getElementById('pagePreview').srcdoc = firstPageHtml;
-        alert('AIのコードが読み取れなかったため、最初のページ設定に基づいた簡易コードを生成し、プレビューに表示しました。');
-    } else {
-        alert('プレビュー表示のためのページ設定が見つかりません。');
+function clearAllPages() {
+    if(confirm("すべてのページを削除しますか？")) {
+        pages=[];
+        renderPages();
     }
 }
 
+function renderPages() {
+    const container = document.getElementById("pageContainer");
+    container.innerHTML = "";
+    pages.forEach((p,i)=>{
+        const div = document.createElement("div");
+        div.className = "page-card";
+        div.innerHTML = `
+            <input type="text" value="${p.pageName}" placeholder="ページ名" oninput="pages[${i}].pageName=this.value">
+            <input type="text" value="${p.pagePurpose}" placeholder="ページ目的" oninput="pages[${i}].pagePurpose=this.value">
+            <button class="delete-btn" onclick="pages.splice(${i},1); renderPages();">削除</button>
+        `;
+        container.appendChild(div);
+    });
+}
+
+// ---------------- 見積書 ----------------
+function downloadEstimate() {
+    let text = "見積書\n\n";
+    text += "※ここに計算ロジック追加可\n";
+    const blob = new Blob([text], {type:"text/plain"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download="estimate.txt";
+    a.click();
+}
+
+// ---------------- AI 指示文生成 ----------------
+function generateInstructions() {
+    const overview = document.getElementById("projectOverviewInput").value || "一般的なコーポレートサイト";
+    const pageType = document.getElementById("pageTypeSelect").value;
+    const userTarget = document.getElementById("userTargetSelect").value;
+    const design = document.getElementById("designSelect").value;
+    const dataReq = document.getElementById("dataRequirementInput").value || "顧客データ管理・問い合わせデータ記録";
+    const operation = document.getElementById("operationInput").value || "静的コンテンツ更新・ニュース運用";
+    const server = document.getElementById("serverSelect").value;
+    const db = document.getElementById("databaseSelect").value;
+    const framework = document.getElementById("designFrameworkSelect").value;
+    const auth = document.getElementById("authSelect").value;
+    const security = document.getElementById("securityInput").value || "SSL/TLS暗号化・定期バックアップ";
+    const langs = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value).join(", ") || "HTML, CSS, JS";
+
+    let pageSummary = '', pageListForCode = [];
+    if (pages.length>0) {
+        pageSummary = pages.map(p=>{
+            const sections = [].concat(p.header.map(x=>"ヘッダー:"+x),p.menu.map(x=>"メニュー:"+x),p.body.map(x=>"ボディ:"+x),p.footer.map(x=>"フッター:"+x)).join(", ");
+            pageListForCode.push(`- ページ名: ${p.pageName}\n  - 構成: ${sections||"構成未定"}`);
+            return `- ${p.pageName}（目的:${p.pagePurpose}） → ${sections||"構成未定"}`;
+        }).join("\n");
+    } else {
+        pageSummary="ページ設定未作成。コーポレートサイト標準構成を自動で作成してください。";
+        pageListForCode.push("トップ/企業情報/サービス/ニュース/お問い合わせ");
+    }
+
+    const instruct = `
+あなたはWebサイト設計の専門家です。以下内容に従い、毎回同じテンプレートで設計書Markdown（機能一覧/テーブル定義/画面遷移図）を作成してください。
+出力内容:
+1. Markdown形式設計書
+2. そのMarkdownからHTML設計書（Bootstrap＋Mermaidで描画、プレビュー可能）
+3. ページ単位HTML（1ページ1ファイル、全ページプレビュー可能）
+4. ページ一覧:
+${pageListForCode.join("\n")}
+
+【プロジェクト設定】
+- 概要: ${overview}
+- ページ分類: ${pageType}
+- ユーザー層: ${userTarget}
+- デザイン: ${design}
+- 使用言語: ${langs}
+- サーバー: ${server}
+- DB: ${db}
+- フレームワーク: ${framework}
+- 認証: ${auth}
+- データ要件: ${dataReq}
+- 運用: ${operation}
+- セキュリティ: ${security}
+
+【ページ構成】
+${pageSummary}
+
+指示文は常に同じテンプレートを維持し、毎回ブレない形で生成してください。
+    `;
+    document.getElementById("aiInstructions").value = instruct;
+}
+
+function copyInstructions() {
+    const area = document.getElementById("aiInstructions");
+    area.select();
+    document.execCommand("copy");
+    alert("コピーしました！");
+}
+
+function downloadInstructions() {
+    const text = document.getElementById("aiInstructions").value;
+    const blob = new Blob([text], {type:"text/plain"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download="ai_instructions.txt";
+    a.click();
+}
+
+// ---------------- HTMLプレビュー ----------------
+function renderHtmlPreview() {
+    const code = document.getElementById("aiHtmlInput").value;
+    const iframe = document.getElementById("htmlPreview");
+    iframe.srcdoc = code;
+}
+
+function clearHtmlPreview() {
+    document.getElementById("aiHtmlInput").value="";
+    document.getElementById("htmlPreview").srcdoc="";
+}
+
+// ---------------- ページHTML生成 ----------------
+function generatePageCode() {
+    if(pages.length===0) { alert("ページがありません"); return; }
+    const iframe = document.getElementById("pagePreview");
+    const firstPage = pages[0];
+    const html = `
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${firstPage.pageName}</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<h1>${firstPage.pageName}</h1>
+<p>目的: ${firstPage.pagePurpose}</p>
+</body>
+</html>`;
+    iframe.srcdoc = html;
+}
+
+// ---------------- ページコードダウンロード ----------------
 function downloadPageCode() {
-    updatePages();
-    const rawCodeInput = document.getElementById('aiCodeInput').value; // AI設計書入力欄を使用
-    const rawHtmlInput = document.getElementById('aiHtmlInput').value; // AI生成HTML入力欄を使用
+    if(pages.length===0) { alert("ページがありません"); return; }
+    pages.forEach((p,i)=>{
+        const html = `
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${p.pageName}</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<h1>${p.pageName}</h1>
+<p>目的: ${p.pagePurpose}</p>
+</body>
+</html>`;
+        const blob = new Blob([html], {type:"text/html"});
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `${p.pageName}.html`;
+        a.click();
+    });
+}
 
-    const sourceCode = rawCodeInput.includes('page_codes.txt') ? rawCodeInput : (rawHtmlInput.includes('page_codes.txt') ? rawHtmlInput : null);
+// ---------------- 設計書Markdown描画 ----------------
+function renderDesignDocs() {
+    const md = document.getElementById("aiCodeInput").value;
+    if(!md) return;
+    const funcDiv = document.getElementById("generateFunctionList");
+    const tableDiv = document.getElementById("generateTableDefinition");
+    const diagramDiv = document.getElementById("generateTransitionDiagram");
 
-    if (!sourceCode) {
-        alert('AI生成コード欄に「page_codes.txt」を含むコードブロックがありません。\nAI指示文を生成・実行して、再度貼り付けてください。');
-        return;
-    }
+    // 簡易分割（--- で区切り想定）
+    const parts = md.split(/-{3,}/);
+    funcDiv.innerHTML = parts[0]||"";
+    tableDiv.innerHTML = parts[1]||"";
+    diagramDiv.innerHTML = parts[2]||"";
 
-    const match = sourceCode.match(/```(?:txt|text)\n(.*page_codes\.txt.*?\n)([\s\S]*?)```/);
-    if (!match || match.length < 3) {
-        alert('「page_codes.txt」のコードブロックが見つかりませんでした。');
-        return;
-    }
+    mermaid.init(undefined, diagramDiv);
+}
 
-    const pageCodesText = match[2];
-
-    if (pageCodesText.trim().length === 0) {
-        alert('ダウンロードするコードが空です。');
-        return;
-    }
-
-    const blob = new Blob([pageCodesText], { type: 'text/plain' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'page_codes_for_download.txt';
-    a.click();
-    alert('全ページコード（page_codes_for_download.txt）のダウンロードを開始しました。');
+function clearRenderedDesigns() {
+    document.getElementById("aiCodeInput").value="";
+    document.getElementById("generateFunctionList").innerHTML="";
+    document.getElementById("generateTableDefinition").innerHTML="";
+    document.getElementById("generateTransitionDiagram").innerHTML="";
 }
