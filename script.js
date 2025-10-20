@@ -142,6 +142,10 @@ function generateInstructions() {
     const pageType = document.getElementById("pageTypeSelect")?.value || "コーポレート／ブランド";
     const userTarget = document.getElementById("userTargetSelect")?.value || "一般ユーザー（20〜40代）";
     const design = document.getElementById("designSelect")?.value || "高級・スタイリッシュ";
+    const mainFont = document.getElementById("mainFontSelect")?.options[document.getElementById("mainFontSelect").selectedIndex].text || "ゴシック体 (標準)";
+    const themeColor = document.getElementById("themeColorSelect")?.options[document.getElementById("themeColorSelect").selectedIndex].text || "ブルー (ビジネス・信頼)";
+    const layoutPattern = document.getElementById("layoutPatternSelect")?.value || "full-hero";
+    const buttonShape = document.getElementById("buttonShapeSelect")?.value || "medium-round";
     const dataReq = document.getElementById("dataRequirementInput")?.value.trim() || "顧客データの管理、および問い合わせデータの記録";
     const operation = document.getElementById("operationInput")?.value.trim() || "静的コンテンツの定期的な更新とニュース機能の運用";
     const server = document.getElementById("serverSelect")?.value || "さくらレンタルサーバー";
@@ -185,6 +189,10 @@ function generateInstructions() {
 - ページ分類: ${pageType}
 - ユーザー層・想定デバイス: ${userTarget}
 - デザイン方針: ${design}
+- メインフォント: ${mainFont}
+- テーマカラー: ${themeColor}
+- レイアウトパターン: ${layoutPattern}
+- ボタン形状: ${buttonShape}
 - 使用言語: ${langs}
 - サーバー: ${server}
 - データベース: ${db}
@@ -214,6 +222,7 @@ ${pageSummary}
 【追加指示（Webページプレビューのデザイン）】
 - ヘッダー・メニュー・ボディ・フッター構成を厳守
 - Bootstrapグリッド・ユーティリティ活用、レスポンシブで美しいデザイン
+- デザイン詳細設定（フォント: ${mainFont}, テーマカラー: ${themeColor}, レイアウト: ${layoutPattern}, ボタン: ${buttonShape}）を反映してください。
 - ヘッダー：ロゴ左、ログインボタン右
 - メニュー：サイドメニューは左固定、カテゴリメニューは水平リスト
 - ボディ：トップはフォーム中心、商品紹介はカルーセル中心
