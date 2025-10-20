@@ -170,8 +170,22 @@
   </div>
 </section>
 
+<section id="designDocsSection" style="margin-top: 30px;">
+    <h2>④ AI設計書描画（機能一覧・テーブル定義・画面遷移図）</h2>
+    <p class="hint">AIの出力結果（Markdown設計書）を貼り付けて「設計書を描画」を押すと、以下に構造化して表示されます。</p>
+    <textarea id="aiCodeInput" rows="10" placeholder="AIが生成したMarkdown設計書をここに貼り付け"></textarea>
+    <div class="preview-actions">
+        <button onclick="renderDesignDocs()">設計書を描画</button>
+        <button onclick="clearRenderedDesigns()">描画をクリア</button>
+    </div>
+    <div id="designDocsOutput" class="p-3 border rounded mt-3">
+        <div id="generateFunctionList" class="mb-4"></div>
+        <div id="generateTableDefinition" class="mb-4"></div>
+        <div id="generateTransitionDiagram" class="mb-4"></div>
+    </div>
+</section>
 <section id="htmlPreviewSection">
-  <h2>④ AI生成設計書HTMLプレビュー</h2>
+  <h2>④-2 AI生成設計書HTMLプレビュー</h2>
   <p class="hint">AI生成HTML（Mermaid.jsを含む完全な設計書HTML）を貼り付けて「プレビューを表示」を押すと、この枠内に表示されます。</p>
   <textarea id="aiHtmlInput" rows="10" placeholder="AIが生成したHTMLコードをここに貼り付け"></textarea>
   <div class="preview-actions">
@@ -198,7 +212,8 @@
                 </ul>
 
             <div class="tab-content border border-top-0 p-2" id="pageTabContent" style="height: 400px;">
-                </div>
+                <iframe id="pagePreview" style="width:100%; height:100%; border:none;"></iframe>
+            </div>
         </div>
     </div>
     
@@ -214,6 +229,8 @@
   <small>ツール提供 — Web制作アシスタント（簡易版）</small>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({ startOnLoad: true });</script>
 <script src="script.js"></script>
 
 <script>
@@ -365,8 +382,11 @@ function updateDesignPreview() {
     `;
 
     // 4. iframeへの書き込み
+    // 🔥修正箇所: HTMLで追加した #pagePreview を参照
     const iframe = document.getElementById('pagePreview');
-    iframe.srcdoc = previewContent;
+    if (iframe) {
+        iframe.srcdoc = previewContent;
+    }
 }
 
 // 既存のAIコードプレビュー機能との連携
@@ -374,13 +394,17 @@ function previewAiPageHtml() {
     const aiHtml = document.getElementById('aiPageHtmlInput').value;
     const iframe = document.getElementById('pagePreview');
     // AIコードを貼り付けた場合は、デザインプレビューを上書き
-    iframe.srcdoc = aiHtml;
+    if (iframe) {
+        iframe.srcdoc = aiHtml;
+    }
 }
 
 function clearPagePreview() {
     document.getElementById('aiPageHtmlInput').value = '';
     const iframe = document.getElementById('pagePreview');
-    iframe.srcdoc = ''; // コンテンツをクリア
+    if (iframe) {
+        iframe.srcdoc = ''; // コンテンツをクリア
+    }
     // クリア後に再度デザインプレビューを表示する
     updateDesignPreview(); 
 }
