@@ -479,75 +479,17 @@ function clearHtmlPreview() {
     document.getElementById('aiHtmlInput').value = '';
 }
 
-// ページコード生成とダウンロード関数
-function generatePageCode() {
-    updatePages();
-    const rawCodeInput = document.getElementById('aiCodeInput').value; // AI設計書入力欄を使用
-    const rawHtmlInput = document.getElementById('aiHtmlInput').value; // AI生成HTML入力欄を使用
-
-    // どちらの入力欄にページコードブロックが含まれているかチェック
-    const sourceCode = rawCodeInput.includes('page_codes.txt') ? rawCodeInput : (rawHtmlInput.includes('page_codes.txt') ? rawHtmlInput : null);
-
-    if (!sourceCode) {
-        alert('AI生成コード欄に「page_codes.txt」を含むコードブロックがありません。\nAI指示文を生成・実行して、再度貼り付けてください。');
-        return;
-    }
-
-    // 'page_codes.txt' の Markdown コードブロックを抽出
-    const match = sourceCode.match(/```(?:txt|text)\n(.*page_codes\.txt.*?\n)([\s\S]*?)```/);
-    if (!match || match.length < 3) {
-        alert('「page_codes.txt」のコードブロックが見つかりませんでした。');
-        return;
-    }
-
-    const pageCodesText = match[2];
-    
-    // 最初のページのHTMLを抽出してプレビューに表示
-    const firstPageMatch = pageCodesText.match(/--- ページ開始: (.*?)\s*---\s*([\s\S]*?)--- ページ終了: \1\s*---/);
-    
-    if (firstPageMatch && firstPageMatch.length >= 3) {
-        const firstPageHtml = firstPageMatch[2].trim();
-        document.getElementById('pagePreview').srcdoc = firstPageHtml;
-        alert(`最初のページ「${firstPageMatch[1]}」のコードを生成し、プレビューに表示しました。`);
-    } else if (pages.length > 0) {
-        // AIの出力が期待通りでない場合、自前で生成した簡易HTMLをフォールバックとして表示
-        const firstPageHtml = buildSinglePageHtml(pages[0]);
-        document.getElementById('pagePreview').srcdoc = firstPageHtml;
-        alert('AIのコードが読み取れなかったため、最初のページ設定に基づいた簡易コードを生成し、プレビューに表示しました。');
-    } else {
-        alert('プレビュー表示のためのページ設定が見つかりません。');
+function previewAiPageHtml() {
+    const code = document.getElementById('aiPageHtmlInput').value.trim();
+    if (!code) { 
+        alert('AI生成HTMLコードを貼り付けてください'); 
+        return; 
     }
+    const iframe = document.getElementById('pagePreview');
+    iframe.srcdoc = code;
 }
 
-function downloadPageCode() {
-    updatePages();
-    const rawCodeInput = document.getElementById('aiCodeInput').value; // AI設計書入力欄を使用
-    const rawHtmlInput = document.getElementById('aiHtmlInput').value; // AI生成HTML入力欄を使用
-
-    const sourceCode = rawCodeInput.includes('page_codes.txt') ? rawCodeInput : (rawHtmlInput.includes('page_codes.txt') ? rawHtmlInput : null);
-
-    if (!sourceCode) {
-        alert('AI生成コード欄に「page_codes.txt」を含むコードブロックがありません。\nAI指示文を生成・実行して、再度貼り付けてください。');
-        return;
-    }
-
-    const match = sourceCode.match(/```(?:txt|text)\n(.*page_codes\.txt.*?\n)([\s\S]*?)```/);
-    if (!match || match.length < 3) {
-        alert('「page_codes.txt」のコードブロックが見つかりませんでした。');
-        return;
-    }
-
-    const pageCodesText = match[2];
-
-    if (pageCodesText.trim().length === 0) {
-        alert('ダウンロードするコードが空です。');
-        return;
-    }
-
-    const blob = new Blob([pageCodesText], { type: 'text/plain' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'page_codes_for_download.txt';
-    a.click();
-    alert('全ページコード（page_codes_for_download.txt）のダウンロードを開始しました。');
+function clearPagePreview() {
+    document.getElementById('aiPageHtmlInput').value = '';
+    document.getElementById('pagePreview').srcdoc = '';
 }
