@@ -1,9 +1,11 @@
+/* Google Fonts 丸文字 */
 body {
   font-family: 'M PLUS Rounded 1c', 'Noto Sans JP', sans-serif;
   background: linear-gradient(135deg,#fff9f9,#f9faff);
   margin:0; padding:20px; color:#333;
   box-sizing:border-box;
 }
+
 * { box-sizing:border-box; }
 
 h1{
@@ -13,23 +15,44 @@ h1{
   box-shadow:0 4px 8px rgba(0,0,0,0.15);
   text-shadow:1px 2px 2px rgba(0,0,0,0.25);
 }
+
 section{
   background:#fff; padding:20px; border-radius:15px; margin:20px auto;
   box-shadow:0 4px 10px rgba(0,0,0,0.05); max-width:900px;
 }
+
 h2{
   margin-top:10px; color:#fff; font-size:1.12rem; padding:10px 12px;
   border-radius:10px; background:linear-gradient(145deg,#82b1ff,#64b5f6);
   box-shadow: inset 2px 2px 5px rgba(255,255,255,0.6),3px 3px 6px rgba(0,0,0,0.1);
   text-shadow:1px 1px 2px rgba(0,0,0,0.15);
 }
+
 label{ display:block; margin-top:10px; font-weight:700; }
-select, textarea, input[type=text]{ width:100%; padding:10px 12px; margin-top:6px; border-radius:8px; border:1px solid #ccc; font-size:0.95rem; box-shadow: inset 1px 1px 3px rgba(0,0,0,0.05); transition: all 0.2s ease; background:#fff;}
-select:focus, textarea:focus, input[type=text]:focus{ outline:none; border-color:#64b5f6; box-shadow:0 0 6px #90caf9;}
+select, textarea, input[type=text]{
+  width:100%; padding:10px 12px; margin-top:6px;
+  border-radius:8px; border:1px solid #ccc; font-size:0.95rem;
+  box-shadow: inset 1px 1px 3px rgba(0,0,0,0.05);
+  transition: all 0.2s ease; background:#fff;
+}
+select:focus, textarea:focus, input[type=text]:focus{
+  outline:none; border-color:#64b5f6; box-shadow:0 0 6px #90caf9;
+}
 input[type=checkbox]{ margin-right:6px; }
-button{ margin-top:12px; padding:10px 14px; border:none; border-radius:8px; background:linear-gradient(145deg,#64b5f6,#2196f3); color:white; font-size:1rem; cursor:pointer; box-shadow:2px 2px 6px rgba(0,0,0,0.15); transition: all 0.2s;}
+
+button{
+  margin-top:12px; padding:10px 14px; border:none;
+  border-radius:8px; background:linear-gradient(145deg,#64b5f6,#2196f3);
+  color:white; font-size:1rem; cursor:pointer;
+  box-shadow:2px 2px 6px rgba(0,0,0,0.15);
+  transition: all 0.2s;
+}
 button:hover{ background:linear-gradient(145deg,#2196f3,#1976d2); transform:translateY(-2px);}
-.delete-btn{ background: linear-gradient(145deg,#f44336,#d32f2f); margin:0; padding:4px 8px; font-size:0.8rem; border-radius:6px; box-shadow:1px 1px 3px rgba(0,0,0,0.2);}
+.delete-btn{
+  background: linear-gradient(145deg,#f44336,#d32f2f); margin:0;
+  padding:4px 8px; font-size:0.8rem; border-radius:6px;
+  box-shadow:1px 1px 3px rgba(0,0,0,0.2);
+}
 .delete-btn:hover{ background:linear-gradient(145deg,#d32f2f,#b71c1c); }
 
 .page-container{ display:block; margin-top:12px; }
@@ -39,12 +62,73 @@ button:hover{ background:linear-gradient(145deg,#2196f3,#1976d2); transform:tran
   margin-bottom:14px;
 }
 .section-title{ font-weight:700; margin-top:8px; color:#2196f3; display:block; }
+
 .checkbox-row label { display:inline-block; margin-right:10px; font-weight:500; }
-.page-controls, .estimate-actions, .instruction-actions, .design-import-actions, .pagecode-actions { margin-top:10px; display:flex; gap:10px; flex-wrap:wrap; }
+
+.page-controls { display:flex; gap:10px; margin-top:8px; }
+.estimate-actions, .instruction-actions, .design-import-actions, .pagecode-actions { margin-top:10px; display:flex; gap:10px; flex-wrap:wrap; }
+
 #estimateTable{ width:100%; border-collapse:collapse; margin-top:10px; }
 #estimateTable th, #estimateTable td{ border:1px solid #ddd; padding:8px; text-align:left; }
 #estimateTable th{ background: linear-gradient(135deg,#bbdefb,#e3f2fd); font-weight:700; }
-pre{ background:#f8f8f8; padding:10px; border-radius:6px; margin-top:10px; white-space:pre-wrap; word-break:break-word; box-shadow:inset 1px 1px 3px rgba(0,0,0,0.05);}
-iframe{ width:100%; height:360px; border:2px solid #bbdefb; border-radius:10px; margin-top:10px; box-shadow:1px 2px 6px rgba(0,0,0,0.1); }
+
+pre{ background:#f8f8f8; padding:10px; border-radius:6px; margin-top:10px;
+  white-space:pre-wrap; word-break:break-word; box-shadow:inset 1px 1px 3px rgba(0,0,0,0.05);
+}
+
+iframe{ width:100%; height:360px; border:2px solid #bbdefb; border-radius:10px; margin-top:10px;
+  box-shadow:1px 2px 6px rgba(0,0,0,0.1);
+}
+
+/* 設計書ブロック */
+/* 設計書ブロック内の見出しと内容の調整 */
+#designOutputSection {
+  padding: 20px;
+  background: #f0f4ff;
+  border-radius: 12px;
+}
+
+#designOutputSection .design-block {
+  margin-top: 16px;       /* ブロック同士の間隔 */
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: inset 1px 1px 4px rgba(0,0,0,0.05);
+}
+
+#designOutputSection .design-block h3 {
+  margin-top: 0;           /* 見出しの上余白をリセット */
+  margin-bottom: 12px;     /* 下余白で内容と離す */
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #1565c0;
+}
+
+#designOutputSection .design-block ul {
+  padding-left: 20px;
+  margin-top: 0;
+}
+
+#designOutputSection .design-block pre.mermaid {
+  padding: 12px;
+  background: #f4f6fb;
+  border-radius: 6px;
+  overflow: auto;
+  margin-top: 8px;
+}
+
+.design-block { margin-top:14px; background:#f5f5f5; padding:12px; border-radius:10px; box-shadow: inset 1px 1px 5px rgba(0,0,0,0.03); }
+.design-block h3{ color:#1976d2; }
+
+/* ヒント */
 .hint{ color:#666; font-size:0.95rem; margin-top:6px; }
-@media screen and (max-width:600px){ body{ padding:14px; } section{ padding:16px; margin:15px auto; } h1{ font-size:1.3rem; padding:12px; } button{ font-size:0.95rem; padding:9px 12px; } iframe{ height:300px; } }
+
+/* レスポンシブ */
+@media screen and (max-width:600px){
+  body{ padding:14px; }
+  section{ padding:16px; margin:15px auto; }
+  h1{ font-size:1.3rem; padding:12px; }
+  button{ font-size:0.95rem; padding:9px 12px; }
+  iframe{ height:300px; }
+}
