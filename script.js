@@ -590,6 +590,16 @@ document.addEventListener('DOMContentLoaded', function() {
     qrLink.innerHTML = `<a href="https://gomamiso-pro.github.io/asobi/" target="_blank">アクセスする</a>`;
     qrModalContent.appendChild(qrLink);
 
+       // QRコードを生成して表示
+    const qrContainer = document.getElementById('qrcode');
+    if (qrContainer) {
+        new QRCode(qrContainer, {
+            text: "https://gomamiso-pro.github.io/asobi/",
+            width: 200,
+            height: 200
+        });
+    }
+
 
     qrCodeButton.addEventListener('click', function() {
         qrModal.style.display = 'flex'; // モーダルを表示
