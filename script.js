@@ -279,7 +279,6 @@ function downloadInstructions() {
 
 /* ---------------- 設計書描画 ---------------- */
 function renderDesignDocs() {
-    // 🔥修正箇所: 入力IDを #aiCodeInput に修正 (HTMLに合わせる)
     const raw = document.getElementById('aiCodeInput').value.trim();
     if (!raw) {
         alert('AIが生成した設計書を貼り付けてください。');
@@ -287,7 +286,6 @@ function renderDesignDocs() {
     }
 
     // Mermaidの描画を一旦リセット
-    // 🔥修正箇所: HTMLで追加した #generateTransitionDiagram を参照
     const transContainer = document.getElementById('generateTransitionDiagram');
     if (transContainer) {
       transContainer.innerHTML = '';
@@ -324,17 +322,9 @@ function renderDesignDocs() {
         const check = (arr) => arr.some(m => line.toLowerCase().indexOf(m.toLowerCase()) !== -1);
         
         // セクションの見出しを検出
-        // **厳密に**出力フォーマットをチェック
-        if (l.startsWith('1) **機能一覧**')) { current = 'func'; return; }
-        if (l.startsWith('2) **テーブル定義書**')) { current = 'table'; return; }
-        if (l.startsWith('3) **画面遷移図**')) { current = 'trans'; return; }
-        
-        // フォールバックチェック
-        if (current === 'other') {
-            if (check(markers.func)) { current = 'func'; return; }
-            if (check(markers.table)) { current = 'table'; return; }
-            if (check(markers.trans)) { current = 'trans'; return; }
-        }
+        if (check(markers.func)) { current = 'func'; return; }
+        if (check(markers.table)) { current = 'table'; return; }
+        if (check(markers.trans)) { current = 'trans'; return; }
 
         if (current === 'func') funcPart += line + '\n';
         else if (current === 'table') tablePart += line + '\n';
@@ -345,12 +335,10 @@ function renderDesignDocs() {
 
     // 1. 機能一覧: Markdown表をHTMLに変換
     const funcHtml = convertMarkdownTableToHtml(funcPart, '機能一覧');
-    // 🔥修正箇所: HTMLで追加した #generateFunctionList を参照
     document.getElementById('generateFunctionList').innerHTML = funcHtml;
 
     // 2. テーブル定義書: Markdown表とサブ見出し、SQLコードを処理
     const tableHtml = convertMarkdownTableToHtml(tablePart, 'テーブル定義書');
-    // 🔥修正箇所: HTMLで追加した #generateTableDefinition を参照
     document.getElementById('generateTableDefinition').innerHTML = tableHtml;
 
     // 3. 画面遷移図: Mermaidコードブロックを<pre class="mermaid">で囲む
@@ -364,7 +352,6 @@ function renderDesignDocs() {
         // Mermaid以外は生のテキストとして表示
         finalTransHtml += `<pre>${escapeHtml(mermaidCode || transPart)}</pre>`;
     }
-    // 🔥修正箇所: HTMLで追加した #generateTransitionDiagram を参照
     document.getElementById('generateTransitionDiagram').innerHTML = finalTransHtml;
     
     // 描画後にMermaidを強制的に再実行し、新しく挿入されたコードを図にする
@@ -380,7 +367,7 @@ function renderDesignDocs() {
 function convertMarkdownTableToHtml(markdown, mainTitle) {
     const lines = markdown.split(/\r?\n/).filter(line => line.trim());
     let html = '';
-    let tableLines = [];
+    let currentTable = '';
 
     const processTable = (tableLines) => {
         if (tableLines.length < 2 || !tableLines[0].trim().startsWith('|')) return ''; // 表ではない
@@ -416,6 +403,7 @@ function convertMarkdownTableToHtml(markdown, mainTitle) {
     
     html += `<h3>${mainTitle}</h3>`;
 
+    let tableLines = [];
     for (const line of lines) {
         const l = line.trim();
         if (l.startsWith('####')) { // 小見出し
@@ -430,13 +418,7 @@ function convertMarkdownTableToHtml(markdown, mainTitle) {
             html += `<div class="sql-code"><pre><code>${escapeHtml(l)}</code></pre></div>`;
         } else if (l.startsWith('---') || l.startsWith('***')) {
             // 区切り線はスキップ
-        } else if (tableLines.length > 0 && l === '') {
-            // テーブル行が続いている途中の空行は無視しない
-        } else if (tableLines.length > 0) {
-            // テーブルが途切れたと判断し、それまでのテーブルを処理
-            html += processTable(tableLines);
-            tableLines = [];
-        }
+        }
     }
     // 最後に残ったテーブルを処理
     html += processTable(tableLines);
@@ -452,15 +434,14 @@ function escapeHtml(s) {
 }
 
 function clearRenderedDesigns() {
-    // 🔥修正箇所: 入力IDを #aiCodeInput に修正
-    document.getElementById('aiCodeInput').value = ''; 
-    // 🔥修正箇所: HTMLで追加した描画コンテナを参照
+    document.getElementById('aiCodeInput').value = '';
     document.getElementById('generateFunctionList').innerHTML = '';
     document.getElementById('generateTableDefinition').innerHTML = '';
     document.getElementById('generateTransitionDiagram').innerHTML = '';
     alert('描画内容をクリアしました。');
 }
 
+// ... 既存の他の関数（updatePages, generateInstructionsなど）は変更しないでください ...
 /* ---------------- HTML生成 ---------------- */
 function buildSinglePageHtml(pageObj) {
   const css = `
@@ -536,19 +517,11 @@ function previewAiPageHtml() {
         alert('AI生成HTMLコードを貼り付けてください'); 
         return; 
     }
-    // 🔥修正箇所: HTMLで追加した #pagePreview を参照
     const iframe = document.getElementById('pagePreview');
-    if (iframe) {
-        iframe.srcdoc = code;
-    }
+    iframe.srcdoc = code;
 }
 
 function clearPagePreview() {
     document.getElementById('aiPageHtmlInput').value = '';
-    // 🔥修正箇所: HTMLで追加した #pagePreview を参照
-    const iframe = document.getElementById('pagePreview');
-    if (iframe) {
-        iframe.srcdoc = '';
-    }
-    updateDesignPreview();
+    document.getElementById('pagePreview').srcdoc = '';
 }
