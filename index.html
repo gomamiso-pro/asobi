@@ -1,111 +1,4 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Web制作支援ツール（V115）</title>
-<link rel="stylesheet" href="style.css" />
-<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;900&display=swap" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-</head>
-<body>
-
-<div class="header-content">
-    <h1>Web制作 設計支援ツール</h1>
-    <button id="qrCodeButton" class="qr-button" title="ツールのQRコードを表示">
-        🌐
-    </button>
-</div>
-
-<section id="hearingSection">
-  <h2>① ヒアリングシート入力</h2>
-
-  <label>プロジェクト概要（任意）</label>
-  <textarea id="projectOverviewInput" placeholder="未入力の場合はおまかせ"></textarea>
-
-  <label>Webページ分類</label>
-  <select id="pageTypeSelect">
-    <option value="コーポレート／ブランド">コーポレート／ブランド</option>
-    <option value="EC・販売サイト">EC・販売サイト</option>
-    <option value="メディア・ブログ">メディア・ブログ</option>
-    <option value="業務システム">業務システム</option>
-    <option value="LP・キャンペーン">LP・キャンペーン</option>
-    <option value="ポータル・コミュニティ">ポータル・コミュニティ</option>
-    <option value="おまかせ">おまかせ</option>
-  </select>
-
-  <label>ユーザー層・想定デバイス</label>
-  <select id="userTargetSelect">
-    <option value="一般ユーザー（20〜40代）">一般ユーザー（20〜40代）</option>
-    <option value="BtoB企業">BtoB企業</option>
-    <option value="管理者／社内利用">管理者／社内利用</option>
-    <option value="学生／若年層">学生／若年層</option>
-    <option value="高齢層中心">高齢層中心</option>
-    <option value="おまかせ">おまかせ</option>
-  </select>
-
-<label>デザイン方針</label>
-<select id="designSelect">
-    <option value="シンプル＆ミニマル">シンプル＆ミニマル</option>
-    <option value="ビジネス＆信頼重視">ビジネス＆信頼重視</option>
-    <option value="ポップ＆カジュアル">ポップ＆カジュアル</option>
-    <option value="高級・スタイリッシュ">高級・スタイリッシュ</option>
-    <option value="自然・ナチュラル">自然・ナチュラル</option>
-    <option value="おまかせ">おまかせ</option>
-  </select>
-
-    <label>メインフォント</label>
-  <select id="mainFontSelect" onchange="updateDesignPreview()">
-    <option value="sans-serif">ゴシック体 (標準)</option>
-    <option value="'Noto Sans JP', sans-serif">Noto Sans JP</option>
-    <option value="'M PLUS Rounded 1c', sans-serif">M PLUS Rounded 1c</option>
-    <option value="'Yu Gothic', 'Hiragino Kaku Gothic ProN', sans-serif">游ゴシック</option>
-  </select>
-
-  <label>テーマカラー</label>
-  <select id="themeColorSelect" onchange="updateDesignPreview()">
-    <option value="#007bff">ブルー (ビジネス・信頼)</option>
-    <option value="#dc3545">レッド (情熱・警告)</option>
-    <option value="#28a745">グリーン (自然・安定)</option>
-    <option value="#6f42c1">パープル (高級感・創造性)</option>
-    <option value="#ffc107">イエロー (ポップ・注目)</option>
-  </select>
-
-  <label>レイアウトパターン</label>
-  <select id="layoutPatternSelect" onchange="updateDesignPreview()">
-    <option value="full-hero">フルワイド（ヒーローセクション型）</option>
-    <option value="2col-left">2カラム（左サイドバー）</option>
-    <option value="2col-right">2カラム（右サイドバー）</option>
-    <option value="3col">3カラム</option>
-  </select>
-  
-  <label>ボタン形状</label>
-  <select id="buttonShapeSelect" onchange="updateDesignPreview()">
-    <option value="medium-round">角丸（中）</option>
-    <option value="square">カクカク</option>
-    <option value="pill">ピル型</option>
-  </select>
-
-  <label>データ・連携・管理要件</label>
-  <textarea id="dataRequirementInput" placeholder="未入力の場合はおまかせ"></textarea>
-
-  <label>運用・更新・公開</label>
-  <textarea id="operationInput" placeholder="未入力の場合はおまかせ"></textarea>
-
-  <label>使用言語（複数選択可）</label>
-  <div class="checkbox-row">
-    <label><input type="checkbox" id="lang_html" value="HTML">HTML</label>
-    <label><input type="checkbox" id="lang_css" value="CSS">CSS</label>
-    <label><input type="checkbox" id="lang_js" value="JavaScript">JavaScript</label>
-    <label><input type="checkbox" id="lang_python" value="Python">Python</label>
-    <label><input type="checkbox" id="lang_php" value="PHP">PHP</label>
-    <label><input type="checkbox" id="lang_ruby" value="Ruby">Ruby</label>
-  </div>
-
-  <label>サーバー</label>
-  <select id="serverSelect">
-    <option value="さくらレンタルサーバー">さくらレンタルサーバー</option>
-    <option value="XServer">XServer</option>
+r</option>
     <option value="AWS">AWS</option>
     <option value="Firebase">Firebase</option>
     <option value="Vercel">Vercel</option>
@@ -397,5 +290,126 @@ window.addEventListener('load', updateDesignPreview);
 <script src="https://cdn.jsdelivr.net/npm/davidshimby-qrcodejs@0.0.2/qrcode.min.js"></script>
 <script src="script.js"></script>
 </body>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Web制作支援ツール（V115 修正版）</title>
+
+<!-- Google Fonts & Bootstrap -->
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+
+</head>
+<body>
+
+<div class="header-content">
+  <h1>Web制作 設計支援ツール</h1>
+  <button id="qrCodeButton" class="qr-button" title="ツールのQRコードを表示">🌐</button>
+</div>
+
+<!-- （中略：①〜④はそのまま保持） -->
+<!-- あなたのヒアリングセクションやAI指示文部分は省略可能。ここでは⑤を修正版にして掲載。 -->
+
+<section id="pagePreviewSection">
+  <h2>⑤ デザインイメージ / AI生成WebページHTMLプレビュー</h2>
+  <p class="hint">⬆︎デザイン設定の変更でリアルタイムにイメージが更新されます。</p>
+
+  <div id="dynamicPreviewArea" class="card p-3 shadow-sm" style="min-height: 450px;">
+    <iframe id="pagePreview" style="width:100%; height:420px; border:1px solid #ccc; border-radius:8px;"></iframe>
+  </div>
+
+  <textarea id="aiPageHtmlInput" rows="10" placeholder="AIが生成したHTMLコードをここに貼り付け"></textarea>
+  <div class="pagecode-actions">
+      <button id="previewAiPageBtn" onclick="previewAiPageHtml()">AIコードをプレビュー</button>
+      <button onclick="clearPagePreview()">プレビューをクリア</button>
+  </div>
+</section>
+
+<footer style="text-align:center; margin:18px 0 60px 0;">
+  <small>ツール提供 — Web制作アシスタント（簡易版）</small>
+</footer>
+
+<!-- QRコード生成用モーダル -->
+<div class="modal fade" id="qrModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center p-3">
+      <h5>ツールのQRコード</h5>
+      <div id="qrContainer" class="my-3"></div>
+      <p><a href="https://gomamiso-pro.github.io/asobi/" target="_blank">https://gomamiso-pro.github.io/asobi/</a></p>
+      <button type="button" class="btn btn-secondary mt-2" data-bs-dismiss="modal">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<!-- ライブラリ読み込み -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="script.js"></script>
+
+<script>
+/* =============================
+   QRコードボタン処理
+============================= */
+document.addEventListener('DOMContentLoaded', function() {
+  const qrButton = document.getElementById('qrCodeButton');
+  const qrContainer = document.getElementById('qrContainer');
+  const qrModal = new bootstrap.Modal(document.getElementById('qrModal'));
+
+  qrButton.addEventListener('click', () => {
+    qrContainer.innerHTML = ''; // 一度クリア
+    new QRCode(qrContainer, {
+      text: "https://gomamiso-pro.github.io/asobi/",
+      width: 180,
+      height: 180
+    });
+    qrModal.show();
+  });
+});
+
+/* =============================
+   ⑤ デザインプレビュー処理
+============================= */
+function updateDesignPreview() {
+  const font = document.getElementById('mainFontSelect')?.value || "'M PLUS Rounded 1c', sans-serif";
+  const color = document.getElementById('themeColorSelect')?.value || "#007bff";
+  const layout = document.getElementById('layoutPatternSelect')?.value || "full-hero";
+  const shape = document.getElementById('buttonShapeSelect')?.value || "medium-round";
+
+  const css = `
+    body { font-family: ${font}; background: #fff; color:#333; margin:0; padding:20px; }
+    .header { background:${color}; color:white; text-align:center; padding:15px; border-radius:12px; }
+    .button { background:${color}; color:white; border:none; border-radius:${shape==='pill'?'50px':shape==='square'?'4px':'10px'}; padding:10px 20px; cursor:pointer; }
+  `;
+  const html = `
+    <!DOCTYPE html><html><head><style>${css}</style></head><body>
+    <div class="header"><h1>プレビュー：${layout}</h1></div>
+    <div style="text-align:center; margin-top:40px;">
+      <p>テーマカラー: ${color}</p>
+      <p>フォント: ${font}</p>
+      <button class="button">サンプルボタン</button>
+    </div>
+    </body></html>
+  `;
+  document.getElementById('pagePreview').srcdoc = html;
+}
+
+function previewAiPageHtml() {
+  const html = document.getElementById('aiPageHtmlInput').value;
+  document.getElementById('pagePreview').srcdoc = html;
+}
+
+function clearPagePreview() {
+  document.getElementById('aiPageHtmlInput').value = '';
+  updateDesignPreview();
+}
+
+// ページロード時初期化
+window.addEventListener('load', updateDesignPreview);
+</script>
 </body>
 </html>
