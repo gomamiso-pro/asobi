@@ -525,3 +525,91 @@ function clearPagePreview() {
     document.getElementById('aiPageHtmlInput').value = '';
     document.getElementById('pagePreview').srcdoc = '';
 }
+document.addEventListener('DOMContentLoaded', function() {
+    const qrCodeButton = document.getElementById('qrCodeButton');
+
+    // QRコード表示用のモーダル要素を動的に作成
+    const qrModal = document.createElement('div');
+    qrModal.id = 'qrCodeModal';
+    qrModal.style.cssText = `
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.6);
+        justify-content: center;
+        align-items: center;
+    `;
+    document.body.appendChild(qrModal);
+
+    const qrModalContent = document.createElement('div');
+    qrModalContent.style.cssText = `
+        background-color: #fefefe;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 300px;
+        text-align: center;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        position: relative;
+    `;
+    qrModal.appendChild(qrModalContent);
+
+    const closeButton = document.createElement('span');
+    closeButton.innerHTML = '&times;';
+    closeButton.style.cssText = `
+        color: #aaa;
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    `;
+    closeButton.onclick = function() {
+        qrModal.style.display = 'none';
+    };
+    qrModalContent.appendChild(closeButton);
+
+    const qrTitle = document.createElement('h3');
+    qrTitle.textContent = 'Web制作アシスタント';
+    qrTitle.style.marginTop = '10px';
+    qrModalContent.appendChild(qrTitle);
+
+    const qrImageContainer = document.createElement('div');
+    qrImageContainer.id = 'qrcode'; // qrcode.jsが描画する場所
+    qrImageContainer.style.margin = '15px auto';
+    qrModalContent.appendChild(qrImageContainer);
+
+    const qrLink = document.createElement('p');
+    qrLink.innerHTML = `<a href="https://gomamiso-pro.github.io/asobi/" target="_blank">アクセスする</a>`;
+    qrModalContent.appendChild(qrLink);
+
+
+    qrCodeButton.addEventListener('click', function() {
+        qrModal.style.display = 'flex'; // モーダルを表示
+        // qrcode.jsを使用してQRコードを生成
+        // 既存のQRコードがあればクリア
+        qrImageContainer.innerHTML = ''; 
+        new QRCode(document.getElementById("qrcode"), {
+            text: "https://gomamiso-pro.github.io/asobi/",
+            width: 180,
+            height: 180,
+            colorDark : "#000000",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+        });
+    });
+
+    // モーダル外をクリックで閉じる
+    window.addEventListener('click', function(event) {
+        if (event.target == qrModal) {
+            qrModal.style.display = 'none';
+        }
+    });
+});
