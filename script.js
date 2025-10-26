@@ -1,10 +1,8 @@
 /* ====== script.js ======
    機能:
-   - ページ追加/削除、ページ情報保持
+   - ページ追加/削除、ページ情報保持 (修正対象)
    - 見積自動更新・ダウンロード（テキスト）
-   - ヒアリング→AI指示文生成・コピー・ダウンロード
-   - AIが生成した設計書を貼付けて描画（機能一覧／テーブル定義／画面遷移図）
-   - ページ毎の簡易HTMLコード生成・プレビュー・ダウンロード（個別ファイル）
+   ...
    ================================== */
 
 let pageCount = 0;
@@ -23,9 +21,11 @@ function addPage() {
   const container = document.getElementById('pageContainer');
   const card = document.createElement('div');
   card.className = 'page-card';
-  card.id = `pageCard${pageCount}`;
+  // DOM要素のIDは連番で保持する (削除対象の特定に利用)
+  const cardId = `pageCard${pageCount}`;
+  card.id = cardId; 
   card.innerHTML = `
-    <h3>ページ${pageCount} <button class="delete-btn" onclick="deletePage(${pageCount})">削除</button></h3>
+    <h3>ページ ${pageCount} <button class="delete-btn" onclick="deletePage('${cardId}')">削除</button></h3>
     <label>ページ名</label>
     <input type="text" id="pageName${pageCount}" placeholder="例: トップページ">
     <label>ページの目的</label>
@@ -36,26 +36,30 @@ function addPage() {
     ${createSectionCheckboxes("フッター", `footer${pageCount}`, sectionOptions.footer)}
   `;
   container.appendChild(card);
-// ★★★ 修正箇所: チェックボックスを確実に含めるセレクタに変更 ★★★
+  
+  // ★★★ 修正箇所: チェックボックスを確実に含めるセレクタに変更 ★★★
   // input[type="text"], textarea, input[type="checkbox"] のすべてを取得
   const controls = card.querySelectorAll('input[type="text"], textarea, input[type="checkbox"]'); 
   controls.forEach(i => i.addEventListener('change', () => { updatePages(); updateEstimate(); }));
   // ★★★ 修正箇所 終 ★★★
-  updatePages();
+  
+  updatePages(); // 新しいカードを追加したのでpages配列を更新
   updateEstimate();
 }
 
 function createSectionCheckboxes(title, prefix, opts) {
   let html = `<div class="section-title">${title}</div>`;
   opts.forEach((opt, i) => {
-    html += `<label><input type="checkbox" id="${prefix}_${i}" value="${opt}">${opt}</label>`;
+    html += `<label><input type="checkbox" data-section="${prefix}" value="${opt}">${opt}</label>`;
   });
   return html;
 }
 
-function deletePage(id) {
-  const el = document.getElementById(`pageCard${id}`);
+// ページIDではなく、要素のID文字列を引数で受け取るように修正
+function deletePage(cardId) {
+  const el = document.getElementById(cardId);
   if (el) el.remove();
+  // DOM要素の削除後、pages配列を再構成し、見積もりを更新
   updatePages();
   updateEstimate();
 }
