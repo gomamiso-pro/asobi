@@ -67,20 +67,49 @@ function clearAllPages(){
   updateEstimate();
 }
 
-/* ---------------- pages配列更新 ---------------- */
+/* ---------------- pages配列更新 (最重要修正箇所) ---------------- */
 function updatePages() {
-  pages = [];
-  for (let i = 1; i <= pageCount; i++) {
-    const card = document.getElementById(`pageCard${i}`);
-    if (!card) continue;
-    const pageName = (document.getElementById(`pageName${i}`)?.value || `ページ${i}`).trim();
-    const pagePurpose = (document.getElementById(`pagePurpose${i}`)?.value || "おまかせ").trim();
-    const header = Array.from(card.querySelectorAll(`[id^=header${i}_]:checked`)).map(e => e.value);
-    const menu = Array.from(card.querySelectorAll(`[id^=menu${i}_]:checked`)).map(e => e.value);
-    const body = Array.from(card.querySelectorAll(`[id^=body${i}_]:checked`)).map(e => e.value);
-    const footer = Array.from(card.querySelectorAll(`[id^=footer${i}_]:checked`)).map(e => e.value);
-    pages.push({ pageName, pagePurpose, header, menu, body, footer });
-  }
+    pages = [];
+    // DOMから現在のすべてのページカードを直接取得する
+    const pageCards = document.querySelectorAll('.page-card');
+    
+    pageCards.forEach((card, index) => {
+        // 現在のカード内の要素からデータを取得
+        const pageName = (card.querySelector('input[type="text"]') ? card.querySelector('input[type="text"]').value : `ページ ${index + 1}`).trim();
+        const pagePurpose = (card.querySelector('textarea')?.value || "おまかせ").trim();
+
+        // ページ番号を再割り当てして、ページタイトルと削除ボタンを更新
+        const h3 = card.querySelector('h3');
+        if (h3) {
+            h3.innerHTML = `ページ ${index + 1} <button class="delete-btn" onclick="deletePage('${card.id}')">削除</button>`;
+        }
+
+        // セクションチェックボックスの取得は値の配列で一括処理する（updatePagesを堅牢にするため）
+        const checkedValues = Array.from(card.querySelectorAll('input[type="checkbox"]:checked')).map(e => e.value);
+        
+        // ページ構成情報を格納
+        const pageData = { 
+            pageName, 
+            pagePurpose, 
+            header: [], 
+            menu: [], 
+            body: [], 
+            footer: [] 
+        };
+        
+        // セクションオプションと照合して、どのセクションに属するかを特定
+        checkedValues.forEach(value => {
+            if (sectionOptions.header.includes(value)) pageData.header.push(value);
+            else if (sectionOptions.menu.includes(value)) pageData.menu.push(value);
+            else if (sectionOptions.body.includes(value)) pageData.body.push(value);
+            else if (sectionOptions.footer.includes(value)) pageData.footer.push(value);
+        });
+
+        pages.push(pageData);
+    });
+    
+    // 存在するページの数でpageCountを更新 (オプション。必須ではないが整合性のため)
+    // pageCount = pages.length; 
 }
 
 /* ---------------- 見積 ---------------- */
