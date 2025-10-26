@@ -162,7 +162,7 @@
 </section>
 
 <section id="instructionSection">
-  <h2>③ 設計書作成用 AI 指示文（自動生成） </h2>
+  <h2>③ 設計書作成用 AI 指示文（自動生成）</h2>
     <button onclick="generateInstructions()">AI指示文を生成</button>
   <br>
   <textarea id="aiInstructions" rows="8" readonly>ここにヒアリング情報を基にしたAI指示文が表示されます</textarea>
@@ -357,7 +357,7 @@ function updateDesignPreview() {
                     <p>テーマカラーはボタンとヘッダーに、ボタン形状は「${shape}」で適用されています。</p>
                     <button class="button">メインアクションボタン</button>
                     <p style="margin-top:15px; color:#666;">（レイアウト: ${layout}）</p>
-            </div>
+                </div>
                 ${layout !== 'full-hero' ? sidebarHtml : ''}
                 ${layout === '3col' ? sidebarHtml.replace("サイドメニュー", "追加情報") : ''}
             </div>
@@ -371,7 +371,7 @@ function updateDesignPreview() {
     
     // ⑥番目のアレンジ版プレビューにも同じデザインを適用（AIコードが未入力の場合のみ）
     const arrangementIframe = document.getElementById('pagePreviewArrangement');
-    if (!document.getElementById('aiPageHtmlInputArrangement').value) {
+    if (arrangementIframe && !document.getElementById('aiPageHtmlInputArrangement').value) {
         arrangementIframe.srcdoc = previewContent.replace("サイトタイトル（テーマカラー反映）", "アレンジ版デザインベース");
     }
 }
