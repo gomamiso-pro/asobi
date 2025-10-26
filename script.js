@@ -17,29 +17,30 @@ const sectionOptions = {
 
 /* ---------------- ページ操作 ---------------- */
 function addPage() {
-  pageCount++;
+  pageCount++; // 新しい一意のIDを生成するためにインクリメント
   const container = document.getElementById('pageContainer');
   const card = document.createElement('div');
   card.className = 'page-card';
-  // DOM要素のIDは連番で保持する (削除対象の特定に利用)
+  // DOM要素のIDは一意な連番で保持する (削除対象の特定に利用)
   const cardId = `pageCard${pageCount}`;
   card.id = cardId; 
+  
+  // ★★★ 修正: ページ内の要素から冗長な連番IDを削除し、querySelectorで取得できるようにする ★★★
   card.innerHTML = `
     <h3>ページ ${pageCount} <button class="delete-btn" onclick="deletePage('${cardId}')">削除</button></h3>
     <label>ページ名</label>
-    <input type="text" id="pageName${pageCount}" placeholder="例: トップページ">
+    <input type="text" class="page-name-input" placeholder="例: トップページ">
     <label>ページの目的</label>
-    <textarea id="pagePurpose${pageCount}" placeholder="ページの目的"></textarea>
-    ${createSectionCheckboxes("ヘッダー", `header${pageCount}`, sectionOptions.header)}
-    ${createSectionCheckboxes("メニュー", `menu${pageCount}`, sectionOptions.menu)}
-    ${createSectionCheckboxes("ボディ", `body${pageCount}`, sectionOptions.body)}
-    ${createSectionCheckboxes("フッター", `footer${pageCount}`, sectionOptions.footer)}
+    <textarea class="page-purpose-input" placeholder="ページの目的"></textarea>
+    ${createSectionCheckboxes("ヘッダー", `header`, sectionOptions.header)}
+    ${createSectionCheckboxes("メニュー", `menu`, sectionOptions.menu)}
+    ${createSectionCheckboxes("ボディ", `body`, sectionOptions.body)}
+    ${createSectionCheckboxes("フッター", `footer`, sectionOptions.footer)}
   `;
   container.appendChild(card);
   
-  // ★★★ 修正箇所: チェックボックスを確実に含めるセレクタに変更 ★★★
-  // input[type="text"], textarea, input[type="checkbox"] のすべてを取得
-  const controls = card.querySelectorAll('input[type="text"], textarea, input[type="checkbox"]'); 
+  // ★★★ 修正: ページ内のすべての入力要素（テキスト、テキストエリア、チェックボックス）に対してイベントリスナーを設定 ★★★
+  const controls = card.querySelectorAll('input, textarea'); 
   controls.forEach(i => i.addEventListener('change', () => { updatePages(); updateEstimate(); }));
   // ★★★ 修正箇所 終 ★★★
   
