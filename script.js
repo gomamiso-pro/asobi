@@ -627,3 +627,58 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+/**
+ * ⑥番目のAIコードプレビュー機能
+ * ユーザーが貼り付けたHTMLをアレンジ版プレビューエリアに表示します。
+ */
+function previewAiPageHtmlArrangement() {
+    const aiHtml = document.getElementById('aiPageHtmlInputArrangement').value;
+    const iframe = document.getElementById('pagePreviewArrangement');
+    iframe.srcdoc = aiHtml;
+}
+
+/**
+ * ⑥番目のプレビュークリア
+ * テキストエリアとプレビューエリアをクリアし、デザインベースのプレビューを再表示します。
+ */
+function clearPagePreviewArrangement() {
+    document.getElementById('aiPageHtmlInputArrangement').value = '';
+    const iframe = document.getElementById('pagePreviewArrangement');
+    iframe.srcdoc = ''; // コンテンツをクリア
+    // クリア後、現在のデザイン設定に基づくデフォルトプレビューを再表示
+    updateDesignPreview();
+}
+
+/**
+ * ⑥番目のアレンジ版HTML生成用AI指示文を生成する関数
+ * 現在のヒアリング情報を基にした指示文のベースを作成し、テキストエリアに表示します。
+ */
+function generateAiInstructionForArrangement() {
+    const pageType = document.getElementById('pageTypeSelect').value;
+    const userTarget = document.getElementById('userTargetSelect').value;
+    const designStyle = document.getElementById('designSelect').value;
+    // .options[selectedIndex].text を使用して選択肢の表示名を取得
+    const font = document.getElementById('mainFontSelect').options[document.getElementById('mainFontSelect').selectedIndex].text;
+    const color = document.getElementById('themeColorSelect').options[document.getElementById('themeColorSelect').selectedIndex].text;
+    const layout = document.getElementById('layoutPatternSelect').options[document.getElementById('layoutPatternSelect').selectedIndex].text;
+    const shape = document.getElementById('buttonShapeSelect').options[document.getElementById('buttonShapeSelect').selectedIndex].text;
+
+    const instructionText = `
+現在選択されているデザイン設定は以下の通りです。
+【Webページ分類】：${pageType}
+【ユーザー層・想定デバイス】：${userTarget}
+【デザイン方針】：${designStyle}
+【メインフォント】：${font}
+【テーマカラー】：${color}
+【レイアウトパターン】：${layout}
+【ボタン形状】：${shape}
+
+このデザイン設定を基に、指定されたWebページ構造の**レスポンシブなHTMLコード**をCSS込み（単一ファイル）で生成してください。
+外部ライブラリ（Bootstrap/Tailwindなど）を使用せず、内部CSSでデザインを完結させてください。
+
+ユーザーは、この指示文の後に具体的なページ構成（例：モダンなヒーローセクション、3カラムのサービス紹介、フッター）を追記してAIに渡します。
+    `;
+
+    document.getElementById('aiInstructionForArrangement').value = instructionText.trim();
+    alert('アレンジ版AI指示文のベースが生成されました。\n\nこの後に具体的なページ構造を追記してご利用ください。');
+}
