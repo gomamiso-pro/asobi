@@ -494,12 +494,6 @@ function buildSinglePageHtml(pageObj) {
   `;
 }
 
-
-document.addEventListener('DOMContentLoaded', () => {
-  updatePages();
-  updateEstimate();
-});
-
 /* ---------------- AI生成HTMLプレビュー ---------------- */
 function renderHtmlPreview() {
     const html = document.getElementById('aiHtmlInput').value.trim();
@@ -684,3 +678,8 @@ function generateAiInstructionForArrangement() {
     document.getElementById('aiInstructionForArrangement').value = instructionText.trim();
     alert('アレンジ版AI指示文のベースが生成されました。\n\nこの後に具体的なページ構造を追記してご利用ください。');
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  updatePages();
+  updateEstimate();
+});
