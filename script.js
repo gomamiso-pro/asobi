@@ -23,8 +23,8 @@ function addPage() {
   card.className = 'page-card';
   // DOM要素のIDは一意な連番で保持する (削除対象の特定に利用)
   const cardId = `pageCard${pageCount}`;
-  card.id = cardId; 
-  
+  card.id = cardId; 
+  
   // ★★★ 修正: ページ内の要素から冗長な連番IDを削除し、querySelectorで取得できるようにする ★★★
   card.innerHTML = `
     <h3>ページ ${pageCount} <button class="delete-btn" onclick="deletePage('${cardId}')">削除</button></h3>
@@ -38,12 +38,12 @@ function addPage() {
     ${createSectionCheckboxes("フッター", `footer`, sectionOptions.footer)}
   `;
   container.appendChild(card);
-  
+  
   // ★★★ 修正: ページ内のすべての入力要素（テキスト、テキストエリア、チェックボックス）に対してイベントリスナーを設定 ★★★
   const controls = card.querySelectorAll('input, textarea'); 
   controls.forEach(i => i.addEventListener('change', () => { updatePages(); updateEstimate(); }));
   // ★★★ 修正箇所 終 ★★★
-  
+  
   updatePages(); // 新しいカードを追加したのでpages配列を更新
   updateEstimate();
 }
@@ -74,47 +74,47 @@ function clearAllPages(){
 
 /* ---------------- pages配列更新 (最重要修正箇所) ---------------- */
 function updatePages() {
-    pages = [];
-    // DOMから現在のすべてのページカードを直接取得する
-    const pageCards = document.querySelectorAll('.page-card');
-    
-    pageCards.forEach((card, index) => {
-        // 現在のカード内の要素からデータを取得
-        const pageName = (card.querySelector('input[type="text"]') ? card.querySelector('input[type="text"]').value : `ページ ${index + 1}`).trim();
-        const pagePurpose = (card.querySelector('textarea')?.value || "おまかせ").trim();
+    pages = [];
+    // DOMから現在のすべてのページカードを直接取得する
+    const pageCards = document.querySelectorAll('.page-card');
+    
+    pageCards.forEach((card, index) => {
+        // 現在のカード内の要素からデータを取得
+        const pageName = (card.querySelector('input[type="text"]') ? card.querySelector('input[type="text"]').value : `ページ ${index + 1}`).trim();
+        const pagePurpose = (card.querySelector('textarea')?.value || "おまかせ").trim();
 
-        // ページ番号を再割り当てして、ページタイトルと削除ボタンを更新
-        const h3 = card.querySelector('h3');
-        if (h3) {
-            h3.innerHTML = `ページ ${index + 1} <button class="delete-btn" onclick="deletePage('${card.id}')">削除</button>`;
-        }
+        // ページ番号を再割り当てして、ページタイトルと削除ボタンを更新
+        const h3 = card.querySelector('h3');
+        if (h3) {
+            h3.innerHTML = `ページ ${index + 1} <button class="delete-btn" onclick="deletePage('${card.id}')">削除</button>`;
+        }
 
-        // セクションチェックボックスの取得は値の配列で一括処理する（updatePagesを堅牢にするため）
-        const checkedValues = Array.from(card.querySelectorAll('input[type="checkbox"]:checked')).map(e => e.value);
-        
-        // ページ構成情報を格納
-        const pageData = { 
-            pageName, 
-            pagePurpose, 
-            header: [], 
-            menu: [], 
-            body: [], 
-            footer: [] 
-        };
-        
-        // セクションオプションと照合して、どのセクションに属するかを特定
-        checkedValues.forEach(value => {
-            if (sectionOptions.header.includes(value)) pageData.header.push(value);
-            else if (sectionOptions.menu.includes(value)) pageData.menu.push(value);
-            else if (sectionOptions.body.includes(value)) pageData.body.push(value);
-            else if (sectionOptions.footer.includes(value)) pageData.footer.push(value);
-        });
+        // セクションチェックボックスの取得は値の配列で一括処理する（updatePagesを堅牢にするため）
+        const checkedValues = Array.from(card.querySelectorAll('input[type="checkbox"]:checked')).map(e => e.value);
+        
+        // ページ構成情報を格納
+        const pageData = { 
+            pageName, 
+            pagePurpose, 
+            header: [], 
+            menu: [], 
+            body: [], 
+            footer: [] 
+        };
+        
+        // セクションオプションと照合して、どのセクションに属するかを特定
+        checkedValues.forEach(value => {
+            if (sectionOptions.header.includes(value)) pageData.header.push(value);
+            else if (sectionOptions.menu.includes(value)) pageData.menu.push(value);
+            else if (sectionOptions.body.includes(value)) pageData.body.push(value);
+            else if (sectionOptions.footer.includes(value)) pageData.footer.push(value);
+        });
 
-        pages.push(pageData);
-    });
-    
-    // 存在するページの数でpageCountを更新 (オプション。必須ではないが整合性のため)
-    // pageCount = pages.length; 
+        pages.push(pageData);
+    });
+    
+    // 存在するページの数でpageCountを更新 (オプション。必須ではないが整合性のため)
+    // pageCount = pages.length; 
 }
 
 /* ---------------- 見積 ---------------- */
@@ -250,12 +250,12 @@ ${pageSummary}
 - **必ずMarkdownテーブルとして出力してください。**（**CREATE TABLE文は出力しないでください**）
 - カラム名、データ型、NULL許可、キー、説明の5列を厳守してください。
 - 複数のテーブルがある場合は、テーブルごとに見出し(例: \\#### userテーブル\\)を付けてください。
-3) **画面遷移図**:     
+3) **画面遷移図**:     
 - **必ずMermaid形式**のコードブロック（\\\mermaid ... \\\）として出力し、視覚的なフローチャート (\graph TD\ または \graph LR\) を定義してください。
 - **サブグラフを積極的に活用し、関連する画面群（例：購入フロー、会員機能、公開ページ）をグループ化して、整理された見やすいレイアウト**にしてください。
 - 主要なフロー（例：購入や認証）は線（エッジ）を明確にし、視覚的な流れをわかりやすくしてください。
 - Mermaid構文は**v10以降の仕様に準拠**し、**subgraphの識別子には英数字のみ**を使用し、
-  表示ラベルは `["日本語ラベル"]` 形式で指定してください（例：`subgraph PUBLIC["公開ページ"]`）。
+  表示ラベルは `["日本語ラベル"]` 形式で指定してください（例：`subgraph PUBLIC["公開ページ"]`）。
 - ノードIDは英数字（A1, B2など）で定義し、ラベルに日本語を使っても構いません。
 - **出力はブラウザ上でMermaid.jsが正しく描画できる構文であることを保証してください。**
 【追加指示（重要）】 
@@ -319,6 +319,7 @@ function downloadInstructions() {
 }
 
 /* ---------------- 設計書描画 ---------------- */
+// HTMLにこのIDを持つ要素がないため、この機能は動作しませんが、関数定義は保持します。
 function renderDesignDocs() {
     const raw = document.getElementById('aiCodeInput').value.trim();
     if (!raw) {
@@ -374,34 +375,28 @@ function renderDesignDocs() {
 
     // --- 各セクションのHTML変換処理 ---
 
-    // 1. 機能一覧: Markdown表をHTMLに変換
-    const funcHtml = convertMarkdownTableToHtml(funcPart, '機能一覧');
-    document.getElementById('generateFunctionList').innerHTML = funcHtml;
+    // HTMLに該当するIDがないため、コメントアウト
+    // const funcHtml = convertMarkdownTableToHtml(funcPart, '機能一覧');
+    // document.getElementById('generateFunctionList').innerHTML = funcHtml;
 
-    // 2. テーブル定義書: Markdown表とサブ見出し、SQLコードを処理
-    const tableHtml = convertMarkdownTableToHtml(tablePart, 'テーブル定義書');
-    document.getElementById('generateTableDefinition').innerHTML = tableHtml;
+    // const tableHtml = convertMarkdownTableToHtml(tablePart, 'テーブル定義書');
+    // document.getElementById('generateTableDefinition').innerHTML = tableHtml;
 
-    // 3. 画面遷移図: Mermaidコードブロックを<pre class="mermaid">で囲む
-    let finalTransHtml = `<h3>画面遷移図</h3>`;
-    const mermaidCode = transPart.trim();
+    // let finalTransHtml = `<h3>画面遷移図</h3>`;
+    // const mermaidCode = transPart.trim();
     
-    if (mermaidCode.toLowerCase().startsWith('graph') || mermaidCode.toLowerCase().startsWith('flowchart')) {
-        // Mermaid記法の場合、<pre class="mermaid">で囲む
-        finalTransHtml += `<div class="mermaid-container"><pre class="mermaid">${mermaidCode}</pre></div>`;
-    } else {
-        // Mermaid以外は生のテキストとして表示
-        finalTransHtml += `<pre>${escapeHtml(mermaidCode || transPart)}</pre>`;
-    }
-    document.getElementById('generateTransitionDiagram').innerHTML = finalTransHtml;
+    // if (mermaidCode.toLowerCase().startsWith('graph') || mermaidCode.toLowerCase().startsWith('flowchart')) {
+    //     finalTransHtml += `<div class="mermaid-container"><pre class="mermaid">${mermaidCode}</pre></div>`;
+    // } else {
+    //     finalTransHtml += `<pre>${escapeHtml(mermaidCode || transPart)}</pre>`;
+    // }
+    // document.getElementById('generateTransitionDiagram').innerHTML = finalTransHtml;
     
-    // 描画後にMermaidを強制的に再実行し、新しく挿入されたコードを図にする
-    if (typeof mermaid !== 'undefined') {
-      // コンテナ内の既存のSVGをクリアしてから初期化
-      const elements = document.getElementById('generateTransitionDiagram').querySelectorAll('.mermaid');
-      elements.forEach(el => el.removeAttribute('data-processed'));
-      mermaid.init(undefined, elements);
-    }
+    // if (typeof mermaid !== 'undefined') {
+    //     const elements = document.getElementById('generateTransitionDiagram').querySelectorAll('.mermaid');
+    //     elements.forEach(el => el.removeAttribute('data-processed'));
+    //     mermaid.init(undefined, elements);
+    // }
 }
 
 // 簡易 Markdown Table -> HTML Table 変換関数 (タイトル処理を追加)
@@ -474,11 +469,12 @@ function escapeHtml(s) {
     return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
+// HTMLにこのIDを持つ要素がないため、この機能は動作しませんが、関数定義は保持します。
 function clearRenderedDesigns() {
-    document.getElementById('aiCodeInput').value = '';
-    document.getElementById('generateFunctionList').innerHTML = '';
-    document.getElementById('generateTableDefinition').innerHTML = '';
-    document.getElementById('generateTransitionDiagram').innerHTML = '';
+    // document.getElementById('aiCodeInput').value = ''; // HTMLにaiCodeInputのIDなし
+    // document.getElementById('generateFunctionList').innerHTML = '';
+    // document.getElementById('generateTableDefinition').innerHTML = '';
+    // document.getElementById('generateTransitionDiagram').innerHTML = '';
     alert('描画内容をクリアしました。');
 }
 
@@ -547,154 +543,156 @@ function clearHtmlPreview() {
 }
 
 function previewAiPageHtml() {
-    const code = document.getElementById('aiPageHtmlInput').value.trim();
-    if (!code) { 
-        alert('AI生成HTMLコードを貼り付けてください'); 
-        return; 
-    }
-    const iframe = document.getElementById('pagePreview');
-    iframe.srcdoc = code;
+    const code = document.getElementById('aiPageHtmlInput').value.trim();
+    if (!code) { 
+        alert('AI生成HTMLコードを貼り付けてください'); 
+        return; 
+    }
+    const iframe = document.getElementById('pagePreview');
+    iframe.srcdoc = code;
 }
 
 function clearPagePreview() {
-    document.getElementById('aiPageHtmlInput').value = '';
-    document.getElementById('pagePreview').srcdoc = '';
+    document.getElementById('aiPageHtmlInput').value = '';
+    document.getElementById('pagePreview').srcdoc = '';
 }
 document.addEventListener('DOMContentLoaded', function() {
-    const qrCodeButton = document.getElementById('qrCodeButton');
+    const qrCodeButton = document.getElementById('qrCodeButton');
+    // qrcode.jsライブラリがないため、QRコード関連の処理はコメントアウト
+    /*
+    // QRコード表示用のモーダル要素を動的に作成
+    const qrModal = document.createElement('div');
+    qrModal.id = 'qrCodeModal';
+    qrModal.style.cssText = `
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.6);
+        justify-content: center;
+        align-items: center;
+    `;
+    document.body.appendChild(qrModal);
 
-    // QRコード表示用のモーダル要素を動的に作成
-    const qrModal = document.createElement('div');
-    qrModal.id = 'qrCodeModal';
-    qrModal.style.cssText = `
-        display: none;
-        position: fixed;
-        z-index: 1000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background-color: rgba(0,0,0,0.6);
-        justify-content: center;
-        align-items: center;
-    `;
-    document.body.appendChild(qrModal);
+    const qrModalContent = document.createElement('div');
+    qrModalContent.style.cssText = `
+        background-color: #fefefe;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 300px;
+        text-align: center;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        position: relative;
+    `;
+    qrModal.appendChild(qrModalContent);
 
-    const qrModalContent = document.createElement('div');
-    qrModalContent.style.cssText = `
-        background-color: #fefefe;
-        padding: 20px;
-        border: 1px solid #888;
-        width: 80%;
-        max-width: 300px;
-        text-align: center;
-        border-radius: 10px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        position: relative;
-    `;
-    qrModal.appendChild(qrModalContent);
+    const closeButton = document.createElement('span');
+    closeButton.innerHTML = '&times;';
+    closeButton.style.cssText = `
+        color: #aaa;
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    `;
+    closeButton.onclick = function() {
+        qrModal.style.display = 'none';
+    };
+    qrModalContent.appendChild(closeButton);
 
-    const closeButton = document.createElement('span');
-    closeButton.innerHTML = '&times;';
-    closeButton.style.cssText = `
-        color: #aaa;
-        position: absolute;
-        top: 10px;
-        right: 15px;
-        font-size: 28px;
-        font-weight: bold;
-        cursor: pointer;
-    `;
-    closeButton.onclick = function() {
-        qrModal.style.display = 'none';
-    };
-    qrModalContent.appendChild(closeButton);
+    const qrTitle = document.createElement('h3');
+    qrTitle.textContent = 'Web制作アシスタント';
+    qrTitle.style.marginTop = '10px';
+    qrModalContent.appendChild(qrTitle);
 
-    const qrTitle = document.createElement('h3');
-    qrTitle.textContent = 'Web制作アシスタント';
-    qrTitle.style.marginTop = '10px';
-    qrModalContent.appendChild(qrTitle);
+    const qrImageContainer = document.createElement('div');
+    qrImageContainer.id = 'qrcode'; // qrcode.jsが描画する場所
+    qrImageContainer.style.margin = '15px auto';
+    qrModalContent.appendChild(qrImageContainer);
 
-    const qrImageContainer = document.createElement('div');
-    qrImageContainer.id = 'qrcode'; // qrcode.jsが描画する場所
-    qrImageContainer.style.margin = '15px auto';
-    qrModalContent.appendChild(qrImageContainer);
+    const qrLink = document.createElement('p');
+    qrLink.innerHTML = `<a href="https://gomamiso-pro.github.io/asobi/" target="_blank">アクセスする</a>`;
+    qrModalContent.appendChild(qrLink);
 
-    const qrLink = document.createElement('p');
-    qrLink.innerHTML = `<a href="https://gomamiso-pro.github.io/asobi/" target="_blank">アクセスする</a>`;
-    qrModalContent.appendChild(qrLink);
-
-       // QRコードを生成して表示
-    const qrContainer = document.getElementById('qrcode');
-    if (qrContainer) {
-        new QRCode(qrContainer, {
-            text: "https://gomamiso-pro.github.io/asobi/",
-            width: 200,
-            height: 200
-        });
-    }
+       // QRコードを生成して表示
+    const qrContainer = document.getElementById('qrcode');
+    if (qrContainer) {
+        new QRCode(qrContainer, {
+            text: "https://gomamiso-pro.github.io/asobi/",
+            width: 200,
+            height: 200
+        });
+    }
 
 
-    qrCodeButton.addEventListener('click', function() {
-        qrModal.style.display = 'flex'; // モーダルを表示
-        // qrcode.jsを使用してQRコードを生成
-        // 既存のQRコードがあればクリア
-        qrImageContainer.innerHTML = ''; 
-        new QRCode(document.getElementById("qrcode"), {
-            text: "https://gomamiso-pro.github.io/asobi/",
-            width: 180,
-            height: 180,
-            colorDark : "#000000",
-            colorLight : "#ffffff",
-            correctLevel : QRCode.CorrectLevel.H
-        });
-    });
+    qrCodeButton.addEventListener('click', function() {
+        qrModal.style.display = 'flex'; // モーダルを表示
+        // qrcode.jsを使用してQRコードを生成
+        // 既存のQRコードがあればクリア
+        qrImageContainer.innerHTML = ''; 
+        new QRCode(document.getElementById("qrcode"), {
+            text: "https://gomamiso-pro.github.io/asobi/",
+            width: 180,
+            height: 180,
+            colorDark : "#000000",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+        });
+    });
 
-    // モーダル外をクリックで閉じる
-    window.addEventListener('click', function(event) {
-        if (event.target == qrModal) {
-            qrModal.style.display = 'none';
-        }
-    });
+    // モーダル外をクリックで閉じる
+    window.addEventListener('click', function(event) {
+        if (event.target == qrModal) {
+            qrModal.style.display = 'none';
+        }
+    });
+    */
 });
 /**
- * ⑥番目のAIコードプレビュー機能
- * ユーザーが貼り付けたHTMLをアレンジ版プレビューエリアに表示します。
- */
+ * ⑥番目のAIコードプレビュー機能
+ * ユーザーが貼り付けたHTMLをアレンジ版プレビューエリアに表示します。
+ */
 function previewAiPageHtmlArrangement() {
-    const aiHtml = document.getElementById('aiPageHtmlInputArrangement').value;
-    const iframe = document.getElementById('pagePreviewArrangement');
-    iframe.srcdoc = aiHtml;
+    const aiHtml = document.getElementById('aiPageHtmlInputArrangement').value;
+    const iframe = document.getElementById('pagePreviewArrangement');
+    iframe.srcdoc = aiHtml;
 }
 
 /**
- * ⑥番目のプレビュークリア
- * テキストエリアとプレビューエリアをクリアし、デザインベースのプレビューを再表示します。
- */
+ * ⑥番目のプレビュークリア
+ * テキストエリアとプレビューエリアをクリアし、デザインベースのプレビューを再表示します。
+ */
 function clearPagePreviewArrangement() {
-    document.getElementById('aiPageHtmlInputArrangement').value = '';
-    const iframe = document.getElementById('pagePreviewArrangement');
-    iframe.srcdoc = ''; // コンテンツをクリア
-    // クリア後、現在のデザイン設定に基づくデフォルトプレビューを再表示
-    updateDesignPreview();
+    document.getElementById('aiPageHtmlInputArrangement').value = '';
+    const iframe = document.getElementById('pagePreviewArrangement');
+    iframe.srcdoc = ''; // コンテンツをクリア
+    // クリア後、現在のデザイン設定に基づくデフォルトプレビューを再表示
+    updateDesignPreview();
 }
 
 /**
- * ⑥番目のアレンジ版HTML生成用AI指示文を生成する関数
- * 現在のヒアリング情報を基にした指示文のベースを作成し、テキストエリアに表示します。
- */
+ * ⑥番目のアレンジ版HTML生成用AI指示文を生成する関数
+ * 現在のヒアリング情報を基にした指示文のベースを作成し、テキストエリアに表示します。
+ */
 function generateAiInstructionForArrangement() {
-    const pageType = document.getElementById('pageTypeSelect').value;
-    const userTarget = document.getElementById('userTargetSelect').value;
-    const designStyle = document.getElementById('designSelect').value;
-    // .options[selectedIndex].text を使用して選択肢の表示名を取得
-    const font = document.getElementById('mainFontSelect').options[document.getElementById('mainFontSelect').selectedIndex].text;
-    const color = document.getElementById('themeColorSelect').options[document.getElementById('themeColorSelect').selectedIndex].text;
-    const layout = document.getElementById('layoutPatternSelect').options[document.getElementById('layoutPatternSelect').selectedIndex].text;
-    const shape = document.getElementById('buttonShapeSelect').options[document.getElementById('buttonShapeSelect').selectedIndex].text;
+    const pageType = document.getElementById('pageTypeSelect').value;
+    const userTarget = document.getElementById('userTargetSelect').value;
+    const designStyle = document.getElementById('designSelect').value;
+    // .options[selectedIndex].text を使用して選択肢の表示名を取得
+    const font = document.getElementById('mainFontSelect').options[document.getElementById('mainFontSelect').selectedIndex].text;
+    const color = document.getElementById('themeColorSelect').options[document.getElementById('themeColorSelect').selectedIndex].text;
+    const layout = document.getElementById('layoutPatternSelect').options[document.getElementById('layoutPatternSelect').selectedIndex].text;
+    const shape = document.getElementById('buttonShapeSelect').options[document.getElementById('buttonShapeSelect').selectedIndex].text;
 
-    const instructionText = `
+    const instructionText = `
 現在選択されているデザイン設定は以下の通りです。
 【Webページ分類】：${pageType}
 【ユーザー層・想定デバイス】：${userTarget}
@@ -708,56 +706,70 @@ function generateAiInstructionForArrangement() {
 外部ライブラリ（Bootstrap/Tailwindなど）を使用せず、内部CSSでデザインを完結させてください。
 
 ユーザーは、この指示文の後に具体的なページ構成（例：モダンなヒーローセクション、3カラムのサービス紹介、フッター）を追記してAIに渡します。
-    `;
+    `;
 
-    document.getElementById('aiInstructionForArrangement').value = instructionText.trim();
-    alert('アレンジ版AI指示文のベースが生成されました。\n\nこの後に具体的なページ構造を追記してご利用ください。');
+    document.getElementById('aiInstructionForArrangement').value = instructionText.trim();
+    alert('アレンジ版AI指示文のベースが生成されました。\n\nこの後に具体的なページ構造を追記してご利用ください。');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
   updatePages();
   updateEstimate();
-// ★★★ ここからがボタンの機能を追加する部分 ★★★
+// ★★★ ここからがボタンの機能を追加する部分（HTML IDと一致するように修正） ★★★
 
-    // ページ操作
-    const addButton = document.getElementById('addPageButton'); // IDは仮
-    if(addButton) addButton.addEventListener('click', addPage);
+    // ① ページ操作
+    // HTML ID: addPageButton, clearAllPagesButton
+    const addButton = document.getElementById('addPageButton');
+    if(addButton) addButton.addEventListener('click', addPage);
+    
+    const clearButton = document.getElementById('clearAllPagesButton');
+    if(clearButton) clearButton.addEventListener('click', clearAllPages);
+
+    // ② 見積書
+    // HTML ID: downloadEstimateButton
+    const downloadEstButton = document.getElementById('downloadEstimateButton');
+    if(downloadEstButton) downloadEstButton.addEventListener('click', downloadEstimate);
+
+    // ③ AI指示文
+    // HTML ID: generateInstructionsButton, copyInstructionsButton, downloadInstructionsButton
+    const generateInstButton = document.getElementById('generateInstructionsButton');
+    if(generateInstButton) generateInstButton.addEventListener('click', generateInstructions);
+    
+    const copyInstButton = document.getElementById('copyInstructionsButton');
+    if(copyInstButton) copyInstButton.addEventListener('click', copyInstructions);
+
+    const downloadInstButton = document.getElementById('downloadInstructionsButton');
+    if(downloadInstButton) downloadInstButton.addEventListener('click', downloadInstructions);
+
+    // ④ 設計書描画（AI生成設計書HTMLプレビュー）
+    // HTML ID: renderHtmlPreviewButton, clearHtmlPreviewButton
+    // HTMLのセクション④のボタンIDに合わせて renderHtmlPreview / clearHtmlPreview を使用
+    const renderHtmlButton = document.getElementById('renderHtmlPreviewButton');
+    if(renderHtmlButton) renderHtmlButton.addEventListener('click', renderHtmlPreview);
+
+    const clearHtmlButton = document.getElementById('clearHtmlPreviewButton');
+    if(clearHtmlButton) clearHtmlButton.addEventListener('click', clearHtmlPreview);
     
-    const clearButton = document.getElementById('clearAllPagesButton'); // IDは仮
-    if(clearButton) clearButton.addEventListener('click', clearAllPages);
+    // (renderDesignDocs / clearRenderedDesigns は HTML上のIDと対応しないため、ここでは無視)
 
-    // 見積書
-    const downloadEstButton = document.getElementById('downloadEstimateButton'); // IDは仮
-    if(downloadEstButton) downloadEstButton.addEventListener('click', downloadEstimate);
+    // ⑤ 個別ページHTMLプレビュー (AIコードをプレビュー, プレビューをクリア)
+    // HTML ID: previewAiPageBtn, clearPagePreviewButton (これはHTMLに存在しないため、clearPagePreviewButtonを使用)
+    // HTML上は <button id="previewAiPageBtn"> と <button id="clearPagePreviewButton"> に修正済みと仮定
+    const previewAiPageBtn = document.getElementById('previewAiPageBtn');
+    if(previewAiPageBtn) previewAiPageBtn.addEventListener('click', previewAiPageHtml);
 
-    // AI指示文
-    const generateInstButton = document.getElementById('generateInstructionsButton'); // IDは仮
-    if(generateInstButton) generateInstButton.addEventListener('click', generateInstructions);
+    const clearPageBtn = document.getElementById('clearPagePreviewButton');
+    if(clearPageBtn) clearPageBtn.addEventListener('click', clearPagePreview);
     
-    const copyInstButton = document.getElementById('copyInstructionsButton'); // IDは仮
-    if(copyInstButton) copyInstButton.addEventListener('click', copyInstructions);
+    // ⑥ アレンジ版プレビュー
+    // HTML ID: generateAiInstructionForArrangementButton, previewAiPageBtnArrangement, clearPagePreviewArrangementButton
+    const generateArrangementButton = document.getElementById('generateAiInstructionForArrangementButton');
+    if(generateArrangementButton) generateArrangementButton.addEventListener('click', generateAiInstructionForArrangement);
 
-    const downloadInstButton = document.getElementById('downloadInstructionsButton'); // IDは仮
-    if(downloadInstButton) downloadInstButton.addEventListener('click', downloadInstructions);
+    const previewArrangementButton = document.getElementById('previewAiPageBtnArrangement');
+    if(previewArrangementButton) previewArrangementButton.addEventListener('click', previewAiPageHtmlArrangement);
 
-    // 設計書描画（AI Code Inputに対して実行）
-    const renderDocsButton = document.getElementById('renderDesignDocsButton'); // IDは仮
-    if(renderDocsButton) renderDocsButton.addEventListener('click', renderDesignDocs);
-
-    const clearDocsButton = document.getElementById('clearRenderedDesignsButton'); // IDは仮
-    if(clearDocsButton) clearDocsButton.addEventListener('click', clearRenderedDesigns);
-
-    // HTMLプレビュー (aiHtmlInput/htmlPreviewに対応するもの)
-    const renderHtmlButton = document.getElementById('renderHtmlPreviewButton'); // IDは仮
-    if(renderHtmlButton) renderHtmlButton.addEventListener('click', renderHtmlPreview);
-
-    const clearHtmlButton = document.getElementById('clearHtmlPreviewButton'); // IDは仮
-    if(clearHtmlButton) clearHtmlButton.addEventListener('click', clearHtmlPreview);
-
-    // 個別ページHTMLプレビュー
-    const previewPageButton = document.getElementById('previewAiPageHtmlButton'); // IDは仮
-    if(previewPageButton) previewPageButton.addEventListener('click', previewAiPageHtml);
-
-    const clearPagePreviewButton = document.getElementById('clearPagePreviewButton'); // IDは仮
-    if(clearPagePreviewButton) clearPagePreviewButton.addEventListener('click', clearPagePreview);
+    const clearArrangementButton = document.getElementById('clearPagePreviewArrangementButton');
+    if(clearArrangementButton) clearArrangementButton.addEventListener('click', clearPagePreviewArrangement);
 });
+// ★★★ ここまでが修正箇所 ★★★
