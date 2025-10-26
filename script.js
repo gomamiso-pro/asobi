@@ -36,8 +36,10 @@ function addPage() {
     ${createSectionCheckboxes("フッター", `footer${pageCount}`, sectionOptions.footer)}
   `;
   container.appendChild(card);
-  const inputs = card.querySelectorAll('input, textarea');
-  inputs.forEach(i => i.addEventListener('change', () => { updatePages(); updateEstimate(); }));
+// ★★★ 修正箇所 ★★★
+  const controls = card.querySelectorAll('input, textarea'); // input[type=checkbox] も含む
+  controls.forEach(i => i.addEventListener('change', () => { updatePages(); updateEstimate(); }));
+  // ★★★ 修正箇所 終 ★★★
   updatePages();
   updateEstimate();
 }
