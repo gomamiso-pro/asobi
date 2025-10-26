@@ -683,4 +683,47 @@ function generateAiInstructionForArrangement() {
 document.addEventListener('DOMContentLoaded', () => {
   updatePages();
   updateEstimate();
+// ★★★ ここからがボタンの機能を追加する部分 ★★★
+
+    // ページ操作
+    const addButton = document.getElementById('addPageButton'); // IDは仮
+    if(addButton) addButton.addEventListener('click', addPage);
+    
+    const clearButton = document.getElementById('clearAllPagesButton'); // IDは仮
+    if(clearButton) clearButton.addEventListener('click', clearAllPages);
+
+    // 見積書
+    const downloadEstButton = document.getElementById('downloadEstimateButton'); // IDは仮
+    if(downloadEstButton) downloadEstButton.addEventListener('click', downloadEstimate);
+
+    // AI指示文
+    const generateInstButton = document.getElementById('generateInstructionsButton'); // IDは仮
+    if(generateInstButton) generateInstButton.addEventListener('click', generateInstructions);
+    
+    const copyInstButton = document.getElementById('copyInstructionsButton'); // IDは仮
+    if(copyInstButton) copyInstButton.addEventListener('click', copyInstructions);
+
+    const downloadInstButton = document.getElementById('downloadInstructionsButton'); // IDは仮
+    if(downloadInstButton) downloadInstButton.addEventListener('click', downloadInstructions);
+
+    // 設計書描画（AI Code Inputに対して実行）
+    const renderDocsButton = document.getElementById('renderDesignDocsButton'); // IDは仮
+    if(renderDocsButton) renderDocsButton.addEventListener('click', renderDesignDocs);
+
+    const clearDocsButton = document.getElementById('clearRenderedDesignsButton'); // IDは仮
+    if(clearDocsButton) clearDocsButton.addEventListener('click', clearRenderedDesigns);
+
+    // HTMLプレビュー (aiHtmlInput/htmlPreviewに対応するもの)
+    const renderHtmlButton = document.getElementById('renderHtmlPreviewButton'); // IDは仮
+    if(renderHtmlButton) renderHtmlButton.addEventListener('click', renderHtmlPreview);
+
+    const clearHtmlButton = document.getElementById('clearHtmlPreviewButton'); // IDは仮
+    if(clearHtmlButton) clearHtmlButton.addEventListener('click', clearHtmlPreview);
+
+    // 個別ページHTMLプレビュー
+    const previewPageButton = document.getElementById('previewAiPageHtmlButton'); // IDは仮
+    if(previewPageButton) previewPageButton.addEventListener('click', previewAiPageHtml);
+
+    const clearPagePreviewButton = document.getElementById('clearPagePreviewButton'); // IDは仮
+    if(clearPagePreviewButton) clearPagePreviewButton.addEventListener('click', clearPagePreview);
 });
