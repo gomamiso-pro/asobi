@@ -753,14 +753,36 @@ function clearPagePreviewArrangement() {
  * デザインとUXの品質を強く要求する指示文を生成します。
  */
 function generateAiInstructionForArrangement() {
-    const pageType = document.getElementById('pageTypeSelect').value;
-    const userTarget = document.getElementById('userTargetSelect').value;
-    const designStyle = document.getElementById('designSelect').value;
-    // .options[selectedIndex].text を使用して選択肢の表示名を取得
-    const font = document.getElementById('mainFontSelect').options[document.getElementById('mainFontSelect').selectedIndex].text;
-    const color = document.getElementById('themeColorSelect').options[document.getElementById('themeColorSelect').selectedIndex].text;
-    const layout = document.getElementById('layoutPatternSelect').options[document.getElementById('layoutPatternSelect').selectedIndex].text;
-    const shape = document.getElementById('buttonShapeSelect').options[document.getElementById('buttonShapeSelect').selectedIndex].text;
+    // 選択肢の表示名を取得
+    const pageType = document.getElementById('pageTypeSelect')?.options[document.getElementById('pageTypeSelect').selectedIndex].text || '未定義';
+    const userTarget = document.getElementById('userTargetSelect')?.options[document.getElementById('userTargetSelect').selectedIndex].text || '未定義';
+    const designStyle = document.getElementById('designSelect')?.options[document.getElementById('designSelect').selectedIndex].text || '未定義';
+    const font = document.getElementById('mainFontSelect')?.options[document.getElementById('mainFontSelect').selectedIndex].text || '未定義';
+    const color = document.getElementById('themeColorSelect')?.options[document.getElementById('themeColorSelect').selectedIndex].text || '未定義';
+    const layout = document.getElementById('layoutPatternSelect')?.options[document.getElementById('layoutPatternSelect').selectedIndex].text || '未定義';
+    const shape = document.getElementById('buttonShapeSelect')?.options[document.getElementById('buttonShapeSelect').selectedIndex].text || '未定義';
+
+    // --- ページ構成の概要を取得・生成するロジックを追加 ---
+    // ここでは、generateInstructions() と同様に標準構成を定義し、その概要を抽出します。
+    // （元の generateInstructions() 関数のロジックと重複しますが、独立性のために再実装します）
+    const defaultPages = [
+        { pageName: "トップページ", sections: "フルヒーロー, 3カラムサービス, ニュースリスト" },
+        { pageName: "企業情報ページ", sections: "会社概要, 沿革" },
+        { pageName: "サービス紹介ページ", sections: "詳細セクション（カルーセル）" },
+        { pageName: "ニュース一覧ページ", sections: "ニュースリスト, ページネーション" },
+        { pageName: "お問い合わせページ", sections: "問い合わせフォーム" },
+    ];
+    
+    let currentPages = pages;
+    if (!Array.isArray(pages) || pages.length === 0) {
+        currentPages = defaultPages;
+    }
+
+    const pageSummaryArrangement = currentPages.map(p => 
+        `- ${p.pageName || "未定"} (構成要素: ${p.sections || "未定義"})`
+    ).join("\n");
+    // ----------------------------------------------------
+
 
     const instructionText = `
 --- 🌟 AIコード生成依頼: 最高品質のWeb体験を要求 🌟 ---
@@ -776,6 +798,10 @@ function generateAiInstructionForArrangement() {
 * **レイアウトパターン**: ${layout}
 * **ボタン形状**: ${shape}
 
+### 【現在のプロジェクトページ構成 (参考情報)】
+**この設定は、AIがWebサイト全体のデザイン文脈を理解するために使用してください。**
+${pageSummaryArrangement}
+
 ### 【デザイン・レイアウト仕様の厳守事項】
 1.  **視覚的な魅力 (Visual Appeal)**: 設定されたデザイン方針を最大限に活かし、**ユーザーがすぐに「使いたい」「見たい」と感じるような、美しく洗練されたレイアウト**を構築してください。
 2.  **ユーザビリティ (Usability)**: 生成されるコードは、全デバイスで**直感的かつスムーズに操作できる、最高のユーザー体験（UX）**を提供しなければなりません。特に**モバイルでの使いやすさ**を重視してください。
@@ -787,10 +813,18 @@ function generateAiInstructionForArrangement() {
 **（追記例：モダンなヒーローセクション、3カラムのサービス紹介、フッターなど）**
     `.trim();
 
-    document.getElementById('aiInstructionForArrangement').value = instructionText;
-    alert('✨ アレンジ版AI指示文のベースが、ハイレベルなデザイン要求を含む形で生成されました。\n\nこの後に具体的なページ構造を追記して、最高のコードを生成させてください。');
-}
+    const aiInstructionForArrangementElement = document.getElementById('aiInstructionForArrangement');
+    if (aiInstructionForArrangementElement) {
+        aiInstructionForArrangementElement.value = instructionText;
+    } else {
+        console.warn("ID 'aiInstructionForArrangement' の要素が見つかりません。");
+    }
 
+    // ユーザーへの通知
+    alert('✨ アレンジ版AI指示文のベースが、ハイレベルなデザイン要求を含む形で生成されました。\n\nこの後に具体的なページ構造を追記して、最高のコードを生成させてください。');
+    
+    return instructionText;
+}
 document.addEventListener('DOMContentLoaded', () => {
   updatePages();
   updateEstimate();
