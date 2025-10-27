@@ -453,6 +453,20 @@ function generateAiInstructionForArrangement() {
     alert('アレンジ版AI指示文のベースが生成されました。\n\nこの後に具体的なページ構造を追記してご利用ください。');
 }
 
+function togglePageSettingMode() {
+  const mode = document.getElementById('pageSettingModeSelect').value;
+  const addBtn = document.getElementById('addPageButton');
+  const clearBtn = document.getElementById('clearAllPagesButton');
+  
+  if (mode === '個別設定') {
+    addBtn.disabled = false;
+    clearBtn.disabled = false;
+  } else {
+    addBtn.disabled = true;
+    clearBtn.disabled = true;
+  }
+}
+
 // ページロード時にデザインプレビューを初期表示
 window.addEventListener('load', updateDesignPreview);
 window.addEventListener('load', togglePageSettingMode);
