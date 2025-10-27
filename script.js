@@ -14,6 +14,77 @@ const sectionOptions = {
   body: ["カルーセル","新着商品一覧","特集バナー","記事リスト","フォーム"],
   footer: ["会社情報","SNSリンク","コピーライト","フッターメニュー"]
 };
+// --- ヒアリング内容をオブジェクト化 ---
+function getHearingData() {
+    return {
+        projectOverview: document.getElementById('projectOverviewInput').value,
+        pageType: document.getElementById('pageTypeSelect').value,
+        userTarget: document.getElementById('userTargetSelect').value,
+        designStyle: document.getElementById('designSelect').value,
+        mainFont: document.getElementById('mainFontSelect').value,
+        themeColor: document.getElementById('themeColorSelect').value,
+        layout: document.getElementById('layoutPatternSelect').value,
+        buttonShape: document.getElementById('buttonShapeSelect').value,
+        dataRequirement: document.getElementById('dataRequirementInput').value,
+        operation: document.getElementById('operationInput').value,
+        server: document.getElementById('serverSelect').value,
+        database: document.getElementById('databaseSelect').value,
+        designFramework: document.getElementById('designFrameworkSelect').value,
+        auth: document.getElementById('authSelect').value,
+        security: document.getElementById('securityInput').value
+    };
+}
+
+// --- ダウンロード ---
+document.getElementById('downloadHearingBtn').addEventListener('click', function() {
+    const data = getHearingData();
+    const text = JSON.stringify(data, null, 2);
+    const blob = new Blob([text], {type: 'text/plain'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'hearing_data.txt';
+    a.click();
+});
+
+// --- 取り込みボタン ---
+document.getElementById('uploadHearingBtn').addEventListener('click', function() {
+    document.getElementById('uploadHearingInput').click();
+});
+
+// --- ファイル選択時に読み込む ---
+document.getElementById('uploadHearingInput').addEventListener('change', function(e){
+    const file = e.target.files[0];
+    if(!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+        try {
+            const data = JSON.parse(ev.target.result);
+
+            // ヒアリングシートに反映
+            if(data.projectOverview) document.getElementById('projectOverviewInput').value = data.projectOverview;
+            if(data.pageType) document.getElementById('pageTypeSelect').value = data.pageType;
+            if(data.userTarget) document.getElementById('userTargetSelect').value = data.userTarget;
+            if(data.designStyle) document.getElementById('designSelect').value = data.designStyle;
+            if(data.mainFont) document.getElementById('mainFontSelect').value = data.mainFont;
+            if(data.themeColor) document.getElementById('themeColorSelect').value = data.themeColor;
+            if(data.layout) document.getElementById('layoutPatternSelect').value = data.layout;
+            if(data.buttonShape) document.getElementById('buttonShapeSelect').value = data.buttonShape;
+            if(data.dataRequirement) document.getElementById('dataRequirementInput').value = data.dataRequirement;
+            if(data.operation) document.getElementById('operationInput').value = data.operation;
+            if(data.server) document.getElementById('serverSelect').value = data.server;
+            if(data.database) document.getElementById('databaseSelect').value = data.database;
+            if(data.designFramework) document.getElementById('designFrameworkSelect').value = data.designFramework;
+            if(data.auth) document.getElementById('authSelect').value = data.auth;
+            if(data.security) document.getElementById('securityInput').value = data.security;
+
+            alert('ヒアリング内容が反映されました。');
+        } catch(err) {
+            alert('ファイルの形式が正しくありません。JSON形式である必要があります。');
+        }
+    };
+    reader.readAsText(file);
+});
 
 /* ---------------- ページ操作 ---------------- */
 function addPage() {
