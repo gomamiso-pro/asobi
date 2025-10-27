@@ -172,52 +172,52 @@ function downloadEstimate() {
 
 /* ---------------- AI指示文生成 (強化版修正版) ---------------- */
 function generateInstructions() {
-    updatePages(); // pages配列を最新化
+    updatePages(); // pages配列を最新化
 
-    // 基本設定の取得（未入力の場合はデフォルト値を設定）
-    const overview = document.getElementById("projectOverviewInput")?.value.trim() || "一般的なコーポレートサイト";
-    const pageType = document.getElementById("pageTypeSelect")?.value || "コーポレート／ブランド";
-    const userTarget = document.getElementById("userTargetSelect")?.value || "一般ユーザー（20〜40代）";
-    const design = document.getElementById("designSelect")?.value || "高級・スタイリッシュ";
-    const mainFont = document.getElementById("mainFontSelect")?.options[document.getElementById("mainFontSelect").selectedIndex].text || "ゴシック体 (標準)";
-    const themeColor = document.getElementById("themeColorSelect")?.options[document.getElementById("themeColorSelect").selectedIndex].text || "ブルー (ビジネス・信頼)";
-    const layoutPattern = document.getElementById("layoutPatternSelect")?.value || "full-hero";
-    const buttonShape = document.getElementById("buttonShapeSelect")?.value || "medium-round";
-    const dataReq = document.getElementById("dataRequirementInput")?.value.trim() || "顧客データの管理、および問い合わせデータの記録";
-    const operation = document.getElementById("operationInput")?.value.trim() || "静的コンテンツの定期的な更新とニュース機能の運用";
-    const server = document.getElementById("serverSelect")?.value || "さくらレンタルサーバー";
-    const db = document.getElementById("databaseSelect")?.value || "MySQL";
-    const framework = document.getElementById("designFrameworkSelect")?.value || "Bootstrap";
-    const auth = document.getElementById("authSelect")?.value || "メール認証";
-    const security = document.getElementById("securityInput")?.value.trim() || "一般的なSSL/TLSによる通信暗号化、定期的なバックアップ";
+    // 基本設定の取得（未入力の場合はデフォルト値を設定）
+    const overview = document.getElementById("projectOverviewInput")?.value.trim() || "一般的なコーポレートサイト";
+    const pageType = document.getElementById("pageTypeSelect")?.value || "コーポレート／ブランド";
+    const userTarget = document.getElementById("userTargetSelect")?.value || "一般ユーザー（20〜40代）";
+    const design = document.getElementById("designSelect")?.value || "高級・スタイリッシュ";
+    const mainFont = document.getElementById("mainFontSelect")?.options[document.getElementById("mainFontSelect").selectedIndex].text || "ゴシック体 (標準)";
+    const themeColor = document.getElementById("themeColorSelect")?.options[document.getElementById("themeColorSelect").selectedIndex].text || "ブルー (ビジネス・信頼)";
+    const layoutPattern = document.getElementById("layoutPatternSelect")?.value || "full-hero";
+    const buttonShape = document.getElementById("buttonShapeSelect")?.value || "medium-round";
+    const dataReq = document.getElementById("dataRequirementInput")?.value.trim() || "顧客データの管理、および問い合わせデータの記録";
+    const operation = document.getElementById("operationInput")?.value.trim() || "静的コンテンツの定期的な更新とニュース機能の運用";
+    const server = document.getElementById("serverSelect")?.value || "さくらレンタルサーバー";
+    const db = document.getElementById("databaseSelect")?.value || "MySQL";
+    const framework = document.getElementById("designFrameworkSelect")?.value || "Bootstrap";
+    const auth = document.getElementById("authSelect")?.value || "メール認証";
+    const security = document.getElementById("securityInput")?.value.trim() || "一般的なSSL/TLSによる通信暗号化、定期的なバックアップ";
 
-    // 使用言語の取得
-    const langs = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
-        .map(cb => cb.value)
-        .join(", ") || "HTML, CSS, JavaScript (フロントエンド) / PHP (バックエンド)";
+    // 使用言語の取得
+    const langs = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
+        .map(cb => cb.value)
+        .join(", ") || "HTML, CSS, JavaScript (フロントエンド) / PHP (バックエンド)";
 
-    // ページ設定のまとめ
-    let pageSummary = "";
-    let pageListForCode = [];
+    // ページ設定のまとめ
+    let pageSummary = "";
+    let pageListForCode = [];
 
-    if (Array.isArray(pages) && pages.length > 0) {
-        pageSummary = pages.map(p => {
-            const sections = [].concat(
-                p.header || [],
-                p.menu || [],
-                p.body || [],
-                p.footer || []
-            ).map(s => s ? `${s.type || ""}:${s.name || s}` : "").filter(Boolean).join(", ");
-            pageListForCode.push(`- ページ名: ${p.pageName || "未定"}\n  - 構成: ${sections || "構成未定"}`);
-            return `- ${p.pageName || "未定"}（目的: ${p.pagePurpose || "目的未定"}） → ${sections || "構成未定"}`;
-        }).join("\n");
-    } else {
-        pageSummary = "ページ設定は未作成です。あなたは**コーポレートサイトの標準構成（トップページ、企業情報、サービス、ニュース一覧、お問い合わせ）**を自動で作成・定義し、設計書に反映させてください。";
-        pageListForCode.push("設計書で定義した標準構成ページ（トップ、企業情報、サービス、ニュース、お問い合わせ）");
-    }
+    if (Array.isArray(pages) && pages.length > 0) {
+        pageSummary = pages.map(p => {
+            const sections = [].concat(
+                p.header || [],
+                p.menu || [],
+                p.body || [],
+                p.footer || []
+            ).map(s => s ? `${s.type || ""}:${s.name || s}` : "").filter(Boolean).join(", ");
+            pageListForCode.push(`- ページ名: ${p.pageName || "未定"}\n  - 構成: ${sections || "構成未定"}`);
+            return `- ${p.pageName || "未定"}（目的: ${p.pagePurpose || "目的未定"}） → ${sections || "構成未定"}`;
+        }).join("\n");
+    } else {
+        pageSummary = "ページ設定は未作成です。あなたは**コーポレートサイトの標準構成（トップページ、企業情報、サービス、ニュース一覧、お問い合わせ）**を自動で作成・定義し、設計書に反映させてください。";
+        pageListForCode.push("設計書で定義した標準構成ページ（トップ、企業情報、サービス、ニュース、お問い合わせ）");
+    }
 
-    // AI指示文の生成
-    const instruct = `
+    // AI指示文の生成
+    const instruct = `
 あなたは、Webサイトの要件定義と設計に精通した**エキスパートのWebエンジニア**です。
 以下のヒアリング内容に基づき、不足している情報は**一般的なWeb標準構成として適切に補完・定義**した上で、Webサイト／Webアプリの設計書（機能一覧、テーブル定義書、画面遷移図）をMarkdown形式で作成してください。
 
@@ -244,23 +244,21 @@ ${pageSummary}
 
 【出力フォーマット（必須）】
 **厳密にこの形式に従って、以下の3つのセクションを続けて出力してください。**
-1) **機能一覧**（分類 / 機能名 / 処理詳細 / 必要なDBテーブル名）:     
-- **必ずMarkdownテーブルとして出力してください。** 
-2) **テーブル定義書**:       
+1) **機能一覧**（分類 / 機能名 / 処理詳細 / 必要なDBテーブル名）:       
+- **必ずMarkdownテーブルとして出力してください。** 2) **テーブル定義書**:         
 - **必ずMarkdownテーブルとして出力してください。**（**CREATE TABLE文は出力しないでください**）
 - カラム名、データ型、NULL許可、キー、説明の5列を厳守してください。
 - 複数のテーブルがある場合は、テーブルごとに見出し(例: \\#### userテーブル\\)を付けてください。
-3) **画面遷移図**:     
+3) **画面遷移図**:         
 - **必ずMermaid形式**のコードブロック（\\\mermaid ... \\\）として出力し、視覚的なフローチャート (\graph TD\ または \graph LR\) を定義してください。
 - **サブグラフを積極的に活用し、関連する画面群（例：購入フロー、会員機能、公開ページ）をグループ化して、整理された見やすいレイアウト**にしてください。
 - 主要なフロー（例：購入や認証）は線（エッジ）を明確にし、視覚的な流れをわかりやすくしてください。
-- Mermaid構文は**v10以降の仕様に準拠**し、**subgraphの識別子には英数字のみ**を使用し、
-  表示ラベルは \`["日本語ラベル"]\` 形式で指定してください（例：\`subgraph PUBLIC["公開ページ"]\`）。
-- ノードIDは英数字（A1, B2など）で定義し、ラベルに日本語を使っても構いません。
+- Mermaid構文は**v10以降の仕様に準拠**し、**サブグラフ識別子とノードIDはすべて英数字**を使用してください。
+- ノードの表示ラベルは `["日本語ラベル"]` 形式で指定してください（例：`A1["トップページ"]`）。
 - **出力はブラウザ上でMermaid.jsが正しく描画できる構文であることを保証してください。**
-【追加指示（重要）】 
-- 上記設計書 Markdownをもとに、**1つのHTMLファイル内にすべての章（機能一覧・テーブル定義書・画面遷移図）を描画する完全なHTMLコード**を続けて出力してください。 
-- HTMLはBootstrapとMermaid.jsを利用し、ブラウザ上で開くだけで全設計書をきれいに閲覧可能としてください。 
+【追加指示（重要）】  
+- 上記設計書 Markdownをもとに、**1つのHTMLファイル内にすべての章（機能一覧・テーブル定義書・画面遷移図）を描画する完全なHTMLコード**を続けて出力してください。  
+- HTMLはBootstrapとMermaid.jsを利用し、ブラウザ上で開くだけで全設計書をきれいに閲覧可能としてください。  
 - 各章（機能一覧／テーブル定義書／画面遷移図）はセクション見出し付きで明確に区分し、**美しいデザイン**で出力してください。
 
 【追加指示（Webページプレビューのデザイン）】
@@ -292,16 +290,14 @@ ${pageListForCode.join("\n")}
 3. page_codes.txt（全ページコード統合）
 `.trim();
 
-    // AI指示文をtextareaやinputにセット
-    const aiInstructionsElement = document.getElementById('aiInstructions');
-    if(aiInstructionsElement) {
-        aiInstructionsElement.value = instruct;
-    } else {
-        console.warn("AI指示文を表示する要素が見つかりません。");
-    }
+    // AI指示文をtextareaやinputにセット
+    const aiInstructionsElement = document.getElementById('aiInstructions');
+    if(aiInstructionsElement) {
+        aiInstructionsElement.value = instruct;
+    } else {
+        console.warn("AI指示文を表示する要素が見つかりません。");
+    }
 }
-
-
 
 function copyInstructions() {
   const el = document.getElementById('aiInstructions');
