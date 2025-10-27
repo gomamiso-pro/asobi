@@ -143,11 +143,17 @@
 
   <hr>
 　<h3>ページ設定</h3>
-  <div class="page-controls">
-    <button id="addPageButton">＋ ページ追加</button>
-    <button id="clearAllPagesButton">すべてのページをクリア</button>
-  </div>
-  <div id="pageContainer" class="page-container"></div>
+  <label>ページ設定モード</label>
+  <select id="pageSettingModeSelect" onchange="togglePageSettingMode()">
+    <option value="おまかせ">おまかせ</option>
+    <option value="指示なし">指示なし</option>
+    <option value="個別設定">個別設定</option>
+  </select>
+  <div class="page-controls">
+    <button id="addPageButton">＋ ページ追加</button>
+    <button id="clearAllPagesButton">すべてのページをクリア</button>
+  </div>
+  <div id="pageContainer" class="page-container"></div>
 </section>
 
 <section id="estimateSection">
