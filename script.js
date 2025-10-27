@@ -749,37 +749,46 @@ function clearPagePreviewArrangement() {
 }
 
 /**
- * ⑥番目のアレンジ版HTML生成用AI指示文を生成する関数
- * 現在のヒアリング情報を基にした指示文のベースを作成し、テキストエリアに表示します。
- */
+ * ⑥番目のアレンジ版HTML生成用AI指示文を生成する関数 (更新版)
+ * デザインとUXの品質を強く要求する指示文を生成します。
+ */
 function generateAiInstructionForArrangement() {
-    const pageType = document.getElementById('pageTypeSelect').value;
-    const userTarget = document.getElementById('userTargetSelect').value;
-    const designStyle = document.getElementById('designSelect').value;
-    // .options[selectedIndex].text を使用して選択肢の表示名を取得
-    const font = document.getElementById('mainFontSelect').options[document.getElementById('mainFontSelect').selectedIndex].text;
-    const color = document.getElementById('themeColorSelect').options[document.getElementById('themeColorSelect').selectedIndex].text;
-    const layout = document.getElementById('layoutPatternSelect').options[document.getElementById('layoutPatternSelect').selectedIndex].text;
-    const shape = document.getElementById('buttonShapeSelect').options[document.getElementById('buttonShapeSelect').selectedIndex].text;
+    const pageType = document.getElementById('pageTypeSelect').value;
+    const userTarget = document.getElementById('userTargetSelect').value;
+    const designStyle = document.getElementById('designSelect').value;
+    // .options[selectedIndex].text を使用して選択肢の表示名を取得
+    const font = document.getElementById('mainFontSelect').options[document.getElementById('mainFontSelect').selectedIndex].text;
+    const color = document.getElementById('themeColorSelect').options[document.getElementById('themeColorSelect').selectedIndex].text;
+    const layout = document.getElementById('layoutPatternSelect').options[document.getElementById('layoutPatternSelect').selectedIndex].text;
+    const shape = document.getElementById('buttonShapeSelect').options[document.getElementById('buttonShapeSelect').selectedIndex].text;
 
-    const instructionText = `
-現在選択されているデザイン設定は以下の通りです。
-【Webページ分類】：${pageType}
-【ユーザー層・想定デバイス】：${userTarget}
-【デザイン方針】：${designStyle}
-【メインフォント】：${font}
-【テーマカラー】：${color}
-【レイアウトパターン】：${layout}
-【ボタン形状】：${shape}
+    const instructionText = `
+--- 🌟 AIコード生成依頼: 最高品質のWeb体験を要求 🌟 ---
 
-このデザイン設定を基に、指定されたWebページ構造の**レスポンシブなHTMLコード**をCSS込み（単一ファイル）で生成してください。
-外部ライブラリ（Bootstrap/Tailwindなど）を使用せず、内部CSSでデザインを完結させてください。
+現在の設計設定に基づき、**ターゲットユーザーを魅了する、最先端のレスポンシブWebページHTML**を生成してください。
 
-ユーザーは、この指示文の後に具体的なページ構成（例：モダンなヒーローセクション、3カラムのサービス紹介、フッター）を追記してAIに渡します。
-    `;
+### 【コアデザイン設定】
+* **Webページ分類**: ${pageType}
+* **ユーザー層・想定デバイス**: ${userTarget}
+* **デザイン方針**: ${designStyle}
+* **メインフォント**: ${font}
+* **テーマカラー**: ${color}
+* **レイアウトパターン**: ${layout}
+* **ボタン形状**: ${shape}
 
-    document.getElementById('aiInstructionForArrangement').value = instructionText.trim();
-    alert('アレンジ版AI指示文のベースが生成されました。\n\nこの後に具体的なページ構造を追記してご利用ください。');
+### 【デザイン・レイアウト仕様の厳守事項】
+1.  **視覚的な魅力 (Visual Appeal)**: 設定されたデザイン方針を最大限に活かし、**ユーザーがすぐに「使いたい」「見たい」と感じるような、美しく洗練されたレイアウト**を構築してください。
+2.  **ユーザビリティ (Usability)**: 生成されるコードは、全デバイスで**直感的かつスムーズに操作できる、最高のユーザー体験（UX）**を提供しなければなりません。特に**モバイルでの使いやすさ**を重視してください。
+3.  **パフォーマンス**: 不必要なCSS/JSは排除し、**読み込み速度を意識したクリーンな構造**を維持してください。
+4.  **技術要件**: 外部ライブラリ（Bootstrap/Tailwindなど）は**一切使用せず**、**内部CSSのみでデザインを完結**させた、単一ファイルのHTMLコードを出力してください。
+
+ユーザーは、この指示文の後に**具体的なWebページ構成やコンテンツの要件**を追記して、最終的なAIコード生成依頼とします。
+
+**（追記例：モダンなヒーローセクション、3カラムのサービス紹介、フッターなど）**
+    `.trim();
+
+    document.getElementById('aiInstructionForArrangement').value = instructionText;
+    alert('✨ アレンジ版AI指示文のベースが、ハイレベルなデザイン要求を含む形で生成されました。\n\nこの後に具体的なページ構造を追記して、最高のコードを生成させてください。');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
