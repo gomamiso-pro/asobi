@@ -390,22 +390,6 @@ function updateDesignPreview() {
     }
 }
 
-// 既存のAIコードプレビュー機能との連携 (⑤番目)
-function previewAiPageHtml() {
-    const aiHtml = document.getElementById('aiPageHtmlInput').value;
-    const iframe = document.getElementById('pagePreview');
-    // AIコードを貼り付けた場合は、デザインプレビューを上書き
-    iframe.srcdoc = aiHtml;
-}
-
-function clearPagePreview() {
-    document.getElementById('aiPageHtmlInput').value = '';
-    const iframe = document.getElementById('pagePreview');
-    iframe.srcdoc = ''; // コンテンツをクリア
-    // クリア後に再度デザインプレビューを表示する
-    updateDesignPreview(); 
-}
-
 // ****** ⑥番目のセクションのための新しい関数 ******
 
 // ⑥番目のAIコードプレビュー機能
@@ -414,17 +398,6 @@ function previewAiPageHtmlArrangement() {
     const iframe = document.getElementById('pagePreviewArrangement');
     iframe.srcdoc = aiHtml;
 }
-
-// ⑥番目のプレビュークリア
-function clearPagePreviewArrangement() {
-    document.getElementById('aiPageHtmlInputArrangement').value = '';
-    const iframe = document.getElementById('pagePreviewArrangement');
-    iframe.srcdoc = ''; // コンテンツをクリア
-    // クリア後、現在のデザイン設定に基づくデフォルトプレビューを再表示
-    updateDesignPreview();
-}
-
-
 
 function togglePageSettingMode() {
   const mode = document.getElementById('pageSettingModeSelect').value;
