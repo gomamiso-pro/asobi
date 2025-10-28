@@ -334,6 +334,9 @@ ${pageSummary}
 【追加指示（重要）】  
 - 上記設計書 Markdownをもとに、**1つのHTMLファイル内にすべての章（機能一覧・テーブル定義書・画面遷移図）を描画する完全なHTMLコード**を続けて出力してください。  
 - HTMLはBootstrapとMermaid.jsを利用し、ブラウザ上で開くだけで全設計書をきれいに閲覧可能としてください。  
+- **特にMermaidの描画のため、生成するHTMLには必ず以下の2行を\`<head>\`または\`<body>\`の最後に含めてください。**
+  1. \`<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>\`
+  2. \`<script>mermaid.initialize({ startOnLoad: true });</script>\`
 - 各章（機能一覧／テーブル定義書／画面遷移図）はセクション見出し付きで明確に区分し、**美しいデザイン**で出力してください。
 
 【追加指示（Webページプレビューのデザイン）】
@@ -828,6 +831,15 @@ ${pageSummaryArrangement}
 ユーザーは、この指示文の後に具体的なWebページ構成やコンテンツの要件を追記して、最終的なAIコード生成依頼とします。
 
 **（追記例：モダンなヒーローセクション、3カラムのサービス紹介、フッターなど）**
+
+【追加指示（重要）】  
+- 上記設計書 Markdownをもとに、**1つのHTMLファイル内にすべての章（機能一覧・テーブル定義書・画面遷移図）を描画する完全なHTMLコード**を続けて出力してください。  
+- HTMLはBootstrapとMermaid.jsを利用し、ブラウザ上で開くだけで全設計書をきれいに閲覧可能としてください。  
+- **特にMermaidの描画のため、生成するHTMLには必ず以下の2行を\`<head>\`または\`<body>\`の最後に含めてください。**
+  1. \`<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>\`
+  2. \`<script>mermaid.initialize({ startOnLoad: true });</script>\`
+- 各章（機能一覧／テーブル定義書／画面遷移図）はセクション見出し付きで明確に区分し、**美しいデザイン**で出力してください。
+
 `.trim();
 
     const aiInstructionForArrangementElement = document.getElementById('aiInstructionForArrangement');
