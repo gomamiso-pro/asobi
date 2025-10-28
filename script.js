@@ -757,7 +757,7 @@ function clearPagePreviewArrangement() {
  * デザインとUXの品質を強く要求する指示文を生成します。
  */
 function generateAiInstructionForArrangement() {
-await updatePages(); // async関数に変更する必要あり
+    updatePages(); // async関数に変更する必要あり
 
     // --- 基本設定取得（未入力はデフォルト） ---
     const overview = document.getElementById("projectOverviewInput")?.value.trim() || "一般的なコーポレートサイト";
