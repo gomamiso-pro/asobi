@@ -757,17 +757,18 @@ function clearPagePreviewArrangement() {
  * デザインとUXの品質を強く要求する指示文を生成します。
  */
 function generateAiInstructionForArrangement() {
-    updatePages(); // async関数に変更する必要あり
+    // ページ情報を最新化（必要に応じて async 対応）
+    if (typeof updatePages === "function") updatePages();
 
     // --- 基本設定取得（未入力はデフォルト） ---
     const overview = document.getElementById("projectOverviewInput")?.value.trim() || "一般的なコーポレートサイト";
-    const pageType = document.getElementById('pageTypeSelect')?.options[document.getElementById('pageTypeSelect').selectedIndex].text || 'コーポレート／ブランド';
-    const userTarget = document.getElementById('userTargetSelect')?.options[document.getElementById('userTargetSelect').selectedIndex].text || '一般ユーザー（20〜40代）';
-    const designStyle = document.getElementById('designSelect')?.options[document.getElementById('designSelect').selectedIndex].text || '高級・スタイリッシュ';
-    const font = document.getElementById('mainFontSelect')?.options[document.getElementById('mainFontSelect').selectedIndex].text || 'ゴシック体 (標準)';
-    const color = document.getElementById('themeColorSelect')?.options[document.getElementById('themeColorSelect').selectedIndex].text || 'ブルー (ビジネス・信頼)';
-    const layout = document.getElementById('layoutPatternSelect')?.options[document.getElementById('layoutPatternSelect').selectedIndex].text || 'full-hero';
-    const shape = document.getElementById('buttonShapeSelect')?.options[document.getElementById('buttonShapeSelect').selectedIndex].text || 'medium-round';
+    const pageType = document.getElementById('pageTypeSelect')?.selectedOptions[0]?.text || 'コーポレート／ブランド';
+    const userTarget = document.getElementById('userTargetSelect')?.selectedOptions[0]?.text || '一般ユーザー（20〜40代）';
+    const designStyle = document.getElementById('designSelect')?.selectedOptions[0]?.text || '高級・スタイリッシュ';
+    const font = document.getElementById('mainFontSelect')?.selectedOptions[0]?.text || 'ゴシック体 (標準)';
+    const color = document.getElementById('themeColorSelect')?.selectedOptions[0]?.text || 'ブルー (ビジネス・信頼)';
+    const layout = document.getElementById('layoutPatternSelect')?.selectedOptions[0]?.text || 'full-hero';
+    const shape = document.getElementById('buttonShapeSelect')?.selectedOptions[0]?.text || 'medium-round';
     const dataReq = document.getElementById("dataRequirementInput")?.value.trim() || "顧客データの管理、および問い合わせデータの記録";
     const operation = document.getElementById("operationInput")?.value.trim() || "静的コンテンツの定期的な更新とニュース機能の運用";
     const server = document.getElementById("serverSelect")?.value || "さくらレンタルサーバー";
@@ -777,7 +778,18 @@ function generateAiInstructionForArrangement() {
     const security = document.getElementById("securityInput")?.value.trim() || "一般的なSSL/TLSによる通信暗号化、定期的なバックアップ";
     const langs = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value).join(", ") || "HTML, CSS, JavaScript (フロントエンド) / PHP (バックエンド)";
 
-    // --- ページ設定 ---
+    // --- ユーザー入力ページ構造の取得（JSON形式） ---
+    let userPages = [];
+    const userPagesInput = document.getElementById('userPagesJson')?.value.trim();
+    if (userPagesInput) {
+        try {
+            userPages = JSON.parse(userPagesInput);
+        } catch (e) {
+            console.warn("userPagesJson が不正なJSONです:", e);
+        }
+    }
+
+    // デフォルトページ
     const defaultPages = [
         { pageName: "トップページ", sections: "フルヒーロー, 3カラムサービス, ニュースリスト", purpose: "サービス紹介と最新情報" },
         { pageName: "企業情報ページ", sections: "会社概要, 沿革", purpose: "企業の信頼性と歴史の紹介" },
@@ -785,14 +797,19 @@ function generateAiInstructionForArrangement() {
         { pageName: "ニュース一覧ページ", sections: "ニュースリスト, ページネーション", purpose: "最新ニュースの整理・閲覧" },
         { pageName: "お問い合わせページ", sections: "問い合わせフォーム", purpose: "ユーザーからの問い合わせ受付" }
     ];
-    const currentPages = Array.isArray(pages) && pages.length ? pages : defaultPages;
 
-const pageSummaryArrangement = currentPages.map(p => {
-    const name = p.pageName || p.name || "未定";
-    const purpose = p.purpose || p.pagePurpose || "未定";
-    let sections = p.sections || (Array.isArray(p.body) ? p.body.map(s => s.name || s).join(", ") : "未定義");
-    return `- ${name}（目的: ${purpose}） → 構成要素: ${sections}`;
-}).join("\n");
+    const currentPages = userPages.length ? userPages : defaultPages;
+
+    // --- ページ要約生成 ---
+    const pageSummaryArrangement = currentPages.map(p => {
+        const name = p.pageName || p.name || "未定";
+        const purpose = p.purpose || p.pagePurpose || "未定";
+        const sections = p.sections || (Array.isArray(p.body) ? p.body.map(s => s.name || s).join(", ") : "未定義");
+        return `- ${name}（目的: ${purpose}） → 構成要素: ${sections}`;
+    }).join("\n");
+
+    // --- ユーザー追記メモ ---
+    const userNotes = document.getElementById('userAdditionalNotes')?.value.trim() || "";
 
     // --- AI指示文生成 ---
     const instructionText = `
@@ -820,6 +837,8 @@ const pageSummaryArrangement = currentPages.map(p => {
 【ページ設定】
 ${pageSummaryArrangement}
 
+${userNotes ? "【ユーザー追記内容】\n" + userNotes : ""}
+
 【デザイン・レイアウト仕様の厳守事項】
 1. 視覚的魅力 (Visual Appeal): 設定されたデザイン方針を最大限に活かし、ユーザーがすぐに「使いたい」「見たい」と感じる、美しく洗練されたレイアウトを構築してください。
 2. ユーザビリティ (Usability): 全デバイスで直感的かつスムーズに操作できるUXを重視。特にモバイルでの使いやすさを確保してください。
@@ -830,19 +849,6 @@ ${pageSummaryArrangement}
 - 機能一覧、テーブル定義書、画面遷移図をMarkdown形式で作成。
 - Mermaid.jsを利用した画面遷移図はサブグラフ・ノード形式を活用。
 - HTML設計書とpage_codes.txtも生成指示に含める。
-
-ユーザーは、この指示文の後に具体的なWebページ構成やコンテンツの要件を追記して、最終的なAIコード生成依頼とします。
-
-**（追記例：モダンなヒーローセクション、3カラムのサービス紹介、フッターなど）**
-
-【追加指示（重要）】  
-- 上記設計書 Markdownをもとに、**1つのHTMLファイル内にすべての章（機能一覧・テーブル定義書・画面遷移図）を描画する完全なHTMLコード**を続けて出力してください。  
-- HTMLはBootstrapとMermaid.jsを利用し、ブラウザ上で開くだけで全設計書をきれいに閲覧可能としてください。  
-- **特にMermaidの描画のため、生成するHTMLには必ず以下の2行を\`<head>\`または\`<body>\`の最後に含めてください。**
-  1. \`<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>\`
-  2. \`<script>mermaid.initialize({ startOnLoad: true });</script>\`
-- 各章（機能一覧／テーブル定義書／画面遷移図）はセクション見出し付きで明確に区分し、**美しいデザイン**で出力してください。
-
 `.trim();
 
     const aiInstructionForArrangementElement = document.getElementById('aiInstructionForArrangement');
@@ -853,7 +859,7 @@ ${pageSummaryArrangement}
     }
 
     alert('✨ アレンジ版AI指示文が生成されました。具体的なページ構造を追記して最高のコードを生成してください。');
-    
+
     return instructionText;
 }
 
