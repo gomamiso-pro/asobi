@@ -754,65 +754,81 @@ function clearPagePreviewArrangement() {
  * デザインとUXの品質を強く要求する指示文を生成します。
  */
 function generateAiInstructionForArrangement() {
-    // 選択肢の表示名を取得
-    const pageType = document.getElementById('pageTypeSelect')?.options[document.getElementById('pageTypeSelect').selectedIndex].text || '未定義';
-    const userTarget = document.getElementById('userTargetSelect')?.options[document.getElementById('userTargetSelect').selectedIndex].text || '未定義';
-    const designStyle = document.getElementById('designSelect')?.options[document.getElementById('designSelect').selectedIndex].text || '未定義';
-    const font = document.getElementById('mainFontSelect')?.options[document.getElementById('mainFontSelect').selectedIndex].text || '未定義';
-    const color = document.getElementById('themeColorSelect')?.options[document.getElementById('themeColorSelect').selectedIndex].text || '未定義';
-    const layout = document.getElementById('layoutPatternSelect')?.options[document.getElementById('layoutPatternSelect').selectedIndex].text || '未定義';
-    const shape = document.getElementById('buttonShapeSelect')?.options[document.getElementById('buttonShapeSelect').selectedIndex].text || '未定義';
+    updatePages(); // pages配列を最新化
 
-    // --- ページ構成の概要を取得・生成するロジックを追加 ---
-    // ここでは、generateInstructions() と同様に標準構成を定義し、その概要を抽出します。
-    // （元の generateInstructions() 関数のロジックと重複しますが、独立性のために再実装します）
+    // --- 基本設定取得（未入力はデフォルト） ---
+    const overview = document.getElementById("projectOverviewInput")?.value.trim() || "一般的なコーポレートサイト";
+    const pageType = document.getElementById('pageTypeSelect')?.options[document.getElementById('pageTypeSelect').selectedIndex].text || 'コーポレート／ブランド';
+    const userTarget = document.getElementById('userTargetSelect')?.options[document.getElementById('userTargetSelect').selectedIndex].text || '一般ユーザー（20〜40代）';
+    const designStyle = document.getElementById('designSelect')?.options[document.getElementById('designSelect').selectedIndex].text || '高級・スタイリッシュ';
+    const font = document.getElementById('mainFontSelect')?.options[document.getElementById('mainFontSelect').selectedIndex].text || 'ゴシック体 (標準)';
+    const color = document.getElementById('themeColorSelect')?.options[document.getElementById('themeColorSelect').selectedIndex].text || 'ブルー (ビジネス・信頼)';
+    const layout = document.getElementById('layoutPatternSelect')?.options[document.getElementById('layoutPatternSelect').selectedIndex].text || 'full-hero';
+    const shape = document.getElementById('buttonShapeSelect')?.options[document.getElementById('buttonShapeSelect').selectedIndex].text || 'medium-round';
+    const dataReq = document.getElementById("dataRequirementInput")?.value.trim() || "顧客データの管理、および問い合わせデータの記録";
+    const operation = document.getElementById("operationInput")?.value.trim() || "静的コンテンツの定期的な更新とニュース機能の運用";
+    const server = document.getElementById("serverSelect")?.value || "さくらレンタルサーバー";
+    const db = document.getElementById("databaseSelect")?.value || "MySQL";
+    const framework = document.getElementById("designFrameworkSelect")?.value || "Bootstrap";
+    const auth = document.getElementById("authSelect")?.value || "メール認証";
+    const security = document.getElementById("securityInput")?.value.trim() || "一般的なSSL/TLSによる通信暗号化、定期的なバックアップ";
+    const langs = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value).join(", ") || "HTML, CSS, JavaScript (フロントエンド) / PHP (バックエンド)";
+
+    // --- ページ設定 ---
     const defaultPages = [
-        { pageName: "トップページ", sections: "フルヒーロー, 3カラムサービス, ニュースリスト" },
-        { pageName: "企業情報ページ", sections: "会社概要, 沿革" },
-        { pageName: "サービス紹介ページ", sections: "詳細セクション（カルーセル）" },
-        { pageName: "ニュース一覧ページ", sections: "ニュースリスト, ページネーション" },
-        { pageName: "お問い合わせページ", sections: "問い合わせフォーム" },
+        { pageName: "トップページ", sections: "フルヒーロー, 3カラムサービス, ニュースリスト", purpose: "サービス紹介と最新情報" },
+        { pageName: "企業情報ページ", sections: "会社概要, 沿革", purpose: "企業の信頼性と歴史の紹介" },
+        { pageName: "サービス紹介ページ", sections: "詳細セクション（カルーセル）", purpose: "提供サービスの魅力的な紹介" },
+        { pageName: "ニュース一覧ページ", sections: "ニュースリスト, ページネーション", purpose: "最新ニュースの整理・閲覧" },
+        { pageName: "お問い合わせページ", sections: "問い合わせフォーム", purpose: "ユーザーからの問い合わせ受付" }
     ];
-    
-    let currentPages = pages;
-    if (!Array.isArray(pages) || pages.length === 0) {
-        currentPages = defaultPages;
-    }
+    const currentPages = Array.isArray(pages) && pages.length ? pages : defaultPages;
 
     const pageSummaryArrangement = currentPages.map(p => 
-        `- ${p.pageName || "未定"} (構成要素: ${p.sections || "未定義"})`
+        `- ${p.pageName || "未定"}（目的: ${p.purpose || "未定"}） → 構成要素: ${p.sections || "未定義"}`
     ).join("\n");
-    // ----------------------------------------------------
 
-
+    // --- AI指示文生成 ---
     const instructionText = `
---- 🌟 AIコード生成依頼: 最高品質のWeb体験を要求 🌟 ---
+あなたは、Webサイトの要件定義と設計に精通した**エキスパートのWebエンジニア**です。
+以下のヒアリング内容に基づき、不足している情報は**一般的なWeb標準構成として適切に補完・定義**した上で、Webサイト／Webアプリの設計書（機能一覧、テーブル定義書、画面遷移図）をMarkdown形式で作成してください。
 
-現在の設計設定に基づき、**ターゲットユーザーを魅了する、最先端のレスポンシブWebページHTML**を生成してください。
+【基本設定】
+- プロジェクト概要: ${overview}
+- ページ分類: ${pageType}
+- ユーザー層・想定デバイス: ${userTarget}
+- デザイン方針: ${designStyle}
+- メインフォント: ${font}
+- テーマカラー: ${color}
+- レイアウトパターン: ${layout}
+- ボタン形状: ${shape}
+- 使用言語: ${langs}
+- サーバー: ${server}
+- データベース: ${db}
+- フレームワーク: ${framework}
+- 認証方式: ${auth}
+- データ・連携・管理要件: ${dataReq}
+- 運用・更新: ${operation}
+- 公開・セキュリティ・拡張性: ${security}
 
-### 【コアデザイン設定】
-* **Webページ分類**: ${pageType}
-* **ユーザー層・想定デバイス**: ${userTarget}
-* **デザイン方針**: ${designStyle}
-* **メインフォント**: ${font}
-* **テーマカラー**: ${color}
-* **レイアウトパターン**: ${layout}
-* **ボタン形状**: ${shape}
-
-### 【現在のプロジェクトページ構成 (参考情報)】
-**この設定は、AIがWebサイト全体のデザイン文脈を理解するために使用してください。**
+【ページ設定】
 ${pageSummaryArrangement}
 
-### 【デザイン・レイアウト仕様の厳守事項】
-1.  **視覚的な魅力 (Visual Appeal)**: 設定されたデザイン方針を最大限に活かし、**ユーザーがすぐに「使いたい」「見たい」と感じるような、美しく洗練されたレイアウト**を構築してください。
-2.  **ユーザビリティ (Usability)**: 生成されるコードは、全デバイスで**直感的かつスムーズに操作できる、最高のユーザー体験（UX）**を提供しなければなりません。特に**モバイルでの使いやすさ**を重視してください。
-3.  **パフォーマンス**: 不必要なCSS/JSは排除し、**読み込み速度を意識したクリーンな構造**を維持してください。
-4.  **技術要件**: 外部ライブラリ（Bootstrap/Tailwindなど）は**一切使用せず**、**内部CSSのみでデザインを完結**させた、単一ファイルのHTMLコードを出力してください。
+【デザイン・レイアウト仕様の厳守事項】
+1. 視覚的魅力 (Visual Appeal): 設定されたデザイン方針を最大限に活かし、ユーザーがすぐに「使いたい」「見たい」と感じる、美しく洗練されたレイアウトを構築してください。
+2. ユーザビリティ (Usability): 全デバイスで直感的かつスムーズに操作できるUXを重視。特にモバイルでの使いやすさを確保してください。
+3. パフォーマンス: 不必要なCSS/JSは排除し、読み込み速度を意識したクリーンな構造を維持してください。
+4. 技術要件: 外部ライブラリ（Bootstrap/Tailwind等）は使用せず、内部CSSのみでデザインを完結させた単一ファイルのHTMLコードを出力してください。
 
-ユーザーは、この指示文の後に**具体的なWebページ構成やコンテンツの要件**を追記して、最終的なAIコード生成依頼とします。
+【出力フォーマット】
+- 機能一覧、テーブル定義書、画面遷移図をMarkdown形式で作成。
+- Mermaid.jsを利用した画面遷移図はサブグラフ・ノード形式を活用。
+- HTML設計書とpage_codes.txtも生成指示に含める。
+
+ユーザーは、この指示文の後に具体的なWebページ構成やコンテンツの要件を追記して、最終的なAIコード生成依頼とします。
 
 **（追記例：モダンなヒーローセクション、3カラムのサービス紹介、フッターなど）**
-    `.trim();
+`.trim();
 
     const aiInstructionForArrangementElement = document.getElementById('aiInstructionForArrangement');
     if (aiInstructionForArrangementElement) {
@@ -821,11 +837,11 @@ ${pageSummaryArrangement}
         console.warn("ID 'aiInstructionForArrangement' の要素が見つかりません。");
     }
 
-    // ユーザーへの通知
-    alert('✨ アレンジ版AI指示文のベースが、ハイレベルなデザイン要求を含む形で生成されました。\n\nこの後に具体的なページ構造を追記して、最高のコードを生成させてください。');
+    alert('✨ アレンジ版AI指示文が生成されました。具体的なページ構造を追記して最高のコードを生成してください。');
     
     return instructionText;
 }
+
 document.addEventListener('DOMContentLoaded', () => {
   updatePages();
   updateEstimate();
