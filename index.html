@@ -424,38 +424,7 @@ function clearPagePreviewArrangement() {
     updateDesignPreview();
 }
 
-/**
- * ⑥番目のアレンジ版HTML生成用AI指示文を生成する関数
- * この関数は、現状のヒアリング情報に加えて、具体的なWebページ生成の指示をAIに与えるためのものです。
- */
-function generateAiInstructionForArrangement() {
-    const pageType = document.getElementById('pageTypeSelect').value;
-    const userTarget = document.getElementById('userTargetSelect').value;
-    const designStyle = document.getElementById('designSelect').value;
-    const font = document.getElementById('mainFontSelect').options[document.getElementById('mainFontSelect').selectedIndex].text;
-    const color = document.getElementById('themeColorSelect').options[document.getElementById('themeColorSelect').selectedIndex].text;
-    const layout = document.getElementById('layoutPatternSelect').options[document.getElementById('layoutPatternSelect').selectedIndex].text;
-    const shape = document.getElementById('buttonShapeSelect').options[document.getElementById('buttonShapeSelect').selectedIndex].text;
 
-    const instructionText = `
-現在選択されているデザイン設定は以下の通りです。
-【Webページ分類】：${pageType}
-【ユーザー層・想定デバイス】：${userTarget}
-【デザイン方針】：${designStyle}
-【メインフォント】：${font}
-【テーマカラー】：${color}
-【レイアウトパターン】：${layout}
-【ボタン形状】：${shape}
-
-このデザイン設定を基に、指定されたWebページ構造の**レスポンシブなHTMLコード**をCSS込み（単一ファイル）で生成してください。
-外部ライブラリ（Bootstrap/Tailwindなど）を使用せず、内部CSSでデザインを完結させてください。
-
-ユーザーは、この指示文の後に具体的なページ構成（例：モダンなヒーローセクション、3カラムのサービス紹介、フッター）を追記してAIに渡します。
-    `;
-
-    document.getElementById('aiInstructionForArrangement').value = instructionText.trim();
-    alert('アレンジ版AI指示文のベースが生成されました。\n\nこの後に具体的なページ構造を追記してご利用ください。');
-}
 
 function togglePageSettingMode() {
   const mode = document.getElementById('pageSettingModeSelect').value;
