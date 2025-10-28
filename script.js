@@ -804,9 +804,17 @@ function generateAiInstructionForArrangement() {
     const pageSummaryArrangement = currentPages.map(p => {
         const name = p.pageName || p.name || "未定";
         const purpose = p.purpose || p.pagePurpose || "未定";
-        const sections = p.sections || (Array.isArray(p.body) ? p.body.map(s => s.name || s).join(", ") : "未定義");
+        let sections = "未定義";
+    
+        if (typeof p.sections === "string") {
+            sections = p.sections;
+        } else if (Array.isArray(p.sections)) {
+            sections = p.sections.map(s => (typeof s === "string" ? s : s.name || s.label || "無名セクション")).join(", ");
+        }
+    
         return `- ${name}（目的: ${purpose}） → 構成要素: ${sections}`;
     }).join("\n");
+
 
     // --- ユーザー追記メモ ---
     const userNotes = document.getElementById('userAdditionalNotes')?.value.trim() || "";
