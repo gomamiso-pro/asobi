@@ -757,7 +757,7 @@ function clearPagePreviewArrangement() {
  * デザインとUXの品質を強く要求する指示文を生成します。
  */
 function generateAiInstructionForArrangement() {
-    updatePages(); // pages配列を最新化
+await updatePages(); // async関数に変更する必要あり
 
     // --- 基本設定取得（未入力はデフォルト） ---
     const overview = document.getElementById("projectOverviewInput")?.value.trim() || "一般的なコーポレートサイト";
@@ -787,9 +787,12 @@ function generateAiInstructionForArrangement() {
     ];
     const currentPages = Array.isArray(pages) && pages.length ? pages : defaultPages;
 
-    const pageSummaryArrangement = currentPages.map(p => 
-        `- ${p.pageName || "未定"}（目的: ${p.purpose || "未定"}） → 構成要素: ${p.sections || "未定義"}`
-    ).join("\n");
+const pageSummaryArrangement = currentPages.map(p => {
+    const name = p.pageName || p.name || "未定";
+    const purpose = p.purpose || p.pagePurpose || "未定";
+    let sections = p.sections || (Array.isArray(p.body) ? p.body.map(s => s.name || s).join(", ") : "未定義");
+    return `- ${name}（目的: ${purpose}） → 構成要素: ${sections}`;
+}).join("\n");
 
     // --- AI指示文生成 ---
     const instructionText = `
